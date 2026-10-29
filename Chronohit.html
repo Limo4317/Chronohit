@@ -372,6 +372,16 @@
   .modal-actions{display:flex; flex-direction:column; gap:10px;}
   .modal-actions button{width:100%;}
 
+  .save-slot-list{display:flex; flex-direction:column; gap:10px;}
+  .save-slot{
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+    padding:12px 14px;
+  }
+  .slot-title{font-family:'Fraunces',serif; font-size:16px;}
+  .slot-meta{font-size:12px; color:var(--muted); margin-top:2px;}
+  .slot-actions{display:flex; gap:8px; flex:none;}
+
   .top-links{display:flex; justify-content:space-between; width:100%; max-width:760px; margin-bottom:6px;}
   .top-links button{background:none;border:none;color:var(--muted);font-size:13px;padding:6px 0;}
   .top-links button:hover{color:var(--accent);}
@@ -571,6 +581,94 @@ async function clearSave(){
   }catch(e){}
 }
 
+/* ============ 4 SPEICHERPLÄTZE (Zelda-artig) ============
+   Zusätzlich zum automatischen Fortsetzen-Speicherstand oben: bis zu 4
+   benannte, manuelle Spielstände. Werden separat gehalten, damit das
+   normale Fortsetzen/Autosave unverändert weiterläuft.
+*/
+const SLOT_COUNT = 4;
+const SLOT_KEY_PREFIX = "chronohit_slot_";
+let memorySlots = [null, null, null, null];   // Fallback, falls localStorage blockiert ist
+
+function slotKey(n){ return SLOT_KEY_PREFIX + n; }
+
+async function loadAllSlots(){
+  const result = [];
+  for(let n = 1; n <= SLOT_COUNT; n++){
+    let raw = null;
+    try{ raw = localStorage.getItem(slotKey(n)); }catch(e){}
+    raw = raw || memorySlots[n-1];
+    result.push(raw ? JSON.parse(raw) : null);
+  }
+  return result;
+}
+
+async function writeSlot(n, data){
+  const raw = JSON.stringify(data);
+  memorySlots[n-1] = raw;
+  try{ localStorage.setItem(slotKey(n), raw); }catch(e){ /* best effort */ }
+  slotsCache[n-1] = data;
+}
+
+async function deleteSlot(n){
+  memorySlots[n-1] = null;
+  try{ localStorage.removeItem(slotKey(n)); }catch(e){}
+  slotsCache[n-1] = null;
+}
+
+let slotsCache = [null, null, null, null];
+
+function formatSlotDate(ts){
+  try{
+    return new Date(ts).toLocaleString('de-DE', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+  }catch(e){ return ''; }
+}
+
+function openSaveSlotDialog(){
+  state.saveSlotDialogOpen = true;
+  render();
+}
+function closeSaveSlotDialog(){
+  state.saveSlotDialogOpen = false;
+  render();
+}
+async function saveToSlot(n){
+  const snapshot = JSON.parse(JSON.stringify(state));
+  snapshot.savedAt = Date.now();
+  snapshot.saveSlotDialogOpen = false;
+  await writeSlot(n, snapshot);
+  state.saveSlotDialogOpen = false;
+  render();
+}
+function loadSlot(n){
+  const data = slotsCache[n-1];
+  if(!data) return;
+  state = JSON.parse(JSON.stringify(data));
+  // Felder aus älteren Spielständen nachziehen
+  if(!state.guess) state.guess = { t:"", a:"" };
+  if(state.guessResult === undefined) state.guessResult = null;
+  if(typeof state.correctCount !== "number") state.correctCount = 0;
+  state.pendingSpend = null;
+  state.showExitDialog = false;
+  state.saveSlotDialogOpen = false;
+  state.screen = "game";
+  render();
+}
+function requestDeleteSlot(n){
+  state.confirmDeleteSlot = n;
+  render();
+}
+function cancelDeleteSlot(){
+  state.confirmDeleteSlot = null;
+  render();
+}
+async function confirmDeleteSlotNow(){
+  const n = state.confirmDeleteSlot;
+  state.confirmDeleteSlot = null;
+  if(n){ await deleteSlot(n); }
+  render();
+}
+
 /* ============ STATE ============ */
 let state = {
   screen: "menu",           // menu | game | win
@@ -592,7 +690,10 @@ let state = {
   showExitDialog: false,
   bonusClaimed: false,
   guess: { t:"", a:"" },   // aktuelle Eingabe für Titel/Interpret
-  guessResult: null        // {titleOk, artistOk, both, awarded, said:{t,a}}
+  guessResult: null,        // {titleOk, artistOk, both, awarded, said:{t,a}}
+  pendingSpend: null,        // {type:"skip"|"buy", amount} — wartet auf Bestätigung
+  saveSlotDialogOpen: false,
+  confirmDeleteSlot: null
 };
 
 /* ============ TITEL/INTERPRET-PRÜFUNG ============
@@ -732,7 +833,10 @@ function newGame(){
     showExitDialog: false,
     bonusClaimed: false,
     guess: { t:"", a:"" },
-    guessResult: null
+    guessResult: null,
+    pendingSpend: null,
+    saveSlotDialogOpen: false,
+    confirmDeleteSlot: null
   };
   drawNext();
   saveState();
@@ -854,7 +958,29 @@ function playCurrent(){
   }
 }
 
-function skipWithToken(){
+function requestSkip(){
+  if(state.tokens < 1 || !state.current) return;
+  state.pendingSpend = {type:"skip", amount:1};
+  render();
+}
+function requestBuy(){
+  if(state.tokens < 3 || !state.current) return;
+  state.pendingSpend = {type:"buy", amount:3};
+  render();
+}
+function cancelSpend(){
+  state.pendingSpend = null;
+  render();
+}
+function confirmSpend(){
+  const p = state.pendingSpend;
+  state.pendingSpend = null;
+  if(!p) return;
+  if(p.type === "skip") doSkipWithToken();
+  else if(p.type === "buy") doBuyWithTokens();
+}
+
+function doSkipWithToken(){
   if(state.tokens < 1 || !state.current) return;
   state.tokens -= 1;
   state.discard.push(state.current);
@@ -862,7 +988,7 @@ function skipWithToken(){
   render(); saveState();
 }
 
-function buyWithTokens(){
+function doBuyWithTokens(){
   if(state.tokens < 3 || !state.current) return;
   state.tokens -= 3;
   // Gekaufte Karte: garantiert korrekt, wird automatisch chronologisch einsortiert
@@ -992,7 +1118,7 @@ async function discardAndMenu(){
     settings: keepSettings,
     deck: [], discard: [], timeline: [],
     current: null, phase: "draw", pendingGap: null, lastResult: null,
-    tokens: 0, correctCount: 0, wrongCount: 0, hasSave: false, showExitDialog: false, bonusClaimed: false
+    tokens: 0, correctCount: 0, wrongCount: 0, hasSave: false, showExitDialog: false, bonusClaimed: false, pendingSpend: null, saveSlotDialogOpen: false, confirmDeleteSlot: null
   };
   render();
 }
@@ -1011,6 +1137,45 @@ function icon(name){
     play: "▶", check:"✓", cross:"✕", token:"◆"
   };
   return map[name] || "";
+}
+
+function renderSaveSlotModal(){
+  const rows = [1,2,3,4].map(n => {
+    const slot = slotsCache[n-1];
+    return `
+      <div class="save-slot">
+        <div class="slot-info">
+          <div class="slot-title">Slot ${n}</div>
+          <div class="slot-meta">${slot ? `${slot.correctCount}/${slot.settings.target} · ${formatSlotDate(slot.savedAt)}` : 'leer'}</div>
+        </div>
+        <button class="btn-primary btn-small" onclick="saveToSlot(${n})">${slot ? 'Überschreiben' : 'Speichern'}</button>
+      </div>`;
+  }).join('');
+  return `
+    <div class="modal-backdrop" onclick="if(event.target===this) closeSaveSlotDialog()">
+      <div class="modal-box">
+        <h3>In welchen Slot speichern?</h3>
+        <div class="save-slot-list">${rows}</div>
+        <div class="modal-actions" style="margin-top:14px;">
+          <button class="btn-ghost" onclick="closeSaveSlotDialog()">Abbrechen</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderDeleteSlotModal(){
+  const n = state.confirmDeleteSlot;
+  return `
+    <div class="modal-backdrop" onclick="if(event.target===this) cancelDeleteSlot()">
+      <div class="modal-box">
+        <h3>Slot ${n} löschen?</h3>
+        <p>Der Spielstand in diesem Slot geht dabei unwiderruflich verloren.</p>
+        <div class="modal-actions">
+          <button class="btn-danger" onclick="confirmDeleteSlotNow()">Ja, löschen</button>
+          <button class="btn-ghost" onclick="cancelDeleteSlot()">Abbrechen</button>
+        </div>
+      </div>
+    </div>`;
 }
 
 function renderMenu(){
@@ -1033,12 +1198,34 @@ function renderMenu(){
     </div>
 
     <div class="menu-card">
+      <h3 style="margin-bottom:14px;font-size:18px;">Spielstände</h3>
+      <div class="save-slot-list">
+        ${[1,2,3,4].map(n => {
+          const slot = slotsCache[n-1];
+          return `
+            <div class="save-slot">
+              <div class="slot-info">
+                <div class="slot-title">Slot ${n}</div>
+                <div class="slot-meta">${slot ? `${slot.correctCount}/${slot.settings.target} · ${formatSlotDate(slot.savedAt)}` : 'leer'}</div>
+              </div>
+              ${slot ? `
+                <div class="slot-actions">
+                  <button class="btn-primary btn-small" onclick="loadSlot(${n})">Laden</button>
+                  <button class="btn-danger btn-small" onclick="requestDeleteSlot(${n})">Löschen</button>
+                </div>` : ``}
+            </div>`;
+        }).join('')}
+      </div>
+      <div class="hint" style="margin-top:10px;">Während einer laufenden Runde kannst du oben rechts jederzeit in einen dieser 4 Slots speichern.</div>
+    </div>
+
+    <div class="menu-card">
       <h3 style="margin-bottom:18px;font-size:18px;">Einstellungen</h3>
       <div class="settings-grid">
 
         <div class="setting-row">
           <div>
-            <div class="label">Hitster-Tokens</div>
+            <div class="label">Chrono-Tokens</div>
             <div class="hint">Karte überspringen, kaufen oder Bonus für Titel &amp; Interpret</div>
           </div>
           <div class="switch ${s.tokens?'on':''}" onclick="toggleSetting('tokens')"><div class="knob"></div></div>
@@ -1092,15 +1279,17 @@ function renderMenu(){
         <p><strong>2. Platzieren:</strong> Ohne das Jahr zu kennen, legst du die Karte an die Stelle deiner Zeitleiste, die du für chronologisch richtig hältst.</p>
         <p><strong>3. Aufdecken:</strong> Die Karte wird umgedreht. Liegt sie richtig, bleibt sie liegen und zählt einen Punkt für deinen Sieg (die Startkarte zählt nicht). Liegt sie falsch, kommt sie auf den Ablagestapel.</p>
         ${s.tokens ? `
-        <p><strong>Hitster-Tokens (aktiv):</strong> Du startest mit 2 Tokens, maximal kannst du 5 gleichzeitig besitzen.</p>
-        <p>&bull; <strong>Song unbekannt?</strong> Wirf für 1 Token die aktuelle Karte ab und ziehe eine neue, ohne sie zu platzieren.</p>
-        <p>&bull; <strong>Karte kaufen:</strong> Für 3 Tokens wird die nächste gezogene Karte garantiert korrekt in deine Zeitleiste einsortiert — ganz ohne Rateversuch und ohne Risiko.</p>
-        <p>&bull; <strong>Bonus-Token:</strong> Bevor du aufdeckst, kannst du Titel und Interpret eintippen. Stimmt beides, gibt es einen weiteren Token. Verglichen wird großzügig: Groß-/Kleinschreibung, Akzente, Umlaut-Schreibweisen und Tippfehler werden verziehen, Zusätze wie &bdquo;feat.&ldquo; oder Klammer-Untertitel sind optional.</p>
+        <p><strong>Chrono-Tokens (aktiv):</strong> Du startest mit 2 Chrono-Tokens, maximal kannst du 5 gleichzeitig besitzen.</p>
+        <p>&bull; <strong>Song unbekannt?</strong> Wirf für 1 Chrono-Token die aktuelle Karte ab und ziehe eine neue, ohne sie zu platzieren.</p>
+        <p>&bull; <strong>Karte kaufen:</strong> Für 3 Chrono-Tokens wird die nächste gezogene Karte garantiert korrekt in deine Zeitleiste einsortiert — ganz ohne Rateversuch und ohne Risiko.</p>
+        <p>&bull; <strong>Bonus-Chrono-Token:</strong> Bevor du aufdeckst, kannst du Titel und Interpret eintippen. Stimmt beides, gibt es einen weiteren Chrono-Token. Verglichen wird großzügig: Groß-/Kleinschreibung, Akzente, Umlaut-Schreibweisen und Tippfehler werden verziehen, Zusätze wie &bdquo;feat.&ldquo; oder Klammer-Untertitel sind optional.</p>
         ` : `
-        <p>Aktiviere Hitster-Tokens im Menü, um Karten überspringen oder kaufen zu können.</p>
+        <p>Aktiviere Chrono-Tokens im Menü, um Karten überspringen oder kaufen zu können.</p>
         `}
       </div>
     </details>
+
+    ${state.confirmDeleteSlot ? renderDeleteSlotModal() : ``}
   `;
 }
 
@@ -1199,8 +1388,8 @@ function renderGame(){
             </div>
             <div class="verdict ${state.guessResult.both ? 'ok':'bad'}">
               ${state.guessResult.both
-                ? (state.guessResult.awarded ? `+1 Bonus-Token ${icon('token')}` : `Beides richtig — aber dein Token-Vorrat ist schon voll (5).`)
-                : `Kein Bonus-Token — beides muss stimmen.`}
+                ? (state.guessResult.awarded ? `+1 Bonus-Chrono-Token ${icon('token')}` : `Beides richtig — aber dein Chrono-Token-Vorrat ist schon voll (5).`)
+                : `Kein Bonus-Chrono-Token — beides muss stimmen.`}
             </div>
           </div>` : ``}
         <button class="btn-primary" onclick="nextTurn()">Nächste Karte</button>
@@ -1232,15 +1421,15 @@ function renderGame(){
           <div class="draw-caption">${state.current.id ? 'Klick auf die Schallplatte zum Abspielen.' : 'Klick auf die Schallplatte, um den Song bei Spotify zu suchen.'}</div>
           ${s.tokens ? `
           <div class="draw-actions">
-            <button class="btn-ghost btn-small" onclick="skipWithToken()" ${state.tokens<1?'disabled':''}>Song unbekannt — überspringen (1 ${icon('token')})</button>
-            <button class="btn-ghost btn-small" onclick="buyWithTokens()" ${state.tokens<3?'disabled':''}>Karte kaufen (3 ${icon('token')})</button>
+            <button class="btn-ghost btn-small" onclick="requestSkip()" ${state.tokens<1?'disabled':''}>Song unbekannt — überspringen (1 ${icon('token')})</button>
+            <button class="btn-ghost btn-small" onclick="requestBuy()" ${state.tokens<3?'disabled':''}>Karte kaufen (3 ${icon('token')})</button>
           </div>` : ``}
         ` : ``}
         ${state.phase === "placing" ? `
           <div class="draw-caption">${state.current.id ? 'Klicke auf der Zeitleiste die Stelle an, wo die Karte hin soll.' : 'Song läuft auf Spotify (neuer Tab). Klicke auf der Zeitleiste die Stelle an, wo die Karte hin soll.'}</div>
           ${s.tokens ? `
           <div class="draw-actions">
-            <button class="btn-ghost btn-small" onclick="skipWithToken()" ${state.tokens<1?'disabled':''}>Song unbekannt — überspringen (1 ${icon('token')})</button>
+            <button class="btn-ghost btn-small" onclick="requestSkip()" ${state.tokens<1?'disabled':''}>Song unbekannt — überspringen (1 ${icon('token')})</button>
           </div>` : ``}
         ` : ``}
         ${state.phase === "revealed_pending" ? `
@@ -1268,7 +1457,8 @@ function renderGame(){
     <div class="topbar">
       <div class="stat">Richtig <b>${state.correctCount} / ${s.target}</b></div>
       <div class="stat">Stapel <b>${state.deck.length}</b></div>
-      ${s.tokens ? `<div class="stat">Tokens <div class="token-dots">${tokenDots}</div></div>` : ``}
+      ${s.tokens ? `<div class="stat">Chrono <div class="token-dots">${tokenDots}</div></div>` : ``}
+      <button class="btn-ghost btn-small" onclick="openSaveSlotDialog()">💾 Speichern</button>
       <button class="btn-ghost btn-small" onclick="openExitDialog()">Zurück zum Menü</button>
     </div>
 
@@ -1291,6 +1481,24 @@ function renderGame(){
         </div>
       </div>
     ` : ``}
+
+    ${state.pendingSpend ? `
+      <div class="modal-backdrop" onclick="if(event.target===this) cancelSpend()">
+        <div class="modal-box">
+          <h3>Chrono-Tokens ausgeben?</h3>
+          <p>${state.pendingSpend.type === "buy"
+            ? "Willst du wirklich 3 Chrono-Tokens ausgeben, um diese Karte garantiert richtig einsortiert auf deine Zeitleiste zu legen?"
+            : "Willst du wirklich 1 Chrono-Token ausgeben, um diesen Song zu überspringen und eine neue Karte zu ziehen?"}</p>
+          <div class="modal-actions">
+            <button class="btn-primary" onclick="confirmSpend()">Ja, ${state.pendingSpend.amount} ${icon('token')} ausgeben</button>
+            <button class="btn-ghost" onclick="cancelSpend()">Abbrechen</button>
+          </div>
+        </div>
+      </div>
+    ` : ``}
+
+    ${state.saveSlotDialogOpen ? renderSaveSlotModal() : ``}
+    ${state.confirmDeleteSlot ? renderDeleteSlotModal() : ``}
   `;
 
   // Zur gerade relevanten Karte scrollen, falls die Zeitleiste breiter
@@ -1362,6 +1570,9 @@ async function resumeGame(){
     if(!state.guess) state.guess = { t:"", a:"" };
     if(state.guessResult === undefined) state.guessResult = null;
     if(typeof state.correctCount !== "number") state.correctCount = 0;
+    state.pendingSpend = null;
+    state.saveSlotDialogOpen = false;
+    state.confirmDeleteSlot = null;
     state.screen = "game";
     render();
   }
@@ -1369,6 +1580,7 @@ async function resumeGame(){
 
 /* ============ INIT ============ */
 (async function init(){
+  slotsCache = await loadAllSlots();
   const saved = await loadSave();
   if(saved){
     state.settings = saved.settings || state.settings;
