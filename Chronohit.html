@@ -6,7 +6,7 @@
 <title>Chronohit</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNTAwIDUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDwhLS0gw6R1w59lcmVyIFJhaG1lbnJpbmcsIG1hY2h0IGRpZSBydW5kZSBGb3JtIGVpbmRldXRpZyAtLT4KICA8Y2lyY2xlIGN4PSIyNTAiIGN5PSIyNTAiIHI9IjIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjIiIG9wYWNpdHk9IjAuMzUiLz4KCiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjUwLDI1MCkgc2NhbGUoNCkiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+CiAgICA8IS0tIFplaXRsZWlzdGUgLS0+CiAgICA8bGluZSB4MT0iLTQ0IiB5MT0iMCIgeDI9IjQ0IiB5Mj0iMCIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDxjaXJjbGUgY3g9Ii0zMiIgY3k9IjAiIHI9IjEuNyIgZmlsbD0iI2U4YTMzZCIvPgogICAgPGNpcmNsZSBjeD0iMzIiIGN5PSIwIiByPSIxLjciIGZpbGw9IiNlOGEzM2QiLz4KCiAgICA8IS0tIFZpbnlsLVJpbGxlbiAtLT4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIyMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIxNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjEiIG9wYWNpdHk9IjAuNTUiLz4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSI4LjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U4YTMzZCIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjMiLz4KCiAgICA8IS0tIFBsYXktRHJlaWVjayBpbSBaZW50cnVtIC0tPgogICAgPHBvbHlnb24gcG9pbnRzPSItNCwtNiAtNCw2IDgsMCIgZmlsbD0iI2U4YTMzZCIvPgogIDwvZz4KPC9zdmc+Cg==">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Outfit:wght@200;300;400;500;600&family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Outfit:wght@200;300;400;500;600&family=VT323&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg: #14151d;
@@ -215,8 +215,7 @@
   :root[data-theme="glass"] .card.pending{ border:1px dashed var(--accent); background-image:none; }
 
   /* ---- Theme: Norisk (angelehnt an die NoRisk-Website) ----
-     Reines Schwarz, blauer Akzent, Pixel-Überschriften (Minecraft-Look), schlanke
-     Outfit-Schrift, hauchdünne Rahmen, Listenzeilen mit Akzentbalken. */
+     Reines Schwarz, blauer Akzent, Pixel-Überschriften (Minecraft-Look), hauchdünne Rahmen, Listenzeilen mit Akzentbalken. */
   :root[data-theme="norisk"]{
     --bg: #000000;
     --bg-2: #070707;
@@ -235,8 +234,8 @@
     --line: rgba(255,255,255,0.08);
     --radius: 16px;
     --btn-radius: 8px;
-    --heading-font: 'Pixelify Sans', 'Minecraft', monospace;
-    --body-font: 'Outfit', sans-serif;
+    --heading-font: 'VT323', 'Minecraft', monospace;
+    --body-font: 'Minecraftia', sans-serif;
     --body-weight: 300;
     --panel-blur: 0px;
     --body-bg-image: radial-gradient(900px 420px at 50% -10%, rgba(79,142,255,.12), transparent 70%);
@@ -596,7 +595,19 @@
   .suggest-text{ flex:1; display:flex; flex-direction:column; gap:1px; }
   .suggest-text small{ color:var(--muted); font-size:12px; }
   .suggest-arrow{ color:var(--muted); }
-  .chip-group{ display:flex; flex-direction:column; gap:10px; }
+  .step-hint{ margin:-6px 0 18px; font-size:13px; line-height:1.5; color:var(--muted); }
+  .chip-group{ display:flex; flex-direction:column; gap:10px; padding-bottom:16px; border-bottom:1px dashed var(--line); }
+  .chip-group:last-child{ border-bottom:none; padding-bottom:0; }
+  .stage-num{
+    width:22px; height:22px; border-radius:50%; flex:none; font-size:12px; font-weight:600;
+    background:var(--accent); color:var(--accent-ink); display:flex; align-items:center; justify-content:center;
+  }
+  .stage-move{ display:flex; gap:6px; }
+  .stage-move .icon-btn{ padding:5px 10px; font-size:12px; }
+  .chip-group-sub{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .stage-after{ font-size:12px; color:var(--muted); }
+  .stage-after b{ color:var(--text); }
+  .chip.empty{ opacity:.35; }
   .chip-group-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
   .chip-quick{ display:flex; gap:6px; }
   .chip-quick .btn-small{ padding:5px 11px; font-size:12px; }
@@ -1026,7 +1037,7 @@
 /* Felder: t=Titel, a=Interpret, y=Jahr, g=Sprache, id=Spotify-Track,
    s=Genres (mehrere möglich, ein Treffer reicht), c=Kategorien (optional, mehrere möglich).
    Jahrzehnte werden automatisch aus dem Jahr abgeleitet. */
-const SONGS = [
+const SONGS_RAW = [
   {t:"Waka Waka (This Time for Africa)", a:"Shakira", y:2010, g:"es", id:"63Tl9k1sH8tznn3bqoMuyF", s:["pop", "latin"], c:["sport"]},
   {t:"Bailando", a:"Enrique Iglesias", y:2014, g:"es", id:"2r8wxDebKM8uuDsLUklMEx", s:["pop", "latin"]},
   {t:"Sofia", a:"Alvaro Soler", y:2015, g:"es", id:"5vj59ONIVbyhcrI8ZSwoRo", s:["pop", "latin"]},
@@ -1639,8 +1650,86 @@ const SONGS = [
   {t:"Layla (Acoustic Live)", a:"Eric Clapton", y:1992, g:"en", id:"0zxj7dVhYZq5ACyaDx5XIo", s:["rock", "jazz"]},
   {t:"Get Free", a:"Major Lazer, Amber of Dirty Projectors", y:2013, g:"en", id:"4p4hyqRFdoiw4EMbEsqBdA", s:["dance", "reggae"]},
   {t:"American Remains", a:"The Highwaymen", y:1990, g:"en", id:"4REjaHRPmVb7btssqChJSy", s:["country"]},
-  {t:"Woman in Love", a:"Barbra Streisand", y:1980, g:"en", id:"1pTGc8pwyo6xtgXBKCBcFn", s:["pop"], c:["ballad"]}
+  {t:"Woman in Love", a:"Barbra Streisand", y:1980, g:"en", id:"1pTGc8pwyo6xtgXBKCBcFn", s:["pop"], c:["ballad"]},
+  // --- Wieder ergänzt: Songs aus der früheren Liste (u. a. alle deutschen) ---
+  {t:"99 Luftballons", a:"Nena", y:1983, g:"de", id:"6jdhEJvstaoKKpxCHgIbUo", s:["pop"], c:["ndw"]},
+  {t:"Rock Me Amadeus", a:"Falco", y:1985, g:"de", id:"0wbdaBHi8t5e7EqXV88nka", s:["pop"]},
+  {t:"You're My Heart, You're My Soul", a:"Modern Talking", y:1984, g:"de", id:"0Zn63G0XTiqXwr1KSmARWz", s:["dance", "pop"]},
+  {t:"Männer", a:"Herbert Grönemeyer", y:1984, g:"de", id:"2PfEAFaaLabTXfmlV58LIj", s:["pop", "rock"]},
+  {t:"Sonne", a:"Rammstein", y:2001, g:"de", id:"3gVhsZtseYtY1fMuyYq06F", s:["rock"]},
+  {t:"Symphonie", a:"Silbermond", y:2005, g:"de", id:"7mOD9NFyZhC8PtW4joWDWT", s:["pop", "rock"]},
+  {t:"Durch den Monsun", a:"Tokio Hotel", y:2005, g:"de", id:"0UfJZtCHKOeDtsYqBqFTNn", s:["rock", "pop"]},
+  {t:"Dieser Weg", a:"Xavier Naidoo", y:2005, g:"de", id:"1DyfnnqGAUhvmwt3AsQFxL", s:["rnb", "pop"]},
+  {t:"Perfekte Welle", a:"Juli", y:2004, g:"de", id:"2LV5joNDrsyuXEh4FBARVK", s:["rock", "pop"]},
+  {t:"Mein Block", a:"Sido", y:2004, g:"de", id:"4T1tVhQahmAOvTF65lKq4o", s:["hiphop"]},
+  {t:"Haus am See", a:"Peter Fox", y:2008, g:"de", id:"7A4KdLy1DXOOC5fhIdDuHz", s:["hiphop", "reggae"]},
+  {t:"Auf uns", a:"Andreas Bourani", y:2014, g:"de", id:"6dXt4t5jgySnVTeTpT4C0l", s:["pop"], c:["sport"]},
+  {t:"Atemlos durch die Nacht", a:"Helene Fischer", y:2013, g:"de", id:"1cSXzDZt8vzuUp2XREQEJN", s:["schlager", "dance"]},
+  {t:"Chöre", a:"Mark Forster", y:2014, g:"de", id:"4ZPXuHp219ujq6QJ9oqteR", s:["pop"]},
+  {t:"Lieblingsmensch", a:"Namika", y:2015, g:"de", id:"6oHDvarQSp0mf5AD1SyNH0", s:["pop"]},
+  {t:"Musik sein", a:"Wincent Weiss", y:2017, g:"de", id:"00ZoztotP7jEoezTPNMjvm", s:["pop"]},
+  {t:"110", a:"Capital Bra & Samra feat. LEA", y:2019, g:"de", id:"5sdQ7VUx6GOfsRoSxnK1YG", s:["hiphop"]},
+  {t:"Roller", a:"Apache 207", y:2019, g:"de", id:"6hw1Sy9wZ8UCxYGdpKrU6M", s:["hiphop"]},
+  {t:"Smells Like Teen Spirit", a:"Nirvana", y:1991, g:"en", id:"4CeeEOM32jQcH3eN9Q2dGj", s:["rock", "indie"]},
+  {t:"bad guy", a:"Billie Eilish", y:2019, g:"en", id:"2Fxmhks0bxGSBdJ92vM42m", s:["pop", "indie"]},
+  {t:"Da Da Da", a:"Trio", y:1982, g:"de", id:"4HCdu48LScraIfJ7Ik7EhE", s:["pop"], c:["ndw"]},
+  {t:"Dickes B", a:"Seeed feat. Black Kappa", y:2001, g:"de", id:"4eRmCZWJoEtLl0wy7EJPwd", s:["reggae", "hiphop"]},
+  {t:"Denkmal", a:"Wir sind Helden", y:2003, g:"de", id:"58zHoX9U5VlSXLUUmWTfe2", s:["rock", "pop"]},
+  {t:"Vom selben Stern", a:"Ich + Ich", y:2007, g:"de", id:"4kCYJigsNQJqs6kpMSlsmL", s:["pop"], c:["ballad"]},
+  {t:"Das Beste", a:"Silbermond", y:2009, g:"de", id:"3FEhbAkm1Dy21UvhbYhFM3", s:["pop", "rock"]},
+  {t:"Freunde bleiben", a:"Revolverheld", y:2010, g:"de", id:"4bzmkrtJDog1RpvWAibK2n", s:["rock", "pop"]},
+  {t:"Hamma!", a:"Culcha Candela", y:2007, g:"de", id:"3vaBHxfz5WPBLLPt1hTUvI", s:["hiphop", "reggae"]},
+  {t:"Remmidemmi (Yippie Yippie Yeah)", a:"Deichkind", y:2012, g:"de", id:"31sD77U64ym70wYEMpnSrQ", s:["hiphop", "dance"]},
+  {t:"Lieder", a:"Adel Tawil", y:2013, g:"de", id:"2ZoO0uLQRp2WhTlyIH8PJf", s:["pop"], c:["ballad"]},
+  {t:"80 Millionen", a:"Max Giesinger", y:2015, g:"de", id:"2ladamWCFAfQbgIIdkewAx", s:["pop"]},
+  {t:"Like a Virgin", a:"Madonna", y:1984, g:"en", id:"1ZPlNanZsJSPK5h9YZZFbZ", s:["pop"]},
+  {t:"I Will Always Love You", a:"Whitney Houston", y:1992, g:"en", id:"4eHbdreAnSOrDDsFfc4Fpm", s:["pop", "rnb"], c:["film", "ballad"]},
+  {t:"All I Want for Christmas Is You", a:"Mariah Carey", y:1994, g:"en", id:"0bYg9bo50gSsH3LtXe2SQn", s:["pop", "rnb"], c:["xmas"]},
+  {t:"Say My Name", a:"Destiny's Child", y:1999, g:"en", id:"7H6ev70Weq6DdpZyyTmUXk", s:["rnb", "pop"]},
+  {t:"No Scrubs", a:"TLC", y:1999, g:"en", id:"1KGi9sZVMeszgZOWivFpxs", s:["rnb", "hiphop"]},
+  {t:"Get Busy", a:"Sean Paul", y:2002, g:"en", id:"6bK9BH9Ts8Gj5JFvnQkzak", s:["reggae"]},
+  {t:"Lose Yourself", a:"Eminem", y:2002, g:"en", id:"5Z01UMMf7V1o0MzF86s6WJ", s:["hiphop"], c:["film"]},
+  {t:"Crazy", a:"Gnarls Barkley", y:2006, g:"en", id:"0BtXtxmKBm1HwGnM3kO3rY", s:["rnb", "indie"]},
+  {t:"Teenage Dream", a:"Katy Perry", y:2010, g:"en", id:"235LXPXfi0SmOaS9TaCh3c", s:["pop"]},
+  {t:"Chandelier", a:"Sia", y:2014, g:"en", id:"4VrWlk8IQxevMvERoX08iC", s:["pop"], c:["ballad"]},
+  {t:"Cheerleader", a:"OMI", y:2014, g:"en", id:"5ByIHT8s38diBQf6dkEWbt", s:["reggae", "pop"]},
+  {t:"Sorry", a:"Justin Bieber", y:2015, g:"en", id:"09CtPGIpYB4BrO8qb1RGsF", s:["pop", "dance"]},
+  {t:"Stressed Out", a:"Twenty One Pilots", y:2015, g:"en", id:"3CRDbSIZ4r5MsZ0YwxuEkn", s:["indie", "hiphop"]},
+  {t:"Work", a:"Rihanna ft. Drake", y:2016, g:"en", id:"72TFWvU3wUYdUuxejTTIzt", s:["reggae", "pop"]},
+  {t:"Havana", a:"Camila Cabello ft. Young Thug", y:2017, g:"en", id:"1rfofaqEpACxVEHIZBJe6W", s:["pop", "latin"]},
+  {t:"Sunflower", a:"Post Malone & Swae Lee", y:2018, g:"en", id:"3KkXRkHbMCARz0aVfEt68P", s:["hiphop", "pop"], c:["film"]},
+  {t:"Old Town Road", a:"Lil Nas X", y:2019, g:"en", id:"0F7FA14euOIX8KcbEturGH", s:["country", "hiphop"]},
+  {t:"Heat Waves", a:"Glass Animals", y:2020, g:"en", id:"3USxtqRwSYz57Ewm6wWRMp", s:["indie", "pop"]},
+  {t:"drivers license", a:"Olivia Rodrigo", y:2021, g:"en", id:"4ml4WlnHDEpOK8HRVYTCWf", s:["pop"], c:["ballad"]},
+  {t:"Flowers", a:"Miley Cyrus", y:2023, g:"en", id:"7DSAEUvxU8FajXtRloy8M0", s:["pop"]},
+  {t:"Komet", a:"Udo Lindenberg ft. Apache 207", y:2023, g:"de", id:"7oQepKHmXDaPC3rgeLRvQu", s:["pop", "hiphop"]},
+  {t:"Wildberry Lillet", a:"Nina Chuba", y:2022, g:"de", id:"6yeZM8gyykjaf8w0GqRfK4", s:["hiphop", "pop"]},
+  {t:"NINA", a:"Nina Chuba", y:2024, g:"de", id:"0j4WzFni16kp0YquOHOwL8", s:["hiphop", "pop"]},
+  {t:"Feuerwerk", a:"Wincent Weiss", y:2017, g:"de", id:"3GRoxbBauU8Ui1zUJwn9aD", s:["pop"]},
+  {t:"Major Tom (völlig losgelöst)", a:"Peter Schilling", y:1982, g:"de", id:"6lXKNdOsnaLv9LwulZbxNl", s:["pop", "dance"], c:["ndw"]},
+  {t:"Nur ein Wort", a:"Wir sind Helden", y:2005, g:"de", id:"4hYinIaRxdaoEFSQni6K6I", s:["rock", "pop"], c:["ballad"]},
+  {t:"Pflaster", a:"Ich + Ich", y:2009, g:"de", id:"2y9woPM180Da3Tgf1bBE2K", s:["pop"], c:["ballad"]},
+  {t:"Astronaut", a:"Sido feat. Andreas Bourani", y:2015, g:"de", id:"0pQr5WsobmdZHnuObT0sc2", s:["hiphop", "pop"]},
+  {t:"Die Reklamation (Guten Tag)", a:"Wir sind Helden", y:2003, g:"de", id:"5YVAa5A1w987AIeCn6I0UI", s:["rock", "pop"]},
+  {t:"Skandal im Sperrbezirk", a:"Spider Murphy Gang", y:1981, g:"de", id:"26kXONuhWX8sutaxnmcpPg", s:["rock"]},
+  {t:"Mr. Brightside", a:"The Killers", y:2003, g:"en", id:"003vvx7Niy0yvhvHt4a68B", s:["indie", "rock"]},
+  {t:"Empire State of Mind (Part II) Broken Down", a:"Alicia Keys", y:2010, g:"en", id:"5sra5UY6sD658OabHL3QtI", s:["rnb", "pop"], c:["ballad"]},
+  {t:"We Don't Need Another Hero (Thunderdome)", a:"Tina Turner", y:1985, g:"en", id:"1qyJ6XpMHdsJD8pkiA7Qww", s:["rock", "pop"], c:["film"]},
+  {t:"Anti-Hero", a:"Taylor Swift", y:2022, g:"en", id:"0V3wPSX9ygBnCm8psDIegu", s:["pop", "indie"]}
 ];
+
+// Doppelt erfasste Songs (gleicher Titel + gleicher Interpret) nur einmal verwenden
+function dedupeSongs(list){
+  const seen = new Set();
+  const norm = x => String(x).toLowerCase().replace(/[^a-z0-9]/g, "");
+  return list.filter(s => {
+    const key = norm(s.t) + "|" + norm(s.a).slice(0, 6);
+    if(seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+const SONGS = dedupeSongs(SONGS_RAW);
 
 /* ============ STORAGE ============ */
 const SAVE_KEY = "chronohit_solo_v1";
@@ -2888,7 +2977,8 @@ function startCreateWizard(){
     genres: Object.fromEntries(LIB.langs.map(l => [l.key, true])),
     styles: Object.fromEntries(LIB.styles.map(x => [x.key, true])),
     decades: Object.fromEntries(LIB.decades.map(x => [x.key, true])),
-    themes: Object.fromEntries(LIB.themes.map(x => [x.key, true]))
+    themes: Object.fromEntries(LIB.themes.map(x => [x.key, true])),
+    filterOrder: ["genres", "styles", "decades", "themes"]
   };
   state.infoOpen = null;
   state.screen = "create";
@@ -2974,7 +3064,48 @@ function songFilterFromWizard(w){
     themes: pick(w.themes)
   };
 }
-function wizardPoolSize(){ return filteredPool(songFilterFromWizard(state.wizard)).length; }
+const FILTER_DEFS = {
+  genres:  { label:"Sprache",    infoKey:"w-langs",
+             desc:"In welchen Sprachen die Songs sein sollen. Es werden nur Sprachen angezeigt, für die Songs vorhanden sind." },
+  styles:  { label:"Genre",      infoKey:"w-styles",
+             desc:"Ein Song kann mehrere Genres haben. Es reicht, wenn <strong>eines</strong> davon aktiv ist — ein Pop-Rock-Song ist also dabei, sobald Pop <em>oder</em> Rock an ist." },
+  decades: { label:"Jahrzehnt",  infoKey:"w-decades",
+             desc:"Aus welchen Jahrzehnten die Songs stammen sollen (wird automatisch aus dem Erscheinungsjahr bestimmt)." },
+  themes:  { label:"Kategorien", infoKey:"w-themes",
+             desc:"Besondere Sammlungen, z. B. Filmmusik oder Balladen. Auch hier reicht ein Treffer. „Sonstige“ sind alle Songs ohne besondere Kategorie." }
+};
+function filterItems(key){
+  return key === "genres" ? LIB.langs : key === "styles" ? LIB.styles : key === "decades" ? LIB.decades : LIB.themes;
+}
+function stageKeysOf(song, key){
+  return key === "genres" ? [song.g]
+       : key === "styles" ? (song.s || [])
+       : key === "decades" ? [String(decadeOf(song.y))]
+       : songThemes(song);
+}
+// Die Gruppen arbeiten der Reihe nach: jede sucht nur in den Songs, die die Gruppen davor übrig lassen.
+function wizardStages(){
+  const w = state.wizard;
+  const f = songFilterFromWizard(w);
+  let pool = SONGS;
+  const stages = [];
+  w.filterOrder.forEach(key => {
+    const counts = {};
+    pool.forEach(s => stageKeysOf(s, key).forEach(k => { counts[k] = (counts[k] || 0) + 1; }));
+    const next = pool.filter(s => songMatches(s, { [key]: f[key] }));
+    stages.push({ key, counts, incoming: pool.length, after: next.length });
+    pool = next;
+  });
+  return { stages, final: pool.length };
+}
+function wizardMoveFilter(key, dir){
+  const order = state.wizard.filterOrder;
+  const i = order.indexOf(key), j = i + dir;
+  if(i < 0 || j < 0 || j >= order.length) return;
+  [order[i], order[j]] = [order[j], order[i]];
+  render();
+}
+function wizardPoolSize(){ return wizardStages().final; }
 function wizardPoolNeeded(){
   const w = state.wizard;
   const starters = w.mode === "multiplayer" ? w.playerCount : 1;
@@ -3078,49 +3209,51 @@ function renderWizardStep3(n){
       </div>
     </div>`;
 }
-function chipGroup(infoKey, label, desc, group, items){
+function chipGroup(key, pos, total, st){
   const w = state.wizard;
-  const chips = items.map(it => `
-    <button class="chip ${w[group][it.key] ? 'on' : ''}" onclick="wizardToggleItem('${group}','${it.key}')">${it.label}<span class="chip-n">${it.count}</span></button>`).join('');
+  const def = FILTER_DEFS[key];
+  const chips = filterItems(key).map(it => {
+    const c = st.counts[it.key] || 0;
+    return `<button class="chip ${w[key][it.key] ? 'on' : ''} ${c === 0 ? 'empty' : ''}" onclick="wizardToggleItem('${key}','${it.key}')">${it.label}<span class="chip-n">${c}</span></button>`;
+  }).join('');
   return `
     <div class="chip-group">
       <div class="chip-group-head">
         <div class="label-with-info">
-          <span class="label">${label}</span>
-          <button type="button" class="info-btn" onclick="toggleInfo('${infoKey}')" aria-label="Info zu ${label}">i</button>
+          <span class="stage-num">${pos + 1}</span>
+          <span class="label">${def.label}</span>
+          <button type="button" class="info-btn" onclick="toggleInfo('${def.infoKey}')" aria-label="Info zu ${def.label}">i</button>
         </div>
-        <div class="chip-quick">
-          <button class="btn-ghost btn-small" onclick="wizardSetGroup('${group}', true)">Alle</button>
-          <button class="btn-ghost btn-small" onclick="wizardSetGroup('${group}', false)">Keine</button>
+        <div class="stage-move">
+          <button class="btn-ghost btn-small icon-btn" onclick="wizardMoveFilter('${key}',-1)" ${pos === 0 ? 'disabled' : ''} aria-label="Nach oben">▲</button>
+          <button class="btn-ghost btn-small icon-btn" onclick="wizardMoveFilter('${key}',1)" ${pos === total - 1 ? 'disabled' : ''} aria-label="Nach unten">▼</button>
         </div>
       </div>
-      ${state.infoOpen === infoKey ? `<div class="info-desc">${desc}</div>` : ``}
+      ${state.infoOpen === def.infoKey ? `<div class="info-desc">${def.desc}</div>` : ``}
+      <div class="chip-group-sub">
+        <span class="stage-after">${st.incoming} → <b>${st.after}</b> Songs</span>
+        <div class="chip-quick">
+          <button class="btn-ghost btn-small" onclick="wizardSetGroup('${key}', true)">Alle</button>
+          <button class="btn-ghost btn-small" onclick="wizardSetGroup('${key}', false)">Keine</button>
+        </div>
+      </div>
       <div class="chip-row">${chips}</div>
     </div>`;
 }
 function renderWizardStep4(n){
-  const size = wizardPoolSize();
+  const w = state.wizard;
+  const { stages, final } = wizardStages();
   const need = wizardPoolNeeded();
-  const ok = size >= need;
+  const ok = final >= need;
   return `
     <div class="menu-card">
       <h3>${n}. Songauswahl</h3>
+      <p class="step-hint">Die Gruppen arbeiten von oben nach unten: Jede sucht nur in den Songs, die die Gruppen darüber übrig lassen — die Zahlen an den Chips zeigen, was an dieser Stelle noch verfügbar ist. Mit ▲ ▼ änderst du die Reihenfolge.</p>
       <div class="settings-grid">
-        ${chipGroup('w-langs', 'Sprache',
-          'In welchen Sprachen die Songs sein sollen. Es werden nur Sprachen angezeigt, für die Songs vorhanden sind.',
-          'genres', LIB.langs)}
-        ${chipGroup('w-styles', 'Genre',
-          'Ein Song kann mehrere Genres haben. Es reicht, wenn <strong>eines</strong> davon aktiv ist — ein Pop-Rock-Song ist also dabei, sobald Pop <em>oder</em> Rock an ist.',
-          'styles', LIB.styles)}
-        ${chipGroup('w-decades', 'Jahrzehnt',
-          'Aus welchen Jahrzehnten die Songs stammen sollen (wird automatisch aus dem Erscheinungsjahr bestimmt).',
-          'decades', LIB.decades)}
-        ${chipGroup('w-themes', 'Kategorien',
-          'Besondere Sammlungen, z. B. Filmmusik oder Balladen. Auch hier reicht ein Treffer. „Sonstige“ sind alle Songs ohne besondere Kategorie.',
-          'themes', LIB.themes)}
+        ${stages.map((st, i) => chipGroup(st.key, i, stages.length, st)).join('')}
       </div>
       <div class="pool-info ${ok ? '' : 'bad'}">
-        <b>${size}</b> Songs im Stapel
+        <b>${final}</b> Songs im Stapel
         ${ok ? '' : `<div>Zu wenig für diese Runde — mindestens <b>${need}</b> nötig (Startkarten + Zielkarten). Wähle mehr Optionen aus.</div>`}
       </div>
     </div>`;
