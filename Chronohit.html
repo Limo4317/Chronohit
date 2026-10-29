@@ -650,6 +650,7 @@ async function saveToSlot(n){
   render();
 }
 function loadSlot(n){
+  pauseSpotifyPlayback();
   const data = slotsCache[n-1];
   if(!data) return;
   state = JSON.parse(JSON.stringify(data));
@@ -827,6 +828,7 @@ function spotifySearchUrl(song){
 
 /* ============ GAME ACTIONS ============ */
 function newGame(){
+  pauseSpotifyPlayback();
   const pool = filteredPool();
   let deck = shuffle(pool);
   const starter = deck.shift();
@@ -1100,6 +1102,7 @@ function checkWin(){
   // Die Startkarte zählt nicht mit: bei Ziel 10 müssen 10 Karten
   // wirklich richtig platziert worden sein.
   if(state.correctCount >= state.settings.target){
+    pauseSpotifyPlayback();
     state.won = true;
     state.screen = "end";
     render(); saveState();
@@ -1109,6 +1112,7 @@ function checkWin(){
 }
 
 function backToMenu(){
+  pauseSpotifyPlayback();
   state.screen = "menu";
   render();
 }
@@ -1122,6 +1126,7 @@ function closeExitDialog(){
   render();
 }
 function saveAndMenu(){
+  pauseSpotifyPlayback();
   state.showExitDialog = false;
   state.hasSave = true;
   state.screen = "menu";
@@ -1129,6 +1134,7 @@ function saveAndMenu(){
   render();
 }
 async function discardAndMenu(){
+  pauseSpotifyPlayback();
   await clearSave();
   const keepSettings = state.settings;
   state = {
@@ -1141,6 +1147,7 @@ async function discardAndMenu(){
   render();
 }
 function abandonGame(){
+  pauseSpotifyPlayback();
   clearSave();
   state.hasSave = false;
   state.screen = "menu";
@@ -1570,7 +1577,7 @@ function renderEnd(){
       <p>richtig platzierte Karten auf deiner Zeitleiste</p>
       <div class="win-stats">
         <div><div class="n">${state.wrongCount}</div><div class="l">Falsch platziert</div></div>
-        <div><div class="n">${state.tokens}</div><div class="l">Tokens übrig</div></div>
+        ${s.tokens ? `<div><div class="n">${state.tokens}</div><div class="l">Chrono-Tokens übrig</div></div>` : ``}
         <div><div class="n">${s.target}</div><div class="l">Ziel</div></div>
       </div>
       <div class="menu-actions">
