@@ -114,9 +114,30 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 8px 32px rgba(0,0,0,.28);
   }
 
-  ::view-transition-old(root), ::view-transition-new(root){ animation-duration:.5s; }
-  :root.theme-transition, :root.theme-transition *{
-    transition: background-color .5s ease, color .5s ease, border-color .5s ease, fill .5s ease, stroke .5s ease !important;
+  /* Farb-Variablen als echte <color>-Typen registrieren: dann lassen sie sich
+     weich ineinander überblenden (inkl. Verläufe, Rahmen, Schatten usw.) */
+  @property --bg{ syntax:'<color>'; inherits:true; initial-value:#14151d; }
+  @property --bg-2{ syntax:'<color>'; inherits:true; initial-value:#1b1d29; }
+  @property --bg-highlight{ syntax:'<color>'; inherits:true; initial-value:#23263a; }
+  @property --panel{ syntax:'<color>'; inherits:true; initial-value:#21232f; }
+  @property --panel-2{ syntax:'<color>'; inherits:true; initial-value:#2a2d3c; }
+  @property --card-face{ syntax:'<color>'; inherits:true; initial-value:#f3ead9; }
+  @property --card-face-2{ syntax:'<color>'; inherits:true; initial-value:#e9dcc2; }
+  @property --ink{ syntax:'<color>'; inherits:true; initial-value:#22201a; }
+  @property --text{ syntax:'<color>'; inherits:true; initial-value:#ece7db; }
+  @property --muted{ syntax:'<color>'; inherits:true; initial-value:#9a97a8; }
+  @property --accent{ syntax:'<color>'; inherits:true; initial-value:#e8a33d; }
+  @property --accent-ink{ syntax:'<color>'; inherits:true; initial-value:#3a2a0f; }
+  @property --correct{ syntax:'<color>'; inherits:true; initial-value:#5a9c78; }
+  @property --wrong{ syntax:'<color>'; inherits:true; initial-value:#c1483b; }
+  @property --line{ syntax:'<color>'; inherits:true; initial-value:#34364a; }
+  @property --radius{ syntax:'<length>'; inherits:true; initial-value:14px; }
+  @property --panel-blur{ syntax:'<length>'; inherits:true; initial-value:0px; }
+  :root.theme-animating{
+    transition-property:--bg, --bg-2, --bg-highlight, --panel, --panel-2, --card-face, --card-face-2,
+      --ink, --text, --muted, --accent, --accent-ink, --correct, --wrong, --line, --radius, --panel-blur;
+    transition-duration:.9s;
+    transition-timing-function:cubic-bezier(.4, 0, .2, 1);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -284,6 +305,97 @@
   }
   .wrong-toggle.none{ font-size:13px; }
   .wrong-toggle .wrong-count{ color:var(--wrong); }
+  /* ---- mehrspieler ---- */
+  .player-list{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+  .player-row{ display:flex; align-items:center; gap:8px; }
+  .player-row .guess-input{ flex:1; min-width:0; }
+  .player-num{
+    width:24px; height:24px; border-radius:50%; flex:none; font-size:12px;
+    background:var(--panel-2); border:1px solid var(--line); color:var(--muted);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .turn-banner{
+    display:flex; flex-direction:column; align-items:center; gap:2px; margin:4px 0 6px;
+  }
+  .turn-label{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+  .turn-name{ font-family:var(--heading-font); font-size:26px; color:var(--accent); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  .drawer-handle{
+    position:fixed; right:0; top:50%; transform:translateY(-50%); z-index:30;
+    writing-mode:vertical-rl; padding:16px 8px; border-radius:12px 0 0 12px;
+    background:var(--panel); color:var(--muted); border:1px solid var(--line); border-right:none;
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    backdrop-filter:blur(var(--panel-blur)); -webkit-backdrop-filter:blur(var(--panel-blur));
+  }
+  .drawer-handle:hover{ color:var(--accent); }
+  .drawer-handle.open{ opacity:0; pointer-events:none; }
+  .drawer-backdrop{
+    position:fixed; inset:0; z-index:31; background:rgba(0,0,0,.5);
+    opacity:0; pointer-events:none; transition:opacity .25s ease;
+  }
+  .drawer-backdrop.open{ opacity:1; pointer-events:auto; }
+  .players-drawer{
+    position:fixed; top:0; right:0; bottom:0; z-index:32;
+    width:min(88vw, 360px); padding:18px 16px 28px; overflow-y:auto;
+    background:var(--bg-2); border-left:1px solid var(--line);
+    box-shadow:-12px 0 32px rgba(0,0,0,.35);
+    transform:translateX(106%); transition:transform .28s ease;
+  }
+  .players-drawer.open{ transform:none; }
+  .drawer-title{
+    display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;
+    font-family:var(--heading-font); font-size:20px;
+  }
+  .pp{ border:1px solid var(--line); border-radius:12px; background:var(--panel-2); margin-bottom:8px; overflow:hidden; }
+  .pp.current{ border-color:var(--accent); }
+  .pp-head{ display:flex; align-items:center; gap:8px; padding:10px 12px; cursor:pointer; }
+  .pp.current .pp-head{ cursor:default; }
+  .pp-order{
+    width:22px; height:22px; border-radius:50%; flex:none; font-size:12px;
+    background:var(--panel); color:var(--muted); display:flex; align-items:center; justify-content:center;
+  }
+  .pp-name{ flex:1; min-width:0; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pp-now{
+    font-size:10px; letter-spacing:.06em; text-transform:uppercase; flex:none;
+    background:var(--accent); color:var(--accent-ink); padding:2px 8px; border-radius:999px;
+  }
+  .pp-stats{ font-size:12px; color:var(--muted); white-space:nowrap; flex:none; }
+  .pp-chevron{ color:var(--muted); transition:transform .2s ease; flex:none; }
+  .pp.open .pp-chevron{ transform:rotate(90deg); }
+  .pp-body{ display:none; padding:2px 12px 10px; border-top:1px solid var(--line); }
+  .pp.open .pp-body{ display:block; }
+  .pp-card{ display:flex; align-items:baseline; gap:10px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:13px; }
+  .pp-card:last-child{ border-bottom:none; }
+  .pp-year{ font-family:var(--heading-font); font-weight:700; color:var(--accent); min-width:44px; }
+  .pp-song{ flex:1; min-width:0; }
+  .pp-song small{ display:block; color:var(--muted); font-size:11px; }
+  .pp-tag{ font-size:10px; color:var(--muted); flex:none; }
+  .pp-empty{ padding:8px 0; font-size:12px; color:var(--muted); }
+
+  .rank-list{ display:flex; flex-direction:column; gap:8px; margin:18px 0 6px; text-align:left; }
+  .rank-row{
+    display:flex; align-items:center; gap:10px; padding:10px 14px;
+    background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+  }
+  .rank-row.winner{ border-color:var(--correct); }
+  .rank-pos{ font-family:var(--heading-font); font-size:18px; color:var(--muted); min-width:22px; }
+  .rank-row.winner .rank-pos{ color:var(--correct); }
+  .rank-name{ flex:1; min-width:0; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .rank-score{ font-size:13px; color:var(--muted); white-space:nowrap; }
+  .rank-score b{ color:var(--text); font-family:var(--heading-font); font-size:16px; }
+  .player-section{ margin-bottom:18px; }
+  .player-section h3{ font-size:18px; margin:0 0 4px; text-align:center; }
+  .player-section .sub{ text-align:center; font-size:12px; color:var(--muted); margin-bottom:4px; }
+  .suggest-list{ display:flex; flex-direction:column; gap:10px; }
+  .suggest-opt{
+    display:flex; align-items:center; gap:14px; text-decoration:none; color:var(--text);
+    background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:12px 14px;
+  }
+  .suggest-opt:hover{ border-color:var(--accent); }
+  .suggest-icon{ display:flex; flex:none; }
+  .suggest-text{ flex:1; display:flex; flex-direction:column; gap:1px; }
+  .suggest-text small{ color:var(--muted); font-size:12px; }
+  .suggest-arrow{ color:var(--muted); }
   .theme-info{ flex:1; }
   .theme-label{ font-family:var(--heading-font); font-size:16px; color:var(--text); }
   .theme-label .wizard-check{ font-size:14px; }
@@ -439,6 +551,15 @@
     box-shadow:0 10px 30px rgba(0,0,0,.4);
   }
   .vinyl-wrap.clickable{cursor:pointer;}
+  .player-reload{
+    position:absolute; right:-8px; bottom:-8px; z-index:2;
+    width:34px; height:34px; padding:0; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--panel); color:var(--muted); border:1px solid var(--line);
+    box-shadow:0 4px 12px rgba(0,0,0,.3);
+  }
+  .player-reload:hover{ color:var(--accent); border-color:var(--accent); }
+  .player-reload:active{ transform:rotate(180deg) scale(.94); transition:transform .25s ease; }
   .vinyl-wrap.clickable:hover .vinyl{filter:brightness(1.08);}
   .vinyl{
     width:100%;height:100%;border-radius:50%;
@@ -1412,6 +1533,10 @@ function loadSlot(n){
   state.infoOpen = null;
   state.activeSlot = n;
   state.activeSaveName = data.name || "";
+  state.playersDrawerOpen = false;
+  state.openPlayerPanels = [];
+  if(!Array.isArray(state.players)) state.players = [];
+  if(isMulti()) syncActiveToPlayer();
   state.screen = "game";
   render();
 }
@@ -1470,6 +1595,12 @@ let state = {
   skippedInfo: null,
   wrongSongs: [],
   showWrongOnTimeline: false,
+  players: [],
+  currentPlayer: 0,
+  winners: [],
+  playersDrawerOpen: false,
+  openPlayerPanels: [],
+  suggestDialogOpen: false,
   wizard: null               // Zwischenstand während "Spiel erstellen"
 };
 
@@ -1591,22 +1722,39 @@ function spotifySearchUrl(song){
 }
 
 /* ============ GAME ACTIONS ============ */
-function newGame(customSettings){
+function newGame(customSettings, playerNames){
   pauseSpotifyPlayback();
   const settings = customSettings || state.settings;
   const pool = filteredPool(settings);
   let deck = shuffle(pool);
-  const starter = { ...deck.shift(), __starter: true };
+  const startTok = settings.tokens ? (typeof settings.startTokens === "number" ? settings.startTokens : 2) : 0;
+  const multi = settings.mode === "multiplayer" && Array.isArray(playerNames) && playerNames.length > 0;
+  let players = [];
+  let timeline;
+  if(multi){
+    // Jeder Spieler bekommt eine eigene Startkarte und eine eigene Zeitleiste
+    players = playerNames.map(name => ({
+      name,
+      timeline: [{ ...deck.shift(), __starter: true }],
+      tokens: startTok,
+      correctCount: 0,
+      wrongCount: 0,
+      wrongSongs: []
+    }));
+    timeline = players[0].timeline;
+  } else {
+    timeline = [{ ...deck.shift(), __starter: true }];
+  }
   state = {
     screen: "game",
     settings,
     deck, discard: [],
-    timeline: [starter],
+    timeline,
     current: null,
     phase: "draw",
     pendingGap: null,
     lastResult: null,
-    tokens: settings.tokens ? (typeof settings.startTokens === "number" ? settings.startTokens : 2) : 0,
+    tokens: startTok,
     correctCount: 0,
     wrongCount: 0,
     won: false,
@@ -1627,11 +1775,69 @@ function newGame(customSettings){
     confirmDeleteOnFinish: false,
     skippedInfo: null,
     wrongSongs: [],
-    showWrongOnTimeline: false
+    showWrongOnTimeline: false,
+    players,
+    currentPlayer: 0,
+    winners: [],
+    playersDrawerOpen: false,
+    openPlayerPanels: []
   };
   drawNext();
   saveState();
   render();
+}
+
+/* ============ MEHRSPIELER (lokal) ============
+   Die Top-Level-Felder (timeline, tokens, correctCount, wrongCount,
+   wrongSongs) gehören immer dem Spieler, der gerade am Zug ist. Beim
+   Zugwechsel werden sie in den Spieler-Eintrag zurückgeschrieben und die
+   des nächsten Spielers geladen. So bleibt die gesamte Einzelspieler-Logik
+   unverändert nutzbar.
+*/
+function isMulti(){
+  return state.settings.mode === "multiplayer" && Array.isArray(state.players) && state.players.length > 0;
+}
+function syncActiveToPlayer(){
+  if(!isMulti()) return;
+  const p = state.players[state.currentPlayer];
+  p.timeline = state.timeline;
+  p.tokens = state.tokens;
+  p.correctCount = state.correctCount;
+  p.wrongCount = state.wrongCount;
+  p.wrongSongs = state.wrongSongs || [];
+}
+function loadActiveFromPlayer(){
+  const p = state.players[state.currentPlayer];
+  state.timeline = p.timeline;
+  state.tokens = p.tokens;
+  state.correctCount = p.correctCount;
+  state.wrongCount = p.wrongCount;
+  state.wrongSongs = p.wrongSongs || [];
+}
+// Aktueller Stand eines Spielers (der aktive kommt aus den Top-Level-Feldern)
+function playerView(i){
+  const p = state.players[i];
+  if(i === state.currentPlayer){
+    return { name:p.name, timeline:state.timeline, tokens:state.tokens,
+             correctCount:state.correctCount, wrongCount:state.wrongCount,
+             wrongSongs:state.wrongSongs || [] };
+  }
+  return p;
+}
+function currentPlayerName(){ return isMulti() ? state.players[state.currentPlayer].name : ""; }
+function nextPlayerIndex(){ return (state.currentPlayer + 1) % state.players.length; }
+function advancePlayer(){
+  syncActiveToPlayer();
+  state.currentPlayer = nextPlayerIndex();
+  loadActiveFromPlayer();
+}
+function finalizeMultiplayer(){
+  if(!isMulti()) return;
+  syncActiveToPlayer();
+  const counts = state.players.map(p => p.correctCount);
+  const max = Math.max(...counts);
+  state.winners = counts.map((c, i) => c === max ? i : -1).filter(i => i >= 0);
+  state.won = true;
 }
 
 /* ============ SPOTIFY IFRAME API ============
@@ -1702,6 +1908,23 @@ function requestSpotifyPlay(song){
   }
 }
 
+// Verwirft den (unsichtbaren) Spotify-Player komplett und baut ihn neu auf.
+// Läuft der Song gerade (Karte gezogen und abgespielt), startet er direkt wieder.
+function reloadPlayer(){
+  const song = state.current;
+  try{ if(spotifyController) spotifyController.destroy(); }catch(e){}
+  spotifyController = null;
+  spotifyPendingUri = null;
+  const host = document.getElementById("spotify-embed-host");
+  if(host) host.innerHTML = '<div id="spotify-embed-root"></div>';
+  // API-Modus erneut versuchen, auch wenn vorher auf den sichtbaren Player zurückgefallen wurde
+  useFallbackEmbed = false;
+  spotifyWatchdogStarted = false;
+  const wasStarted = state.phase === "placing" || state.phase === "revealed_pending";
+  render();   // setzt auch den Fortschrittsbalken zurück
+  if(wasStarted && song && song.id){ requestSpotifyPlay(song); }
+}
+
 function toggleSpotifyPlayback(){
   if(!spotifyController || useFallbackEmbed) return;
   try{ spotifyController.togglePlay(); }catch(e){}
@@ -1731,6 +1954,7 @@ function drawNext(){
     state.current = null;
     state.phase = "empty";
     state.won = false;
+    if(isMulti()) finalizeMultiplayer();
     state.screen = "end";
     return;
   }
@@ -1917,6 +2141,7 @@ function evaluateGuess(song){
 }
 
 function nextTurn(){
+  if(isMulti() && state.players.length > 1) advancePlayer();
   drawNext();
   render(); saveState();
 }
@@ -1927,6 +2152,7 @@ function checkWin(){
   if(state.correctCount >= state.settings.target){
     pauseSpotifyPlayback();
     state.won = true;
+    if(isMulti()) finalizeMultiplayer();
     state.screen = "end";
     render(); saveState();
     return true;
@@ -1971,7 +2197,7 @@ async function discardAndMenu(){
     settings: keepSettings,
     deck: [], discard: [], timeline: [],
     current: null, phase: "draw", pendingGap: null, lastResult: null,
-    tokens: 0, correctCount: 0, wrongCount: 0, won: false, hasSave: false, showExitDialog: false, bonusClaimed: false, pendingSpend: null, saveSlotDialogOpen: false, saveNameDraft: "", confirmDeleteSlot: null, openSlotSettings: null, infoOpen: null, activeSlot: null, activeSaveName: "", confirmOverwriteSave: false, confirmDeleteOnFinish: false, skippedInfo: null, wrongSongs: [], showWrongOnTimeline: false, wizard: null
+    tokens: 0, correctCount: 0, wrongCount: 0, won: false, hasSave: false, showExitDialog: false, bonusClaimed: false, pendingSpend: null, saveSlotDialogOpen: false, saveNameDraft: "", confirmDeleteSlot: null, openSlotSettings: null, infoOpen: null, activeSlot: null, activeSaveName: "", confirmOverwriteSave: false, confirmDeleteOnFinish: false, skippedInfo: null, wrongSongs: [], showWrongOnTimeline: false, players: [], currentPlayer: 0, winners: [], playersDrawerOpen: false, openPlayerPanels: [], wizard: null
   };
   render();
 }
@@ -1993,6 +2219,13 @@ function icon(name){
   return map[name] || "";
 }
 
+function slotProgress(slot){
+  if(slot.settings && slot.settings.mode === "multiplayer" && Array.isArray(slot.players) && slot.players.length){
+    return `${slot.players.length} Spieler`;
+  }
+  return `${slot.correctCount}/${slot.settings.target}`;
+}
+
 function renderSaveSlotModal(){
   const rows = [1,2,3,4].map(n => {
     const slot = slotsCache[n-1];
@@ -2000,7 +2233,7 @@ function renderSaveSlotModal(){
       <div class="save-slot">
         <div class="slot-info">
           <div class="slot-title">${slot && slot.name ? esc(slot.name) : `Slot ${n}`}</div>
-          <div class="slot-meta">${slot ? `Slot ${n} · ${slot.correctCount}/${slot.settings.target} · ${formatSlotDate(slot.savedAt)}` : 'leer'}</div>
+          <div class="slot-meta">${slot ? `Slot ${n} · ${slotProgress(slot)} · ${formatSlotDate(slot.savedAt)}` : 'leer'}</div>
         </div>
         <button class="btn-primary btn-small" onclick="saveToSlot(${n})">${slot ? 'Überschreiben' : 'Speichern'}</button>
       </div>`;
@@ -2129,6 +2362,41 @@ function renderLoading(){
 }
 
 /* ============ HAUPTMENÜ ============ */
+function openSuggest(){
+  state.suggestDialogOpen = true;
+  render();
+}
+function closeSuggest(){
+  state.suggestDialogOpen = false;
+  render();
+}
+const ICON_DISCORD = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>';
+const ICON_WHATSAPP = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
+const ICON_FORM = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><polyline points="14 3 14 8 19 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>';
+function renderSuggestModal(){
+  const opt = (href, icon, color, label, sub) => `
+    <a class="suggest-opt" href="${href}" target="_blank" rel="noopener" onclick="setTimeout(closeSuggest, 200)">
+      <span class="suggest-icon" style="color:${color};">${icon}</span>
+      <span class="suggest-text"><b>${label}</b><small>${sub}</small></span>
+      <span class="suggest-arrow">↗</span>
+    </a>`;
+  return `
+    <div class="modal-backdrop" onclick="if(event.target===this) closeSuggest()">
+      <div class="modal-box">
+        <h3>Vorschläge</h3>
+        <p>Wo möchtest du deine Ideen und Vorschläge loswerden?</p>
+        <div class="suggest-list">
+          ${opt('https://discord.gg/nP2DyDSfk5', ICON_DISCORD, '#5865F2', 'Discord', 'Server beitreten')}
+          ${opt('https://whatsapp.com/channel/0029VbDlidhKgsNzKoYkez1S', ICON_WHATSAPP, '#25D366', 'WhatsApp', 'Kanal öffnen')}
+          ${opt('https://forms.gle/cvKQuWEpUhbSPMFx9', ICON_FORM, 'var(--muted)', 'Habe ich nicht', 'Stattdessen das Formular')}
+        </div>
+        <div class="modal-actions" style="margin-top:14px;">
+          <button class="btn-ghost" onclick="closeSuggest()">Abbrechen</button>
+        </div>
+      </div>
+    </div>`;
+}
+
 function openLoadGame(){
   state.openSlotSettings = null;
   state.screen = "loadgame";
@@ -2152,18 +2420,16 @@ const THEME_INFO = [
   { key:"custom", label:"Benutzerdefiniert", desc:"Eigene Farben, Transparenz und Schriftart frei wählen." }
 ];
 
+let themeAnimTimer = null;
 function selectTheme(key){
   if(key === currentTheme) return;
-  const swap = () => { applyTheme(key); render(); };
-  if(document.startViewTransition){
-    // Überblendet die komplette Seite, inkl. Hintergrundverlauf
-    document.startViewTransition(swap);
-  } else {
-    const root = document.documentElement;
-    root.classList.add("theme-transition");
-    swap();
-    setTimeout(() => root.classList.remove("theme-transition"), 600);
-  }
+  const root = document.documentElement;
+  // Klasse zuerst setzen, damit die Farbwechsel als Übergang laufen
+  root.classList.add("theme-animating");
+  applyTheme(key);
+  render();
+  clearTimeout(themeAnimTimer);
+  themeAnimTimer = setTimeout(() => root.classList.remove("theme-animating"), 1000);
 }
 
 function renderSettings(){
@@ -2246,9 +2512,10 @@ function renderMenu(){
       </div>
     </div>
     <div class="fab-stack">
-      <a class="todo-fab" href="https://forms.gle/cvKQuWEpUhbSPMFx9" target="_blank" rel="noopener">Vorschläge ↗</a>
+      <button class="todo-fab" onclick="openSuggest()">Vorschläge</button>
       <a class="todo-fab" href="https://docs.google.com/spreadsheets/d/1_-Ud2AE-zAwF1ktxfawKfEWAKZf54e6rmZJ6jXU7S7E/edit?usp=sharing" target="_blank" rel="noopener">To-Do-Liste ↗</a>
     </div>
+    ${state.suggestDialogOpen ? renderSuggestModal() : ``}
   `;
 }
 
@@ -2262,6 +2529,7 @@ function renderSlotSettingsPanel(slot){
   return `
     <div class="slot-settings-panel">
       <div class="row"><span>Modus</span><b>${modeLabel(s.mode)}</b></div>
+      ${s.mode === 'multiplayer' && Array.isArray(slot.players) ? `<div class="row"><span>Spieler</span><b>${slot.players.map(p => esc(p.name)).join(', ')}</b></div>` : ``}
       <div class="row"><span>Schwierigkeit</span><b>${difficultyLabel(s.difficulty)}</b></div>
       <div class="row"><span>Chrono-Tokens</span><b>${s.tokens ? `Ja (max. ${s.maxTokens})` : 'Nein'}</b></div>
       <div class="row"><span>Ziel</span><b>${s.target} Karten</b></div>
@@ -2275,7 +2543,7 @@ function renderLoadGame(){
       <div class="save-slot">
         <div class="slot-info">
           <div class="slot-title">${slot && slot.name ? esc(slot.name) : `Slot ${n}`}</div>
-          <div class="slot-meta">${slot ? `Slot ${n} · ${slot.correctCount}/${slot.settings.target} · ${formatSlotDate(slot.savedAt)}` : 'leer'}</div>
+          <div class="slot-meta">${slot ? `Slot ${n} · ${slotProgress(slot)} · ${formatSlotDate(slot.savedAt)}` : 'leer'}</div>
         </div>
         ${slot ? `
           <div class="slot-actions">
@@ -2343,20 +2611,47 @@ function startCreateWizard(){
     startTokens: 2,
     coopTokens: 5,
     target: 10,
+    playerCount: 2,
+    playerNames: ["", ""],
+    orderMode: "random",
     genres: { de:true, en:true, es:true }
   };
   state.infoOpen = null;
   state.screen = "create";
   render();
 }
+// Schritte: Slot, Modus, (Spieler nur bei Mehrspieler), Einstellungen, Songs
+function wizardStepKeys(){
+  const keys = ["slot", "mode"];
+  if(state.wizard.mode === "multiplayer") keys.push("players");
+  keys.push("settings", "songs");
+  return keys;
+}
 function wizardNext(){
-  if(state.wizard.step < 4){ state.wizard.step++; state.infoOpen = null; render(); }
+  if(state.wizard.step < wizardStepKeys().length){ state.wizard.step++; state.infoOpen = null; render(); }
 }
 function wizardBack(){
   if(state.wizard.step > 1){ state.wizard.step--; state.infoOpen = null; render(); }
   else { state.wizard = null; state.screen = "menu"; render(); }
 }
 function wizardSetSlot(n){ state.wizard.slot = n; render(); }
+function wizardStepPlayerCount(delta){
+  const w = state.wizard;
+  const n = w.playerCount + delta;
+  if(n < 1 || n > 10) return;
+  w.playerCount = n;
+  while(w.playerNames.length < n) w.playerNames.push("");
+  while(w.playerNames.length > n) w.playerNames.pop();
+  render();
+}
+function wizardSetOrderMode(mode){ state.wizard.orderMode = mode; render(); }
+function wizardMovePlayer(i, dir){
+  const names = state.wizard.playerNames;
+  const j = i + dir;
+  if(j < 0 || j >= names.length) return;
+  [names[i], names[j]] = [names[j], names[i]];
+  render();
+}
 function wizardSetMode(v){ state.wizard.mode = v; render(); }
 function wizardSetDifficulty(v){ state.wizard.difficulty = v; render(); }
 function wizardToggleTokens(){ state.wizard.tokens = !state.wizard.tokens; render(); }
@@ -2424,13 +2719,12 @@ function renderWizardStep2(){
       <h3>2. Modus &amp; Schwierigkeit</h3>
       <div class="settings-grid">
         ${infoRow('w-mode', 'Spielmodus',
-          'Solo und Koop sind spielbar. Mehrspieler ist für die Zukunft geplant.',
+          '<strong>Solo</strong>: du allein.<br><strong>Koop</strong>: gemeinsam gegen die Tokens.<br><strong>Mehrspieler</strong>: 1–10 Spieler am selben Gerät, jeder mit eigener Zeitleiste.',
           `<select class="dropdown" onchange="wizardSetMode(this.value)">
             <option value="solo" ${w.mode==='solo'?'selected':''}>Solo</option>
             <option value="multiplayer" ${w.mode==='multiplayer'?'selected':''}>Mehrspieler</option>
             <option value="coop" ${w.mode==='coop'?'selected':''}>Koop</option>
           </select>`)}
-        ${w.mode === 'multiplayer' ? plannedFeatureNotice() : ``}
         ${infoRow('w-difficulty', 'Schwierigkeit',
           '<strong>Normal</strong>: Nur die Position auf der Zeitleiste zählt.<br><strong>Profi</strong>: Titel &amp; Interpret müssen zusätzlich stimmen.<br><strong>Experte</strong>: zusätzlich auch das exakte Erscheinungsjahr.',
           `<select class="dropdown" onchange="wizardSetDifficulty(this.value)">
@@ -2441,11 +2735,11 @@ function renderWizardStep2(){
       </div>
     </div>`;
 }
-function renderWizardStep3(){
+function renderWizardStep3(n){
   const w = state.wizard;
   return `
     <div class="menu-card">
-      <h3>3. Weitere Einstellungen</h3>
+      <h3>${n}. Weitere Einstellungen</h3>
       <div class="settings-grid">
         ${w.mode === 'coop' ? `
         ${infoRow('w-cooptokens', 'Chrono-Tokens (Koop)',
@@ -2460,14 +2754,14 @@ function renderWizardStep3(){
           'Erlaubt, Karten mit Tokens zu überspringen oder garantiert richtig zu kaufen.',
           `<div class="switch ${w.tokens?'on':''}" onclick="wizardToggleTokens()"><div class="knob"></div></div>`)}
         ${w.tokens ? infoRow('w-starttokens', 'Start-Chrono-Tokens',
-          'Wie viele Chrono-Tokens du zu Beginn der Runde besitzt (0–15).',
+          'Wie viele Chrono-Tokens du zu Beginn der Runde besitzt (0–15).' + (w.mode === 'multiplayer' ? ' Gilt für jeden Spieler einzeln.' : ''),
           `<div class="stepper">
             <button onclick="wizardStepStartTokens(-1)">–</button>
             <div class="val">${w.startTokens}</div>
             <button onclick="wizardStepStartTokens(1)">+</button>
           </div>`) : ``}
         ${w.tokens ? infoRow('w-maxtokens', 'Maximale Chrono-Tokens',
-          'Wie viele Chrono-Tokens du gleichzeitig horten kannst (3–15).',
+          'Wie viele Chrono-Tokens du gleichzeitig horten kannst (3–15).' + (w.mode === 'multiplayer' ? ' Gilt für jeden Spieler einzeln.' : ''),
           `<div class="stepper">
             <button onclick="wizardStepMaxTokens(-1)">–</button>
             <div class="val">${w.maxTokens}</div>
@@ -2484,12 +2778,12 @@ function renderWizardStep3(){
       </div>
     </div>`;
 }
-function renderWizardStep4(){
+function renderWizardStep4(n){
   const w = state.wizard;
   const genreChip = (key,label) => `<button class="chip ${w.genres[key] ? 'on':''}" onclick="wizardToggleGenre('${key}')">${label}</button>`;
   return `
     <div class="menu-card">
-      <h3>4. Songauswahl</h3>
+      <h3>${n}. Songauswahl</h3>
       <div class="settings-grid">
         ${infoRow('w-genres', 'Sprachen im Kartenstapel',
           'Aktuell verfügbare Sprachen im Kartenstapel — weitere Sprachen kommen später dazu.',
@@ -2497,22 +2791,63 @@ function renderWizardStep4(){
       </div>
     </div>`;
 }
+function renderWizardPlayers(n){
+  const w = state.wizard;
+  const custom = w.orderMode === "custom";
+  const rows = w.playerNames.map((name, i) => `
+    <div class="player-row">
+      ${custom ? `<span class="player-num">${i+1}</span>` : ``}
+      <input class="guess-input" type="text" maxlength="20" autocomplete="off"
+        placeholder="Spieler ${i+1}" value="${esc(name)}"
+        oninput="state.wizard.playerNames[${i}]=this.value">
+      ${custom ? `
+        <button class="btn-ghost btn-small icon-btn" onclick="wizardMovePlayer(${i},-1)" ${i===0?'disabled':''} aria-label="Nach oben">▲</button>
+        <button class="btn-ghost btn-small icon-btn" onclick="wizardMovePlayer(${i},1)" ${i===w.playerNames.length-1?'disabled':''} aria-label="Nach unten">▼</button>` : ``}
+    </div>`).join('');
+  return `
+    <div class="menu-card">
+      <h3>${n}. Spieler</h3>
+      <div class="settings-grid">
+        ${infoRow('w-pcount', 'Anzahl Spieler',
+          'Wie viele Personen am selben Gerät mitspielen (1–10). Jeder bekommt eine eigene Zeitleiste und ist reihum am Zug.',
+          `<div class="stepper">
+            <button onclick="wizardStepPlayerCount(-1)">–</button>
+            <div class="val">${w.playerCount}</div>
+            <button onclick="wizardStepPlayerCount(1)">+</button>
+          </div>`)}
+        ${infoRow('w-porder', 'Reihenfolge',
+          '<strong>Zufällig</strong>: Die Reihenfolge wird beim Start ausgelost.<br><strong>Eigene</strong>: Du legst sie selbst fest — mit den Pfeilen verschiebst du Spieler nach oben oder unten.',
+          `<div class="chip-row">
+            <button class="chip ${!custom?'on':''}" onclick="wizardSetOrderMode('random')">Zufällig</button>
+            <button class="chip ${custom?'on':''}" onclick="wizardSetOrderMode('custom')">Eigene</button>
+          </div>`)}
+      </div>
+      <div class="player-list">${rows}</div>
+      <div class="guess-hint" style="margin-top:10px;">${custom
+        ? 'Von oben nach unten: so ist die Reihenfolge der Züge. Leere Namen werden zu „Spieler 1“, „Spieler 2“ usw.'
+        : 'Leere Namen werden zu „Spieler 1“, „Spieler 2“ usw. Die Reihenfolge wird beim Start zufällig ausgelost.'}</div>
+    </div>`;
+}
 function renderCreateGame(){
   const w = state.wizard;
+  const keys = wizardStepKeys();
+  const total = keys.length;
+  const key = keys[w.step - 1];
   const stepContent =
-    w.step === 1 ? renderWizardStep1() :
-    w.step === 2 ? renderWizardStep2() :
-    w.step === 3 ? renderWizardStep3() :
-    renderWizardStep4();
+    key === "slot" ? renderWizardStep1() :
+    key === "mode" ? renderWizardStep2() :
+    key === "players" ? renderWizardPlayers(w.step) :
+    key === "settings" ? renderWizardStep3(w.step) :
+    renderWizardStep4(w.step);
   app.innerHTML = `
     <div class="brand">
       <h1 style="font-size:30px;">Spiel erstellen</h1>
-      <div class="wizard-steps">${[1,2,3,4].map(n=>`<span class="wizard-dot ${w.step===n?'active':''} ${w.step>n?'done':''}"></span>`).join('')}</div>
+      <div class="wizard-steps">${keys.map((_, i) => { const n = i + 1; return `<span class="wizard-dot ${w.step===n?'active':''} ${w.step>n?'done':''}"></span>`; }).join('')}</div>
     </div>
     ${stepContent}
     <div class="menu-actions wizard-actions">
       <button class="btn-ghost" onclick="wizardBack()">${w.step===1?'Abbrechen':'← Zurück'}</button>
-      ${w.step < 4
+      ${w.step < total
         ? `<button class="btn-primary" onclick="wizardNext()">Weiter</button>`
         : `<button class="btn-primary" onclick="createGameFromWizard()">Spiel erstellen</button>`}
     </div>
@@ -2539,8 +2874,15 @@ async function createGameFromWizard(){
   };
   const slotNum = w.slot;
   const saveName = (w.name || "").trim();
+  let playerNames = null;
+  if(w.mode === "multiplayer"){
+    // Leere Namen vor dem Mischen auffüllen, damit "Spieler 3" auch nach dem Auslosen "Spieler 3" bleibt
+    playerNames = w.playerNames.map((nm, i) => (nm || "").trim() || `Spieler ${i+1}`);
+    if(w.orderMode === "random") playerNames = shuffle(playerNames);
+    settings.playerCount = playerNames.length;
+  }
   state.wizard = null;
-  newGame(settings);
+  newGame(settings, playerNames);
   state.activeSlot = slotNum;
   state.activeSaveName = saveName;
   const snapshot = JSON.parse(JSON.stringify(state));
@@ -2577,6 +2919,56 @@ async function confirmOverwriteSaveNow(){
 function renderTag(song, timeline, idxInTimeline){
   if(idxInTimeline === 0 && song.__starter) return `<span class="tag start">Start</span>`;
   return "";
+}
+
+function toggleDrawer(){
+  state.playersDrawerOpen = !state.playersDrawerOpen;
+  ["players-drawer", "players-backdrop", "players-handle"].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.classList.toggle("open", state.playersDrawerOpen);
+  });
+}
+function togglePlayerPanel(i){
+  if(!Array.isArray(state.openPlayerPanels)) state.openPlayerPanels = [];
+  const k = state.openPlayerPanels.indexOf(i);
+  if(k >= 0) state.openPlayerPanels.splice(k, 1); else state.openPlayerPanels.push(i);
+  const el = document.getElementById("pp-" + i);
+  if(el) el.classList.toggle("open", k < 0);
+}
+function renderPlayersDrawer(){
+  if(!isMulti() || state.players.length < 2) return "";
+  const s = state.settings;
+  const open = !!state.playersDrawerOpen;
+  const openPanels = state.openPlayerPanels || [];
+  const rows = state.players.map((_, i) => {
+    const v = playerView(i);
+    const isCur = i === state.currentPlayer;
+    const expanded = !isCur && openPanels.includes(i);
+    const cards = (v.timeline || []).map(song => `
+      <div class="pp-card">
+        <span class="pp-year">${song.y}</span>
+        <span class="pp-song">${esc(song.t)}<small>${esc(song.a)}</small></span>
+        ${song.__starter ? `<span class="pp-tag">Start</span>` : ``}
+      </div>`).join("");
+    return `
+      <div class="pp ${isCur ? 'current' : ''} ${expanded ? 'open' : ''}" id="pp-${i}">
+        <div class="pp-head" ${isCur ? '' : `onclick="togglePlayerPanel(${i})"`}>
+          <span class="pp-order">${i+1}</span>
+          <span class="pp-name">${esc(v.name)}</span>
+          ${isCur ? `<span class="pp-now">am Zug</span>` : ``}
+          <span class="pp-stats">${v.correctCount}/${s.target}${s.tokens ? ` · ${v.tokens} ${icon('token')}` : ''}</span>
+          ${isCur ? `` : `<span class="pp-chevron">›</span>`}
+        </div>
+        ${isCur ? `` : `<div class="pp-body">${cards || `<div class="pp-empty">Noch keine Karten</div>`}</div>`}
+      </div>`;
+  }).join("");
+  return `
+    <div class="drawer-backdrop ${open ? 'open' : ''}" id="players-backdrop" onclick="toggleDrawer()"></div>
+    <button class="drawer-handle ${open ? 'open' : ''}" id="players-handle" onclick="toggleDrawer()" aria-label="Spielerübersicht öffnen">Spieler</button>
+    <aside class="players-drawer ${open ? 'open' : ''}" id="players-drawer">
+      <div class="drawer-title"><span>Spieler</span><button class="btn-ghost btn-small icon-btn" onclick="toggleDrawer()" aria-label="Schließen">✕</button></div>
+      ${rows}
+    </aside>`;
 }
 
 function renderGame(){
@@ -2681,7 +3073,7 @@ function renderGame(){
             </div>` : ``}
           </div>
         ` : ``}
-        <button class="btn-primary" onclick="nextTurn()">Nächste Karte</button>
+        <button class="btn-primary" onclick="nextTurn()">${isMulti() && state.players.length > 1 ? `Weiter: ${esc(state.players[nextPlayerIndex()].name)} ist dran` : 'Nächste Karte'}</button>
       </div>`;
   } else if(state.current){
     const spinning = state.phase === "placing" || state.phase === "revealed_pending";
@@ -2698,6 +3090,9 @@ function renderGame(){
           </div>` : ``}
         <div class="vinyl-wrap ${vinylClickable ? 'clickable':''}" ${vinylClickable ? `onclick="${vinylOnClick}"` : ``}>
           <div class="vinyl ${spinning ? 'spin':''}"><div class="label"><svg width="20" height="20" viewBox="0 0 20 20"><polygon points="6,4 16,10 6,16" fill="currentColor"/></svg></div></div>
+          <button class="player-reload" onclick="event.stopPropagation(); reloadPlayer()" title="Player neu laden" aria-label="Player neu laden">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+          </button>
         </div>
         ${showPlaybackUI ? (useFallbackEmbed ? `
           <div class="embed-crop">
@@ -2706,7 +3101,6 @@ function renderGame(){
           </div>
           <div class="preview-bar running"><div class="fill"></div></div>
           <div class="draw-caption" style="font-size:12px;">Eingeschränkter Modus: Die unsichtbare Spotify-Steuerung wurde blockiert (z.B. Adblocker) — hier ist der zugeschnittene Player, Balken ist ein 30s-Richtwert.</div>
-          <button class="btn-ghost btn-small" onclick="render()">↻ Player neu laden</button>
         ` : `
           <div class="preview-bar"><div class="fill" id="live-progress-fill"></div></div>
           <div class="draw-caption" style="font-size:12px;">Spielt unsichtbar über Spotify. Nochmal auf die Schallplatte klicken = Pause/Weiter.</div>
@@ -2768,11 +3162,19 @@ function renderGame(){
       <button class="btn-ghost btn-small" onclick="openExitDialog()">Zurück zum Menü</button>
     </div>
 
+    ${isMulti() ? `
+      <div class="turn-banner">
+        <span class="turn-label">Am Zug</span>
+        <span class="turn-name">${esc(currentPlayerName())}</span>
+      </div>` : ``}
+
     ${drawZoneHtml}
 
     <div class="timeline-wrap">
       <div class="timeline">${timelineHtml}</div>
     </div>
+
+    ${renderPlayersDrawer()}
 
     ${state.showExitDialog ? `
       <div class="modal-backdrop" onclick="if(event.target===this) closeExitDialog()">
@@ -2835,8 +3237,45 @@ function simpleCardHtml(song, isStart, isWrong){
     </div>`;
 }
 
+function isMultiRound(){ return isMulti() && state.players.length > 1; }
+
+function rankedPlayers(){
+  const list = state.players.map((_, i) => ({ i, v: playerView(i) }));
+  list.forEach(r => { r.pos = 1 + list.filter(o => o.v.correctCount > r.v.correctCount).length; });
+  list.sort((a, b) => (b.v.correctCount - a.v.correctCount) || (a.v.wrongCount - b.v.wrongCount) || (a.i - b.i));
+  return list;
+}
+
 function renderEnd(){
   const s = state.settings;
+  if(isMultiRound()){
+    const ranking = rankedPlayers();
+    const winners = state.winners || [];
+    const heading = winners.length === 1
+      ? `${esc(state.players[winners[0]].name)} gewinnt!`
+      : `Unentschieden!`;
+    const rows = ranking.map(r => `
+      <div class="rank-row ${winners.includes(r.i) ? 'winner' : ''}">
+        <span class="rank-pos">${r.pos}.</span>
+        <span class="rank-name">${esc(r.v.name)}</span>
+        <span class="rank-score"><b>${r.v.correctCount}</b> / ${s.target} · ${r.v.wrongCount} falsch</span>
+      </div>`).join('');
+    app.innerHTML = `
+      <div class="brand">
+        <div class="mark">SPIELENDE</div>
+      </div>
+      <div class="menu-card win-card">
+        <div class="end-heading won">${heading}</div>
+        ${winners.length > 1 ? `<p>${winners.map(i => esc(state.players[i].name)).join(' &amp; ')}</p>` : ``}
+        <div class="rank-list">${rows}</div>
+        <div class="menu-actions" style="margin-top:18px;">
+          <button class="btn-primary" onclick="showFinalTimeline()">Finale Zeitleisten ansehen</button>
+          <button class="btn-ghost" onclick="abandonGame()">Hauptmenü</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
   app.innerHTML = `
     <div class="brand">
       <div class="mark">RUNDE BEENDET</div>
@@ -2869,32 +3308,53 @@ function toggleShowWrong(){
   render();
 }
 
-function renderTimelineOnly(){
-  const wrong = state.wrongSongs || [];
-  let items = state.timeline.map(song => ({ song, wrong:false }));
-  if(state.showWrongOnTimeline && wrong.length){
+function timelineCardsHtml(timeline, wrongSongs, showWrong){
+  let items = timeline.map(song => ({ song, wrong:false }));
+  if(showWrong && wrongSongs.length){
     // Falsche Songs chronologisch (nach Jahr) einsortieren; bei Gleichstand nach den richtigen
-    wrong.forEach(song => {
+    wrongSongs.forEach(song => {
       let idx = items.findIndex(it => it.song.y > song.y);
       if(idx === -1) idx = items.length;
       items.splice(idx, 0, { song, wrong:true });
     });
   }
-  const cardsHtml = items.map(it => simpleCardHtml(it.song, !it.wrong && !!it.song.__starter, it.wrong)).join('');
-  const toggleHtml = wrong.length ? `
+  return items.map(it => simpleCardHtml(it.song, !it.wrong && !!it.song.__starter, it.wrong)).join('');
+}
+
+function renderTimelineOnly(){
+  const multi = isMultiRound();
+  const wrongTotal = multi
+    ? state.players.reduce((sum, _, i) => sum + (playerView(i).wrongSongs || []).length, 0)
+    : (state.wrongSongs || []).length;
+  const toggleHtml = wrongTotal ? `
     <div class="wrong-toggle">
-      <span>Falsch geratene Songs anzeigen <span class="wrong-count">(${wrong.length})</span></span>
+      <span>Falsch geratene Songs anzeigen <span class="wrong-count">(${wrongTotal})</span></span>
       <div class="switch ${state.showWrongOnTimeline ? 'on' : ''}" onclick="toggleShowWrong()"><div class="knob"></div></div>
     </div>` : `<div class="wrong-toggle none">Keine falsch geratenen Songs — stark!</div>`;
+
+  let body;
+  if(multi){
+    body = rankedPlayers().map(r => `
+      <div class="player-section">
+        <h3>${esc(r.v.name)}</h3>
+        <div class="sub">${r.v.correctCount} richtig · ${r.v.wrongCount} falsch</div>
+        <div class="timeline-wrap">
+          <div class="timeline final-view">${timelineCardsHtml(r.v.timeline, r.v.wrongSongs || [], state.showWrongOnTimeline)}</div>
+        </div>
+      </div>`).join('');
+  } else {
+    body = `
+      <div class="timeline-wrap">
+        <div class="timeline final-view">${timelineCardsHtml(state.timeline, state.wrongSongs || [], state.showWrongOnTimeline)}</div>
+      </div>`;
+  }
   app.innerHTML = `
     <div class="brand">
-      <div class="mark">${state.won ? 'GEWONNEN' : 'VERLOREN'}</div>
-      <h1 style="font-size:28px;">Finale Zeitleiste</h1>
+      <div class="mark">${multi ? 'SPIELENDE' : (state.won ? 'GEWONNEN' : 'VERLOREN')}</div>
+      <h1 style="font-size:28px;">${multi ? 'Finale Zeitleisten' : 'Finale Zeitleiste'}</h1>
     </div>
     ${toggleHtml}
-    <div class="timeline-wrap">
-      <div class="timeline final-view">${cardsHtml}</div>
-    </div>
+    ${body}
     <div class="menu-actions" style="margin-top:24px;">
       <button class="btn-primary" onclick="requestDeleteOnFinish()">Hauptmenü</button>
     </div>
@@ -2943,7 +3403,7 @@ function updateDocumentTitle(){
     settings: "Einstellungen - Chronohit",
     create: "Spiel erstellen - Chronohit",
     game: `${state.activeSaveName ? state.activeSaveName : "Unbenannt"} - Chronohit`,
-    end: `${state.won ? "Gewonnen" : "Verloren"} - Chronohit`,
+    end: `${isMultiRound() ? "Spielende" : (state.won ? "Gewonnen" : "Verloren")} - Chronohit`,
     timeline: "Zeitleiste - Chronohit"
   };
   document.title = map[state.screen] || "Chronohit";
@@ -3016,6 +3476,10 @@ async function resumeGame(){
     state.pendingSpend = null;
     state.saveSlotDialogOpen = false;
     state.confirmDeleteSlot = null;
+    state.playersDrawerOpen = false;
+    state.openPlayerPanels = [];
+    if(!Array.isArray(state.players)) state.players = [];
+    if(isMulti()) syncActiveToPlayer();
     state.screen = "game";
     render();
   }
