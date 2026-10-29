@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Chronohit</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNTAwIDUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNTAwIiBoZWlnaHQ9IjUwMCIgZmlsbD0iIzAwMDAwMCIvPgoKICA8IS0tIMOkdcOfZXJlciBSYWhtZW5yaW5nLCBtYWNodCBkaWUgcnVuZGUgRm9ybSBlaW5kZXV0aWcgLS0+CiAgPGNpcmNsZSBjeD0iMjUwIiBjeT0iMjUwIiByPSIyMzAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U4YTMzZCIgc3Ryb2tlLXdpZHRoPSIyIiBvcGFjaXR5PSIwLjM1Ii8+CgogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI1MCwyNTApIHNjYWxlKDQpIiBzdHJva2UtbGluZWNhcD0icm91bmQiPgogICAgPCEtLSBaZWl0bGVpc3RlIC0tPgogICAgPGxpbmUgeDE9Ii00NCIgeTE9IjAiIHgyPSI0NCIgeTI9IjAiIHN0cm9rZT0iI2U4YTMzZCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8Y2lyY2xlIGN4PSItMzIiIGN5PSIwIiByPSIxLjciIGZpbGw9IiNlOGEzM2QiLz4KICAgIDxjaXJjbGUgY3g9IjMyIiBjeT0iMCIgcj0iMS43IiBmaWxsPSIjZThhMzNkIi8+CgogICAgPCEtLSBWaW55bC1SaWxsZW4gLS0+CiAgICA8Y2lyY2xlIGN4PSIwIiBjeT0iMCIgcj0iMjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U4YTMzZCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8Y2lyY2xlIGN4PSIwIiBjeT0iMCIgcj0iMTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U4YTMzZCIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjU1Ii8+CiAgICA8Y2lyY2xlIGN4PSIwIiBjeT0iMCIgcj0iOC41IiBmaWxsPSJub25lIiBzdHJva2U9IiNlOGEzM2QiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC4zIi8+CgogICAgPCEtLSBQbGF5LURyZWllY2sgaW0gWmVudHJ1bSAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iLTQsLTYgLTQsNiA4LDAiIGZpbGw9IiNlOGEzM2QiLz4KICA8L2c+Cjwvc3ZnPgo=">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNTAwIDUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDwhLS0gw6R1w59lcmVyIFJhaG1lbnJpbmcsIG1hY2h0IGRpZSBydW5kZSBGb3JtIGVpbmRldXRpZyAtLT4KICA8Y2lyY2xlIGN4PSIyNTAiIGN5PSIyNTAiIHI9IjIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjIiIG9wYWNpdHk9IjAuMzUiLz4KCiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjUwLDI1MCkgc2NhbGUoNCkiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+CiAgICA8IS0tIFplaXRsZWlzdGUgLS0+CiAgICA8bGluZSB4MT0iLTQ0IiB5MT0iMCIgeDI9IjQ0IiB5Mj0iMCIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDxjaXJjbGUgY3g9Ii0zMiIgY3k9IjAiIHI9IjEuNyIgZmlsbD0iI2U4YTMzZCIvPgogICAgPGNpcmNsZSBjeD0iMzIiIGN5PSIwIiByPSIxLjciIGZpbGw9IiNlOGEzM2QiLz4KCiAgICA8IS0tIFZpbnlsLVJpbGxlbiAtLT4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIyMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIxNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjEiIG9wYWNpdHk9IjAuNTUiLz4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSI4LjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U4YTMzZCIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjMiLz4KCiAgICA8IS0tIFBsYXktRHJlaWVjayBpbSBaZW50cnVtIC0tPgogICAgPHBvbHlnb24gcG9pbnRzPSItNCwtNiAtNCw2IDgsMCIgZmlsbD0iI2U4YTMzZCIvPgogIDwvZz4KPC9zdmc+Cg==">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -763,6 +763,7 @@ function loadSlot(n){
   if(state.guessResult === undefined) state.guessResult = null;
   if(typeof state.correctCount !== "number") state.correctCount = 0;
   if(typeof state.settings.maxTokens !== "number") state.settings.maxTokens = 5;
+  if(typeof state.settings.startTokens !== "number") state.settings.startTokens = 2;
   if(!state.settings.mode) state.settings.mode = "solo";
   if(!state.settings.difficulty) state.settings.difficulty = "normal";
   state.pendingSpend = null;
@@ -799,6 +800,7 @@ let state = {
     // strictYear: false, // vorerst deaktiviert – siehe isPlacementCorrect() weiter unten
     target: 10,
     maxTokens: 5,
+    startTokens: 2,
     mode: "solo",        // solo | multiplayer | coop
     difficulty: "normal", // normal | pro | expert
     genres: { de:true, en:true, es:true }
@@ -826,6 +828,7 @@ let state = {
   activeSlot: null,          // an welchen Slot die laufende Runde gebunden ist
   activeSaveName: "",
   confirmOverwriteSave: false,
+  confirmDeleteOnFinish: false,
   wizard: null               // Zwischenstand während "Spiel erstellen"
 };
 
@@ -962,7 +965,7 @@ function newGame(customSettings){
     phase: "draw",
     pendingGap: null,
     lastResult: null,
-    tokens: settings.tokens ? 2 : 0,
+    tokens: settings.tokens ? (typeof settings.startTokens === "number" ? settings.startTokens : 2) : 0,
     correctCount: 0,
     wrongCount: 0,
     won: false,
@@ -979,7 +982,8 @@ function newGame(customSettings){
     infoOpen: null,
     activeSlot: null,
     activeSaveName: "",
-    confirmOverwriteSave: false
+    confirmOverwriteSave: false,
+    confirmDeleteOnFinish: false
   };
   drawNext();
   saveState();
@@ -1071,6 +1075,12 @@ function reshuffleIfNeeded(){
 
 function drawNext(){
   pauseSpotifyPlayback();
+  if(state.settings.mode === "coop" && state.tokens <= 0){
+    state.current = null;
+    state.won = false;
+    state.screen = "end";
+    return;
+  }
   reshuffleIfNeeded();
   if(state.deck.length === 0){
     state.current = null;
@@ -1211,17 +1221,26 @@ function revealCard(){
   } else {
     state.discard.push(song);
     state.wrongCount += 1;
+    if(state.settings.mode === "coop"){
+      state.tokens = Math.max(0, state.tokens - 1);
+    }
   }
-  state.lastResult = { ok, song, positionOk, guessCheck, difficulty: diff };
 
-  if(diff === "normal"){
-    // Bonus-Chrono-Token fürs Raten gibt's nur im Normal-Modus — in
-    // Pro/Expert ist das Raten ja bereits Pflicht fürs Zählen der Karte.
-    evaluateGuess(song);
-  } else {
-    state.guessResult = null;
-    state.guess = { t:"", a:"", y:"" };
+  // Bonus-Chrono-Token fürs richtige Titel/Interpret-Raten — gilt in JEDEM
+  // Modus, auch in Profi/Experte, wo das Raten ohnehin Pflicht fürs
+  // Zählen der Karte ist. Ein Treffer verdient den Token trotzdem.
+  let bonusAwarded = false;
+  if(state.settings.tokens && state.settings.mode !== "coop" && guessCheck.both && !state.bonusClaimed){
+    state.bonusClaimed = true;
+    if(state.tokens < state.settings.maxTokens){
+      state.tokens += 1;
+      bonusAwarded = true;
+    }
   }
+
+  state.lastResult = { ok, song, positionOk, guessCheck, difficulty: diff, bonusAwarded };
+  state.guessResult = null;
+  state.guess = { t:"", a:"", y:"" };
 
   state.phase = "feedback";
   render(); saveState();
@@ -1302,7 +1321,7 @@ async function discardAndMenu(){
     settings: keepSettings,
     deck: [], discard: [], timeline: [],
     current: null, phase: "draw", pendingGap: null, lastResult: null,
-    tokens: 0, correctCount: 0, wrongCount: 0, won: false, hasSave: false, showExitDialog: false, bonusClaimed: false, pendingSpend: null, saveSlotDialogOpen: false, saveNameDraft: "", confirmDeleteSlot: null, openSlotSettings: null, infoOpen: null, activeSlot: null, activeSaveName: "", confirmOverwriteSave: false, wizard: null
+    tokens: 0, correctCount: 0, wrongCount: 0, won: false, hasSave: false, showExitDialog: false, bonusClaimed: false, pendingSpend: null, saveSlotDialogOpen: false, saveNameDraft: "", confirmDeleteSlot: null, openSlotSettings: null, infoOpen: null, activeSlot: null, activeSaveName: "", confirmOverwriteSave: false, confirmDeleteOnFinish: false, wizard: null
   };
   render();
 }
@@ -1551,10 +1570,11 @@ function renderTutorial(){
           <strong>Normal</strong> — nur die Position zählt.<br>
           <strong>Profi</strong> — Titel &amp; Interpret müssen vor dem Aufdecken zusätzlich stimmen.<br>
           <strong>Experte</strong> — zusätzlich auch das exakte Erscheinungsjahr.</p>
-        <p><strong>Chrono-Tokens (falls aktiviert):</strong> Du startest mit 2, das Maximum ist einstellbar.</p>
+        <p><strong>Koop-Modus:</strong> Ihr startet gemeinsam mit einer festen Anzahl Chrono-Tokens (1–10, einstellbar) und einer Startkarte. Jede falsch platzierte Karte kostet einen Token — Skip/Kaufen gibt es hier nicht, die Tokens sind eure gemeinsamen Leben. Erreicht ihr 0 Tokens, bevor die Zielkartenzahl erreicht ist, habt ihr verloren; schafft ihr die Zielkartenzahl vorher, habt ihr gewonnen.</p>
+        <p><strong>Chrono-Tokens (falls aktiviert, außerhalb von Koop):</strong> Start- und Maximalwert sind einstellbar.</p>
         <p>&bull; <strong>Song unbekannt?</strong> Wirf für 1 Chrono-Token die aktuelle Karte ab und ziehe eine neue, ohne sie zu platzieren.</p>
         <p>&bull; <strong>Karte kaufen:</strong> Für 3 Chrono-Tokens wird die nächste gezogene Karte garantiert korrekt in deine Zeitleiste einsortiert — ganz ohne Rateversuch und ohne Risiko.</p>
-        <p>&bull; <strong>Bonus-Chrono-Token (nur im Normal-Modus):</strong> Bevor du aufdeckst, kannst du Titel und Interpret eintippen. Stimmt beides, gibt es einen weiteren Chrono-Token. Verglichen wird großzügig: Groß-/Kleinschreibung, Akzente, Umlaut-Schreibweisen und Tippfehler werden verziehen. In Profi/Experte ist das Eintippen ohnehin Pflicht, daher entfällt dort der separate Bonus-Token.</p>
+        <p>&bull; <strong>Bonus-Chrono-Token:</strong> Sobald du Titel und Interpret richtig eintippst, gibt es einen weiteren Chrono-Token — in jedem Schwierigkeitsgrad, auch wenn das Eintippen in Profi/Experte ohnehin Pflicht fürs Zählen der Karte ist. Verglichen wird großzügig: Groß-/Kleinschreibung, Akzente, Umlaut-Schreibweisen und Tippfehler werden verziehen.</p>
         <p><strong>Spielstände:</strong> Beim Erstellen eines Spiels wählst du einen von 4 Speicherplätzen und einen Namen. Über den 💾-Button im Spiel speicherst du jederzeit in genau diesen Slot.</p>
       </div>
     </div>
@@ -1576,6 +1596,8 @@ function startCreateWizard(){
     difficulty: "normal",
     tokens: false,
     maxTokens: 5,
+    startTokens: 2,
+    coopTokens: 5,
     target: 10,
     genres: { de:true, en:true, es:true }
   };
@@ -1594,10 +1616,25 @@ function wizardSetSlot(n){ state.wizard.slot = n; render(); }
 function wizardSetMode(v){ state.wizard.mode = v; render(); }
 function wizardSetDifficulty(v){ state.wizard.difficulty = v; render(); }
 function wizardToggleTokens(){ state.wizard.tokens = !state.wizard.tokens; render(); }
+function wizardStepCoopTokens(delta){
+  const t = state.wizard.coopTokens + delta;
+  if(t < 1 || t > 10) return;
+  state.wizard.coopTokens = t;
+  render();
+}
+function wizardStepStartTokens(delta){
+  const t = state.wizard.startTokens + delta;
+  if(t < 0 || t > 15) return;
+  state.wizard.startTokens = t;
+  if(state.wizard.startTokens > state.wizard.maxTokens){ state.wizard.maxTokens = state.wizard.startTokens; }
+  render();
+}
 function wizardStepMaxTokens(delta){
   const m = state.wizard.maxTokens + delta;
   if(m < 3 || m > 15) return;
-  state.wizard.maxTokens = m; render();
+  state.wizard.maxTokens = m;
+  if(state.wizard.startTokens > m){ state.wizard.startTokens = m; }
+  render();
 }
 function wizardStepTarget(delta){
   const t = state.wizard.target + delta;
@@ -1643,13 +1680,13 @@ function renderWizardStep2(){
       <h3>2. Modus &amp; Schwierigkeit</h3>
       <div class="settings-grid">
         ${infoRow('w-mode', 'Spielmodus',
-          'Solo ist spielbar. Mehrspieler und Koop sind für die Zukunft geplant.',
+          'Solo und Koop sind spielbar. Mehrspieler ist für die Zukunft geplant.',
           `<select class="dropdown" onchange="wizardSetMode(this.value)">
             <option value="solo" ${w.mode==='solo'?'selected':''}>Solo</option>
             <option value="multiplayer" ${w.mode==='multiplayer'?'selected':''}>Mehrspieler</option>
             <option value="coop" ${w.mode==='coop'?'selected':''}>Koop</option>
           </select>`)}
-        ${w.mode !== 'solo' ? plannedFeatureNotice() : ``}
+        ${w.mode === 'multiplayer' ? plannedFeatureNotice() : ``}
         ${infoRow('w-difficulty', 'Schwierigkeit',
           '<strong>Normal</strong>: Nur die Position auf der Zeitleiste zählt.<br><strong>Profi</strong>: Titel &amp; Interpret müssen zusätzlich stimmen.<br><strong>Experte</strong>: zusätzlich auch das exakte Erscheinungsjahr.',
           `<select class="dropdown" onchange="wizardSetDifficulty(this.value)">
@@ -1666,9 +1703,25 @@ function renderWizardStep3(){
     <div class="menu-card">
       <h3>3. Weitere Einstellungen</h3>
       <div class="settings-grid">
+        ${w.mode === 'coop' ? `
+        ${infoRow('w-cooptokens', 'Chrono-Tokens (Koop)',
+          'Ihr startet gemeinsam mit dieser Anzahl an Tokens (1–10). Jede falsch platzierte Karte kostet einen Token. Geht ihr auf 0, verliert ihr — erreicht ihr die Zielkartenzahl vorher, gewinnt ihr.',
+          `<div class="stepper">
+            <button onclick="wizardStepCoopTokens(-1)">–</button>
+            <div class="val">${w.coopTokens}</div>
+            <button onclick="wizardStepCoopTokens(1)">+</button>
+          </div>`)}
+        ` : `
         ${infoRow('w-tokens', 'Chrono-Tokens',
           'Erlaubt, Karten mit Tokens zu überspringen oder garantiert richtig zu kaufen.',
           `<div class="switch ${w.tokens?'on':''}" onclick="wizardToggleTokens()"><div class="knob"></div></div>`)}
+        ${w.tokens ? infoRow('w-starttokens', 'Start-Chrono-Tokens',
+          'Wie viele Chrono-Tokens du zu Beginn der Runde besitzt (0–15).',
+          `<div class="stepper">
+            <button onclick="wizardStepStartTokens(-1)">–</button>
+            <div class="val">${w.startTokens}</div>
+            <button onclick="wizardStepStartTokens(1)">+</button>
+          </div>`) : ``}
         ${w.tokens ? infoRow('w-maxtokens', 'Maximale Chrono-Tokens',
           'Wie viele Chrono-Tokens du gleichzeitig horten kannst (3–15).',
           `<div class="stepper">
@@ -1676,6 +1729,7 @@ function renderWizardStep3(){
             <div class="val">${w.maxTokens}</div>
             <button onclick="wizardStepMaxTokens(1)">+</button>
           </div>`) : ``}
+        `}
         ${infoRow('w-target', 'Kartenanzahl bis Sieg',
           'Wie viele Karten du richtig erraten musst, um zu gewinnen — die Startkarte zählt nicht mit.',
           `<div class="stepper">
@@ -1722,10 +1776,19 @@ function renderCreateGame(){
 }
 async function createGameFromWizard(){
   const w = state.wizard;
-  const settings = {
+  const settings = w.mode === "coop" ? {
+    tokens: true,
+    target: w.target,
+    maxTokens: w.coopTokens,
+    startTokens: w.coopTokens,
+    mode: w.mode,
+    difficulty: w.difficulty,
+    genres: { ...w.genres }
+  } : {
     tokens: w.tokens,
     target: w.target,
     maxTokens: w.maxTokens,
+    startTokens: w.startTokens,
     mode: w.mode,
     difficulty: w.difficulty,
     genres: { ...w.genres }
@@ -1846,12 +1909,13 @@ function renderGame(){
             <iframe src="https://open.spotify.com/embed/track/${song.id}?utm_source=generator&theme=0"
               loading="lazy" allow="encrypted-media" title="Spotify player"></iframe>
           </div>` : ``}
-        ${diff !== "normal" ? `
+        ${(diff !== "normal" || (s.tokens && s.mode !== 'coop')) ? `
           <div class="guess-result">
+            ${diff !== "normal" ? `
             <div class="row ${r.positionOk ? 'ok':'bad'}">
               <span class="mark">${r.positionOk ? '✓':'✕'}</span>
               <span>Position auf der Zeitleiste</span>
-            </div>
+            </div>` : ``}
             <div class="row ${r.guessCheck.titleOk ? 'ok':'bad'}">
               <span class="mark">${r.guessCheck.titleOk ? '✓':'✕'}</span>
               <span>Titel <span class="said">— du: „${esc(r.guessCheck.said.t) || '—'}"</span></span>
@@ -1865,24 +1929,14 @@ function renderGame(){
               <span class="mark">${r.guessCheck.yearOk ? '✓':'✕'}</span>
               <span>Jahr <span class="said">— du: „${esc(r.guessCheck.said.y) || '—'}"</span></span>
             </div>` : ``}
+            ${s.tokens && s.mode !== 'coop' ? `
+            <div class="verdict ${r.guessCheck.both ? 'ok':'bad'}">
+              ${r.guessCheck.both
+                ? (r.bonusAwarded ? `+1 Bonus-Chrono-Token ${icon('token')}` : `Beides richtig — aber dein Chrono-Token-Vorrat ist schon voll (${s.maxTokens}).`)
+                : `Kein Bonus-Chrono-Token — Titel &amp; Interpret müssen stimmen.`}
+            </div>` : ``}
           </div>
         ` : ``}
-        ${diff === "normal" && s.tokens && state.guessResult ? `
-          <div class="guess-result">
-            <div class="row ${state.guessResult.titleOk ? 'ok':'bad'}">
-              <span class="mark">${state.guessResult.titleOk ? '✓':'✕'}</span>
-              <span>Titel <span class="said">— du: „${esc(state.guessResult.said.t) || '—'}"</span></span>
-            </div>
-            <div class="row ${state.guessResult.artistOk ? 'ok':'bad'}">
-              <span class="mark">${state.guessResult.artistOk ? '✓':'✕'}</span>
-              <span>Interpret <span class="said">— du: „${esc(state.guessResult.said.a) || '—'}"</span></span>
-            </div>
-            <div class="verdict ${state.guessResult.both ? 'ok':'bad'}">
-              ${state.guessResult.both
-                ? (state.guessResult.awarded ? `+1 Bonus-Chrono-Token ${icon('token')}` : `Beides richtig — aber dein Chrono-Token-Vorrat ist schon voll (${s.maxTokens}).`)
-                : `Kein Bonus-Chrono-Token — beides muss stimmen.`}
-            </div>
-          </div>` : ``}
         <button class="btn-primary" onclick="nextTurn()">Nächste Karte</button>
       </div>`;
   } else if(state.current){
@@ -1910,7 +1964,7 @@ function renderGame(){
         `) : ``}
         ${state.phase === "draw" ? `
           <div class="draw-caption">${state.current.id ? 'Klick auf die Schallplatte zum Abspielen.' : 'Klick auf die Schallplatte, um den Song bei Spotify zu suchen.'}</div>
-          ${s.tokens ? `
+          ${s.tokens && s.mode !== 'coop' ? `
           <div class="draw-actions">
             <button class="btn-ghost btn-small" onclick="requestSkip()" ${state.tokens<1?'disabled':''}>Song unbekannt — überspringen (1 ${icon('token')})</button>
             <button class="btn-ghost btn-small" onclick="requestBuy()" ${state.tokens<3?'disabled':''}>Karte kaufen (3 ${icon('token')})</button>
@@ -1918,14 +1972,14 @@ function renderGame(){
         ` : ``}
         ${state.phase === "placing" ? `
           <div class="draw-caption">${state.current.id ? 'Klicke auf der Zeitleiste die Stelle an, wo die Karte hin soll.' : 'Song läuft auf Spotify (neuer Tab). Klicke auf der Zeitleiste die Stelle an, wo die Karte hin soll.'}</div>
-          ${s.tokens ? `
+          ${s.tokens && s.mode !== 'coop' ? `
           <div class="draw-actions">
             <button class="btn-ghost btn-small" onclick="requestSkip()" ${state.tokens<1?'disabled':''}>Song unbekannt — überspringen (1 ${icon('token')})</button>
           </div>` : ``}
         ` : ``}
         ${state.phase === "revealed_pending" ? `
           <div class="draw-caption">Karte liegt bereit. Aufdecken?</div>
-          ${s.tokens || s.difficulty !== 'normal' ? `
+          ${s.difficulty !== 'normal' || (s.tokens && s.mode !== 'coop') ? `
           <div class="guess-box">
             <div class="head">${
               s.difficulty === 'expert' ? 'Titel, Interpret &amp; Jahr — Pflicht für den Punkt!'
@@ -2070,9 +2124,41 @@ function renderTimelineOnly(){
       <div class="timeline final-view">${cardsHtml}</div>
     </div>
     <div class="menu-actions" style="margin-top:24px;">
-      <button class="btn-primary" onclick="abandonGame()">Hauptmenü</button>
+      <button class="btn-primary" onclick="requestDeleteOnFinish()">Hauptmenü</button>
     </div>
+    ${state.confirmDeleteOnFinish ? renderDeleteOnFinishModal() : ``}
   `;
+}
+function requestDeleteOnFinish(){
+  state.confirmDeleteOnFinish = true;
+  render();
+}
+function cancelDeleteOnFinish(){
+  state.confirmDeleteOnFinish = false;
+  render();
+}
+function keepAndGoToMenu(){
+  state.confirmDeleteOnFinish = false;
+  abandonGame();
+}
+async function deleteAndGoToMenu(){
+  if(state.activeSlot){ await deleteSlot(state.activeSlot); }
+  state.confirmDeleteOnFinish = false;
+  abandonGame();
+}
+function renderDeleteOnFinishModal(){
+  const label = state.activeSaveName ? esc(state.activeSaveName) : (state.activeSlot ? `Slot ${state.activeSlot}` : "dieser Spielstand");
+  return `
+    <div class="modal-backdrop" onclick="if(event.target===this) cancelDeleteOnFinish()">
+      <div class="modal-box">
+        <h3>Spielstand löschen?</h3>
+        <p>Die Runde ist vorbei. Soll „${label}" gelöscht werden, oder möchtest du ihn behalten?</p>
+        <div class="modal-actions">
+          <button class="btn-danger" onclick="deleteAndGoToMenu()">Löschen</button>
+          <button class="btn-ghost" onclick="keepAndGoToMenu()">Behalten</button>
+        </div>
+      </div>
+    </div>`;
 }
 
 function updateDocumentTitle(){
@@ -2150,6 +2236,7 @@ async function resumeGame(){
     if(state.guessResult === undefined) state.guessResult = null;
     if(typeof state.correctCount !== "number") state.correctCount = 0;
     if(typeof state.settings.maxTokens !== "number") state.settings.maxTokens = 5;
+  if(typeof state.settings.startTokens !== "number") state.settings.startTokens = 2;
   if(!state.settings.mode) state.settings.mode = "solo";
   if(!state.settings.difficulty) state.settings.difficulty = "normal";
     state.pendingSpend = null;
@@ -2167,6 +2254,7 @@ async function resumeGame(){
   if(saved){
     state.settings = saved.settings || state.settings;
     if(typeof state.settings.maxTokens !== "number") state.settings.maxTokens = 5;
+  if(typeof state.settings.startTokens !== "number") state.settings.startTokens = 2;
   if(!state.settings.mode) state.settings.mode = "solo";
   if(!state.settings.difficulty) state.settings.difficulty = "normal";
     state.hasSave = saved.screen === "game";
