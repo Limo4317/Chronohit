@@ -114,6 +114,10 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 8px 32px rgba(0,0,0,.28);
   }
 
+  ::view-transition-old(root), ::view-transition-new(root){ animation-duration:.5s; }
+  :root.theme-transition, :root.theme-transition *{
+    transition: background-color .5s ease, color .5s ease, border-color .5s ease, fill .5s ease, stroke .5s ease !important;
+  }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   html{overflow-x:hidden;}
@@ -257,6 +261,29 @@
   .theme-swatch[data-theme-preview="custom"] .theme-dots span:nth-child(1){ background:conic-gradient(from 0deg, #e8a33d, #5a9c78, #175cc2, #c1483b, #e8a33d); }
   .theme-swatch[data-theme-preview="custom"] .theme-dots span:nth-child(2),
   .theme-swatch[data-theme-preview="custom"] .theme-dots span:nth-child(3){ display:none; }
+  .custom-theme-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px 18px; }
+  .custom-color-row{
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    font-size:13px; color:var(--muted);
+  }
+  .custom-color-row input[type="color"]{
+    width:42px; height:32px; padding:2px; cursor:pointer;
+    border:1px solid var(--line); border-radius:8px; background:none;
+  }
+  .skip-notice{
+    display:flex; flex-direction:column; align-items:center; gap:2px; text-align:center;
+    background:var(--panel-2); border:1px dashed var(--line); border-radius:12px;
+    padding:8px 14px; font-size:13px; max-width:340px;
+  }
+  .skip-notice .skip-label{ color:var(--muted); font-size:11px; letter-spacing:.04em; text-transform:uppercase; }
+  .skip-notice .skip-song{ color:var(--text); }
+  .skip-notice .skip-song b{ color:var(--accent); font-weight:600; }
+  .wrong-toggle{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin:0 auto 18px; font-size:14px; color:var(--muted);
+  }
+  .wrong-toggle.none{ font-size:13px; }
+  .wrong-toggle .wrong-count{ color:var(--wrong); }
   .theme-info{ flex:1; }
   .theme-label{ font-family:var(--heading-font); font-size:16px; color:var(--text); }
   .theme-label .wizard-check{ font-size:14px; }
@@ -1440,6 +1467,9 @@ let state = {
   activeSaveName: "",
   confirmOverwriteSave: false,
   confirmDeleteOnFinish: false,
+  skippedInfo: null,
+  wrongSongs: [],
+  showWrongOnTimeline: false,
   wizard: null               // Zwischenstand während "Spiel erstellen"
 };
 
@@ -1594,7 +1624,10 @@ function newGame(customSettings){
     activeSlot: null,
     activeSaveName: "",
     confirmOverwriteSave: false,
-    confirmDeleteOnFinish: false
+    confirmDeleteOnFinish: false,
+    skippedInfo: null,
+    wrongSongs: [],
+    showWrongOnTimeline: false
   };
   drawNext();
   saveState();
@@ -1686,6 +1719,7 @@ function reshuffleIfNeeded(){
 
 function drawNext(){
   pauseSpotifyPlayback();
+  state.skippedInfo = null;
   if(state.settings.mode === "coop" && state.tokens <= 0){
     state.current = null;
     state.won = false;
@@ -1747,9 +1781,12 @@ function confirmSpend(){
 
 function doSkipWithToken(){
   if(state.tokens < 1 || !state.current) return;
+  const skipped = state.current;
   state.tokens -= 1;
-  state.discard.push(state.current);
+  state.discard.push(skipped);
   drawNext();
+  // Nach drawNext setzen (drawNext leert den Hinweis), damit er bei der neuen Karte erscheint
+  state.skippedInfo = { t: skipped.t, a: skipped.a, y: skipped.y };
   render(); saveState();
 }
 
@@ -1832,6 +1869,8 @@ function revealCard(){
   } else {
     state.discard.push(song);
     state.wrongCount += 1;
+    if(!state.wrongSongs) state.wrongSongs = [];
+    state.wrongSongs.push(song);
     if(state.settings.mode === "coop"){
       state.tokens = Math.max(0, state.tokens - 1);
     }
@@ -1932,7 +1971,7 @@ async function discardAndMenu(){
     settings: keepSettings,
     deck: [], discard: [], timeline: [],
     current: null, phase: "draw", pendingGap: null, lastResult: null,
-    tokens: 0, correctCount: 0, wrongCount: 0, won: false, hasSave: false, showExitDialog: false, bonusClaimed: false, pendingSpend: null, saveSlotDialogOpen: false, saveNameDraft: "", confirmDeleteSlot: null, openSlotSettings: null, infoOpen: null, activeSlot: null, activeSaveName: "", confirmOverwriteSave: false, confirmDeleteOnFinish: false, wizard: null
+    tokens: 0, correctCount: 0, wrongCount: 0, won: false, hasSave: false, showExitDialog: false, bonusClaimed: false, pendingSpend: null, saveSlotDialogOpen: false, saveNameDraft: "", confirmDeleteSlot: null, openSlotSettings: null, infoOpen: null, activeSlot: null, activeSaveName: "", confirmOverwriteSave: false, confirmDeleteOnFinish: false, skippedInfo: null, wrongSongs: [], showWrongOnTimeline: false, wizard: null
   };
   render();
 }
@@ -2114,8 +2153,17 @@ const THEME_INFO = [
 ];
 
 function selectTheme(key){
-  applyTheme(key);
-  render();
+  if(key === currentTheme) return;
+  const swap = () => { applyTheme(key); render(); };
+  if(document.startViewTransition){
+    // Überblendet die komplette Seite, inkl. Hintergrundverlauf
+    document.startViewTransition(swap);
+  } else {
+    const root = document.documentElement;
+    root.classList.add("theme-transition");
+    swap();
+    setTimeout(() => root.classList.remove("theme-transition"), 600);
+  }
 }
 
 function renderSettings(){
@@ -2141,10 +2189,47 @@ function renderSettings(){
       <div class="theme-list">${swatches}</div>
     </div>
 
+    ${currentTheme === 'custom' ? renderCustomThemePanel() : ``}
+
     <div class="menu-actions">
       <button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button>
     </div>
   `;
+}
+
+function renderCustomThemePanel(){
+  const c = customTheme;
+  const colorRow = (label, key) => `
+    <label class="custom-color-row">
+      <span>${label}</span>
+      <input type="color" value="${c[key]}" oninput="setCustomColor('${key}', this.value)">
+    </label>`;
+  const fontOptions = FONT_OPTIONS.map(f =>
+    `<option value="${f.key}" ${c.font === f.key ? 'selected' : ''}>${f.key}</option>`).join('');
+  return `
+    <div class="menu-card">
+      <h3>Benutzerdefiniert anpassen</h3>
+      <div class="custom-theme-grid">
+        ${colorRow('Hintergrund', 'bg')}
+        ${colorRow('Flächen', 'panel')}
+        ${colorRow('Akzent', 'accent')}
+        ${colorRow('Text', 'text')}
+        ${colorRow('Richtig', 'correct')}
+        ${colorRow('Falsch', 'wrong')}
+      </div>
+      <div class="setting-row" style="margin-top:16px;">
+        <div class="label">Opazität der Flächen</div>
+        <input type="range" min="0.3" max="1" step="0.05" value="${c.opacity}"
+          oninput="setCustomOpacity(this.value)" style="width:150px;">
+      </div>
+      <div class="setting-row" style="margin-top:14px;">
+        <div class="label">Schriftart</div>
+        <select class="dropdown" onchange="setCustomFont(this.value)">${fontOptions}</select>
+      </div>
+      <div class="menu-actions" style="margin-top:16px;">
+        <button class="btn-ghost btn-small" onclick="resetCustomTheme()">Zurücksetzen</button>
+      </div>
+    </div>`;
 }
 
 function renderMenu(){
@@ -2606,6 +2691,11 @@ function renderGame(){
     const vinylOnClick = state.phase === "draw" ? "playCurrent()" : "toggleSpotifyPlayback()";
     drawZoneHtml = `
       <div class="draw-zone">
+        ${state.skippedInfo ? `
+          <div class="skip-notice">
+            <span class="skip-label">Übersprungen — das war:</span>
+            <span class="skip-song">„${esc(state.skippedInfo.t)}" – ${esc(state.skippedInfo.a)} <b>(${state.skippedInfo.y})</b></span>
+          </div>` : ``}
         <div class="vinyl-wrap ${vinylClickable ? 'clickable':''}" ${vinylClickable ? `onclick="${vinylOnClick}"` : ``}>
           <div class="vinyl ${spinning ? 'spin':''}"><div class="label"><svg width="20" height="20" viewBox="0 0 20 20"><polygon points="6,4 16,10 6,16" fill="currentColor"/></svg></div></div>
         </div>
@@ -2732,10 +2822,11 @@ function renderGame(){
   });
 }
 
-function simpleCardHtml(song, isStart){
+function simpleCardHtml(song, isStart, isWrong){
   return `
-    <div class="card">
+    <div class="card ${isWrong ? 'wrong' : ''}">
       ${isStart ? `<span class="tag start">Start</span>` : ``}
+      ${isWrong ? `<span class="tag bad">falsch</span>` : ``}
       <div><div class="year">${song.y}</div></div>
       <div>
         <div class="title">${song.t}</div>
@@ -2768,17 +2859,39 @@ function renderEnd(){
 }
 
 function showFinalTimeline(){
+  state.showWrongOnTimeline = false;
   state.screen = "timeline";
   render();
 }
 
+function toggleShowWrong(){
+  state.showWrongOnTimeline = !state.showWrongOnTimeline;
+  render();
+}
+
 function renderTimelineOnly(){
-  const cardsHtml = state.timeline.map(song => simpleCardHtml(song, !!song.__starter)).join('');
+  const wrong = state.wrongSongs || [];
+  let items = state.timeline.map(song => ({ song, wrong:false }));
+  if(state.showWrongOnTimeline && wrong.length){
+    // Falsche Songs chronologisch (nach Jahr) einsortieren; bei Gleichstand nach den richtigen
+    wrong.forEach(song => {
+      let idx = items.findIndex(it => it.song.y > song.y);
+      if(idx === -1) idx = items.length;
+      items.splice(idx, 0, { song, wrong:true });
+    });
+  }
+  const cardsHtml = items.map(it => simpleCardHtml(it.song, !it.wrong && !!it.song.__starter, it.wrong)).join('');
+  const toggleHtml = wrong.length ? `
+    <div class="wrong-toggle">
+      <span>Falsch geratene Songs anzeigen <span class="wrong-count">(${wrong.length})</span></span>
+      <div class="switch ${state.showWrongOnTimeline ? 'on' : ''}" onclick="toggleShowWrong()"><div class="knob"></div></div>
+    </div>` : `<div class="wrong-toggle none">Keine falsch geratenen Songs — stark!</div>`;
   app.innerHTML = `
     <div class="brand">
       <div class="mark">${state.won ? 'GEWONNEN' : 'VERLOREN'}</div>
       <h1 style="font-size:28px;">Finale Zeitleiste</h1>
     </div>
+    ${toggleHtml}
     <div class="timeline-wrap">
       <div class="timeline final-view">${cardsHtml}</div>
     </div>
@@ -2910,16 +3023,127 @@ async function resumeGame(){
 
 /* ============ THEME ============ */
 const THEME_STORAGE_KEY = "chronohit_theme";
+const CUSTOM_THEME_KEY = "chronohit_custom_theme";
 let currentTheme = "og";
+
+const FONT_OPTIONS = [
+  { key:"Space Grotesk",    family:"'Space Grotesk', sans-serif",  google:"Space+Grotesk:wght@400;500;600;700" },
+  { key:"Inter",            family:"'Inter', sans-serif",          google:"Inter:wght@400;500;600;700" },
+  { key:"Poppins",          family:"'Poppins', sans-serif",        google:"Poppins:wght@400;500;600;700" },
+  { key:"Space Mono",       family:"'Space Mono', monospace",      google:"Space+Mono:wght@400;700" },
+  { key:"IBM Plex Mono",    family:"'IBM Plex Mono', monospace",   google:"IBM+Plex+Mono:wght@400;500;600;700" },
+  { key:"Playfair Display", family:"'Playfair Display', serif",    google:"Playfair+Display:wght@500;600;700" },
+  { key:"System",           family:"system-ui, -apple-system, 'Segoe UI', sans-serif", google:null }
+];
+const CUSTOM_THEME_DEFAULTS = {
+  bg: "#14151d", panel: "#21232f", accent: "#e8a33d", text: "#ece7db",
+  correct: "#5a9c78", wrong: "#c1483b", opacity: 1, font: "Space Grotesk"
+};
+const CUSTOM_PROPS = [
+  "--bg","--bg-2","--bg-highlight","--panel","--panel-2","--line","--text","--muted",
+  "--accent","--accent-ink","--correct","--wrong","--panel-blur",
+  "--heading-font","--body-font","--body-bg-image"
+];
+let customTheme = { ...CUSTOM_THEME_DEFAULTS };
+
+function loadCustomTheme(){
+  try{
+    const raw = localStorage.getItem(CUSTOM_THEME_KEY);
+    if(raw){ customTheme = { ...CUSTOM_THEME_DEFAULTS, ...JSON.parse(raw) }; }
+  }catch(e){}
+}
+function saveCustomTheme(){
+  try{ localStorage.setItem(CUSTOM_THEME_KEY, JSON.stringify(customTheme)); }catch(e){}
+}
+
+function hexToRgba(hex, alpha){
+  const h = hex.replace("#","");
+  return `rgba(${parseInt(h.substring(0,2),16)},${parseInt(h.substring(2,4),16)},${parseInt(h.substring(4,6),16)},${alpha})`;
+}
+function mixHex(hex, towardHex, amount){
+  const a = hex.replace("#",""), b = towardHex.replace("#","");
+  const ch = (s,i) => parseInt(s.substring(i,i+2),16);
+  const mix = i => Math.round(ch(a,i) + (ch(b,i) - ch(a,i)) * amount);
+  const toHex = n => n.toString(16).padStart(2,"0");
+  return "#" + toHex(mix(0)) + toHex(mix(2)) + toHex(mix(4));
+}
+function relativeLuminance(hex){
+  const h = hex.replace("#","");
+  const r = parseInt(h.substring(0,2),16)/255, g = parseInt(h.substring(2,4),16)/255, b = parseInt(h.substring(4,6),16)/255;
+  return 0.2126*r + 0.7152*g + 0.0722*b;
+}
+function ensureGoogleFont(query){
+  if(!query) return;
+  const id = "gf-" + query.split(":")[0];
+  if(document.getElementById(id)) return;
+  const link = document.createElement("link");
+  link.id = id;
+  link.rel = "stylesheet";
+  link.href = `https://fonts.googleapis.com/css2?family=${query}&display=swap`;
+  document.head.appendChild(link);
+}
+
+function clearCustomOverrides(){
+  const root = document.documentElement.style;
+  CUSTOM_PROPS.forEach(p => root.removeProperty(p));
+}
+function applyCustomTheme(){
+  const c = customTheme;
+  const root = document.documentElement.style;
+  root.setProperty("--bg", c.bg);
+  root.setProperty("--bg-2", mixHex(c.bg, "#ffffff", 0.06));
+  root.setProperty("--bg-highlight", mixHex(c.bg, "#ffffff", 0.12));
+  root.setProperty("--panel", hexToRgba(c.panel, c.opacity));
+  root.setProperty("--panel-2", hexToRgba(mixHex(c.panel, "#ffffff", 0.08), c.opacity));
+  root.setProperty("--line", hexToRgba(mixHex(c.bg, "#ffffff", 0.3), Math.max(c.opacity, 0.5)));
+  root.setProperty("--text", c.text);
+  root.setProperty("--muted", mixHex(c.text, c.bg, 0.45));
+  root.setProperty("--accent", c.accent);
+  root.setProperty("--accent-ink", relativeLuminance(c.accent) > 0.55 ? "#14151d" : "#ffffff");
+  root.setProperty("--correct", c.correct);
+  root.setProperty("--wrong", c.wrong);
+  root.setProperty("--panel-blur", c.opacity < 1 ? Math.round((1 - c.opacity) * 24 + 4) + "px" : "0px");
+  const f = FONT_OPTIONS.find(x => x.key === c.font) || FONT_OPTIONS[0];
+  ensureGoogleFont(f.google);
+  root.setProperty("--heading-font", f.family);
+  root.setProperty("--body-font", f.family);
+  root.setProperty("--body-bg-image", "none");
+}
+
 function applyTheme(theme){
   currentTheme = theme;
   document.documentElement.setAttribute("data-theme", theme);
+  if(theme === "custom"){ applyCustomTheme(); }
+  else { clearCustomOverrides(); }
   try{ localStorage.setItem(THEME_STORAGE_KEY, theme); }catch(e){ /* best effort */ }
 }
 function loadTheme(){
+  loadCustomTheme();
   let saved = null;
   try{ saved = localStorage.getItem(THEME_STORAGE_KEY); }catch(e){}
   applyTheme(saved && THEME_INFO.some(t => t.key === saved) ? saved : "og");
+}
+
+function setCustomColor(key, value){
+  customTheme[key] = value;
+  applyCustomTheme();
+  saveCustomTheme();
+}
+function setCustomOpacity(value){
+  customTheme.opacity = parseFloat(value);
+  applyCustomTheme();
+  saveCustomTheme();
+}
+function setCustomFont(value){
+  customTheme.font = value;
+  applyCustomTheme();
+  saveCustomTheme();
+}
+function resetCustomTheme(){
+  customTheme = { ...CUSTOM_THEME_DEFAULTS };
+  saveCustomTheme();
+  applyCustomTheme();
+  render();
 }
 
 /* ============ INIT ============ */
