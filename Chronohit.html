@@ -74,7 +74,7 @@
   }
 
   /* ---- Theme: Modern (Konsolen-Look, leicht angeglast) ---- */
-  :root[data-theme="modern"]{
+  :root[data-design="modern"]{
     --bg: #0d1416;
     --bg-2: #10181a;
     --bg-highlight: #16302c;
@@ -98,7 +98,7 @@
      Blur + Sättigung, diagonalem Glanzverlauf, hellen Lichtkanten (oben links stark,
      unten rechts schwach) und einem Glanzreflex. In Chromium-Browsern kommt zusätzlich
      eine echte Lichtbrechung (SVG-Verzerrung des Hintergrunds) dazu. */
-  :root[data-theme="glass"]{
+  :root[data-design="glass"]{
     --bg: #13224a;
     --bg-2: #1b2c5c;
     --bg-highlight: #3a5a9c;
@@ -125,21 +125,21 @@
       radial-gradient(820px 620px at 55% 95%, rgba(140,95,255,.60), transparent 65%),
       linear-gradient(160deg, #1e3c72 0%, #2a5298 38%, #6a4fc2 70%, #1fa9c4 100%);
   }
-  :root.glass-refract[data-theme="glass"]{
+  :root.glass-refract[data-design="glass"]{
     --glass-filter: url(#glass-refract) blur(5px) saturate(190%) brightness(1.1);
   }
-  :root[data-theme="glass"] body{ text-shadow:0 1px 10px rgba(8,16,60,.35); }
+  :root[data-design="glass"] body{ text-shadow:0 1px 10px rgba(8,16,60,.35); }
 
   /* Große, schwebende Flächen (mit Backdrop-Blur/Brechung) */
-  :root[data-theme="glass"] .menu-card,
-  :root[data-theme="glass"] .modal-box,
-  :root[data-theme="glass"] .players-drawer,
-  :root[data-theme="glass"] .stat,
-  :root[data-theme="glass"] .todo-fab,
-  :root[data-theme="glass"] .drawer-handle,
-  :root[data-theme="glass"] .skip-notice,
-  :root[data-theme="glass"] .guess-box,
-  :root[data-theme="glass"] .guess-result{
+  :root[data-design="glass"] .menu-card,
+  :root[data-design="glass"] .modal-box,
+  :root[data-design="glass"] .players-drawer,
+  :root[data-design="glass"] .stat,
+  :root[data-design="glass"] .todo-fab,
+  :root[data-design="glass"] .drawer-handle,
+  :root[data-design="glass"] .skip-notice,
+  :root[data-design="glass"] .guess-box,
+  :root[data-design="glass"] .guess-result{
     background-color:var(--panel);
     background-image:linear-gradient(135deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,.07) 30%, rgba(255,255,255,.02) 58%, rgba(255,255,255,.12) 100%);
     border:1px solid rgba(255,255,255,.26);
@@ -151,14 +151,14 @@
     backdrop-filter:var(--glass-filter);
     -webkit-backdrop-filter:var(--glass-filter);
   }
-  :root[data-theme="glass"] .players-drawer{ background-color:rgba(24,40,92,.55); }
-  :root[data-theme="glass"] .modal-box{ background-color:rgba(255,255,255,.10); }
+  :root[data-design="glass"] .players-drawer{ background-color:rgba(24,40,92,.55); }
+  :root[data-design="glass"] .modal-box{ background-color:rgba(255,255,255,.10); }
 
   /* Glanzreflex oben links + schwacher Gegenreflex unten rechts */
-  :root[data-theme="glass"] .menu-card,
-  :root[data-theme="glass"] .modal-box{ position:relative; isolation:isolate; }
-  :root[data-theme="glass"] .menu-card::before,
-  :root[data-theme="glass"] .modal-box::before{
+  :root[data-design="glass"] .menu-card,
+  :root[data-design="glass"] .modal-box{ position:relative; isolation:isolate; }
+  :root[data-design="glass"] .menu-card::before,
+  :root[data-design="glass"] .modal-box::before{
     content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; border-radius:inherit;
     background:
       radial-gradient(130% 70% at 14% -8%, rgba(255,255,255,.42), rgba(255,255,255,0) 52%),
@@ -166,17 +166,17 @@
   }
 
   /* Kleine Elemente innerhalb der Flächen: nur Glanz + Lichtkanten */
-  :root[data-theme="glass"] .save-slot,
-  :root[data-theme="glass"] .theme-swatch,
-  :root[data-theme="glass"] .pp,
-  :root[data-theme="glass"] .suggest-opt,
-  :root[data-theme="glass"] .info-desc,
-  :root[data-theme="glass"] .slot-settings-panel,
-  :root[data-theme="glass"] .dropdown,
-  :root[data-theme="glass"] .chip,
-  :root[data-theme="glass"] .btn-ghost,
-  :root[data-theme="glass"] .stepper button,
-  :root[data-theme="glass"] .player-reload{
+  :root[data-design="glass"] .save-slot,
+  :root[data-design="glass"] .theme-swatch,
+  :root[data-design="glass"] .pp,
+  :root[data-design="glass"] .suggest-opt,
+  :root[data-design="glass"] .info-desc,
+  :root[data-design="glass"] .slot-settings-panel,
+  :root[data-design="glass"] .dropdown,
+  :root[data-design="glass"] .chip,
+  :root[data-design="glass"] .btn-ghost,
+  :root[data-design="glass"] .stepper button,
+  :root[data-design="glass"] .player-reload{
     background-color:var(--panel-2);
     background-image:linear-gradient(160deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,.04) 45%, rgba(255,255,255,.10) 100%);
     border:1px solid rgba(255,255,255,.28);
@@ -185,18 +185,18 @@
       inset -1px -1px .5px -.5px rgba(255,255,255,.30),
       0 6px 18px rgba(6,12,45,.22);
   }
-  :root[data-theme="glass"] .btn-ghost:hover:not(:disabled),
-  :root[data-theme="glass"] .chip:hover,
-  :root[data-theme="glass"] .save-slot:hover,
-  :root[data-theme="glass"] .theme-swatch:hover,
-  :root[data-theme="glass"] .suggest-opt:hover{ background-color:rgba(255,255,255,.2); }
-  :root[data-theme="glass"] .chip.on{ background-color:var(--accent); background-image:linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,0) 55%); border-color:rgba(255,255,255,.6); }
-  :root[data-theme="glass"] .theme-swatch.selected,
-  :root[data-theme="glass"] .wizard-slot.selected,
-  :root[data-theme="glass"] .pp.current{ border-color:var(--accent); }
+  :root[data-design="glass"] .btn-ghost:hover:not(:disabled),
+  :root[data-design="glass"] .chip:hover,
+  :root[data-design="glass"] .save-slot:hover,
+  :root[data-design="glass"] .theme-swatch:hover,
+  :root[data-design="glass"] .suggest-opt:hover{ background-color:rgba(255,255,255,.2); }
+  :root[data-design="glass"] .chip.on{ background-color:var(--accent); background-image:linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,0) 55%); border-color:rgba(255,255,255,.6); }
+  :root[data-design="glass"] .theme-swatch.selected,
+  :root[data-design="glass"] .wizard-slot.selected,
+  :root[data-design="glass"] .pp.current{ border-color:var(--accent); }
 
   /* Primärbutton: glänzender, leuchtender Glas-Knopf */
-  :root[data-theme="glass"] .btn-primary{
+  :root[data-design="glass"] .btn-primary{
     background-color:var(--accent);
     background-image:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0) 58%);
     border:1px solid rgba(255,255,255,.6);
@@ -206,10 +206,10 @@
       0 8px 26px rgba(0,222,255,.38);
     text-shadow:none;
   }
-  :root[data-theme="glass"] .switch.on{ box-shadow:0 0 18px rgba(0,222,255,.55); }
+  :root[data-design="glass"] .switch.on{ box-shadow:0 0 18px rgba(0,222,255,.55); }
 
   /* Karten: gefrostetes Milchglas */
-  :root[data-theme="glass"] .card{
+  :root[data-design="glass"] .card{
     background-image:linear-gradient(135deg, rgba(255,255,255,.55), rgba(255,255,255,0) 50%);
     border:1px solid rgba(255,255,255,.75);
     box-shadow:inset 1px 1px 1px rgba(255,255,255,.95), 0 10px 26px rgba(6,12,45,.30);
@@ -217,12 +217,12 @@
     -webkit-backdrop-filter:blur(10px) saturate(170%);
     text-shadow:none;
   }
-  :root[data-theme="glass"] .card.pending{ border:1px dashed var(--accent); background-image:none; }
+  :root[data-design="glass"] .card.pending{ border:1px dashed var(--accent); background-image:none; }
 
   /* ---- Theme: NRC (angelehnt an die NRC-Website) ----
      Reines Schwarz, blauer Akzent, Pixel-Überschriften (Minecraft-Look), schlanke
      Outfit-Schrift, hauchdünne Rahmen, Listenzeilen mit Akzentbalken. */
-  :root[data-theme="norisk"]{
+  :root[data-design="norisk"]{
     --bg: #000000;
     --bg-2: #070707;
     --bg-highlight: #0b1220;
@@ -247,74 +247,74 @@
     --panel-blur: 0px;
     --body-bg-image: radial-gradient(900px 420px at 50% -10%, rgba(79,142,255,.12), transparent 70%);
   }
-  :root[data-theme="norisk"] h1,
-  :root[data-theme="norisk"] h2,
-  :root[data-theme="norisk"] h3{ font-weight:400; letter-spacing:0; line-height:1.15; }
-  :root[data-theme="norisk"] .brand h1{ font-size:clamp(2rem, 6vw, 3rem); line-height:1; }
+  :root[data-design="norisk"] h1,
+  :root[data-design="norisk"] h2,
+  :root[data-design="norisk"] h3{ font-weight:400; letter-spacing:0; line-height:1.15; }
+  :root[data-design="norisk"] .brand h1{ font-size:clamp(2rem, 6vw, 3rem); line-height:1; }
   /* Kleine Abschnittsüberschriften wie in der NoRisk-Seitenleiste */
-  :root[data-theme="norisk"] .menu-card h3{
+  :root[data-design="norisk"] .menu-card h3{
     font-family:var(--body-font); font-size:.6875rem; font-weight:500;
     letter-spacing:.14em; text-transform:uppercase; color:var(--muted); line-height:1;
     margin-bottom:18px;
   }
-  :root[data-theme="norisk"] .menu-card{ background:var(--panel); border:1px solid var(--line); }
-  :root[data-theme="norisk"] .modal-box{
+  :root[data-design="norisk"] .menu-card{ background:var(--panel); border:1px solid var(--line); }
+  :root[data-design="norisk"] .modal-box{
     background:#0a0a0a; border:1px solid rgba(255,255,255,.10); box-shadow:0 24px 60px rgba(0,0,0,.65);
   }
-  :root[data-theme="norisk"] .btn-ghost{
+  :root[data-design="norisk"] .btn-ghost{
     background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
     color:rgba(255,255,255,.82); font-weight:500;
   }
-  :root[data-theme="norisk"] .btn-ghost:hover:not(:disabled){
+  :root[data-design="norisk"] .btn-ghost:hover:not(:disabled){
     background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.16); color:#fff;
   }
-  :root[data-theme="norisk"] .btn-primary{ font-weight:600; box-shadow:0 0 24px rgba(79,142,255,.28); }
-  :root[data-theme="norisk"] .chip{ border-radius:999px; }
-  :root[data-theme="norisk"] .switch{ border-radius:999px; }
-  :root[data-theme="norisk"] .card{ border:1px solid rgba(255,255,255,.18); border-radius:8px; }
-  :root[data-theme="norisk"] .card .tag{ border-radius:4px; }
-  :root[data-theme="norisk"] button:focus-visible,
-  :root[data-theme="norisk"] a:focus-visible,
-  :root[data-theme="norisk"] input:focus-visible,
-  :root[data-theme="norisk"] select:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  :root[data-design="norisk"] .btn-primary{ font-weight:600; box-shadow:0 0 24px rgba(79,142,255,.28); }
+  :root[data-design="norisk"] .chip{ border-radius:999px; }
+  :root[data-design="norisk"] .switch{ border-radius:999px; }
+  :root[data-design="norisk"] .card{ border:1px solid rgba(255,255,255,.18); border-radius:8px; }
+  :root[data-design="norisk"] .card .tag{ border-radius:4px; }
+  :root[data-design="norisk"] button:focus-visible,
+  :root[data-design="norisk"] a:focus-visible,
+  :root[data-design="norisk"] input:focus-visible,
+  :root[data-design="norisk"] select:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
 
   /* Listen: eine Umrandung, Zeilen mit Haarlinien und Akzentbalken beim Hover */
-  :root[data-theme="norisk"] .save-slot-list,
-  :root[data-theme="norisk"] .theme-list,
-  :root[data-theme="norisk"] .suggest-list{
+  :root[data-design="norisk"] .save-slot-list,
+  :root[data-design="norisk"] .theme-list,
+  :root[data-design="norisk"] .suggest-list{
     gap:0; border:1px solid rgba(255,255,255,.07); border-radius:8px; overflow:hidden;
     background:rgba(255,255,255,.013);
   }
-  :root[data-theme="norisk"] .save-slot,
-  :root[data-theme="norisk"] .theme-swatch,
-  :root[data-theme="norisk"] .suggest-opt{
+  :root[data-design="norisk"] .save-slot,
+  :root[data-design="norisk"] .theme-swatch,
+  :root[data-design="norisk"] .suggest-opt{
     position:relative; overflow:hidden; background:transparent; border:none; border-radius:0;
     border-bottom:1px solid rgba(255,255,255,.07);
   }
-  :root[data-theme="norisk"] .save-slot:last-child,
-  :root[data-theme="norisk"] .theme-swatch:last-child,
-  :root[data-theme="norisk"] .suggest-opt:last-child{ border-bottom:none; }
-  :root[data-theme="norisk"] .save-slot:hover,
-  :root[data-theme="norisk"] .theme-swatch:hover,
-  :root[data-theme="norisk"] .suggest-opt:hover{ background:rgba(255,255,255,.02); }
-  :root[data-theme="norisk"] .save-slot::before,
-  :root[data-theme="norisk"] .theme-swatch::before,
-  :root[data-theme="norisk"] .suggest-opt::before{
+  :root[data-design="norisk"] .save-slot:last-child,
+  :root[data-design="norisk"] .theme-swatch:last-child,
+  :root[data-design="norisk"] .suggest-opt:last-child{ border-bottom:none; }
+  :root[data-design="norisk"] .save-slot:hover,
+  :root[data-design="norisk"] .theme-swatch:hover,
+  :root[data-design="norisk"] .suggest-opt:hover{ background:rgba(255,255,255,.02); }
+  :root[data-design="norisk"] .save-slot::before,
+  :root[data-design="norisk"] .theme-swatch::before,
+  :root[data-design="norisk"] .suggest-opt::before{
     content:""; position:absolute; left:0; top:0; bottom:0; width:2px; background:var(--accent);
     transform:scaleY(0); transition:transform .4s cubic-bezier(.16, 1, .3, 1);
   }
-  :root[data-theme="norisk"] .save-slot:hover::before,
-  :root[data-theme="norisk"] .theme-swatch:hover::before,
-  :root[data-theme="norisk"] .suggest-opt:hover::before,
-  :root[data-theme="norisk"] .theme-swatch.selected::before,
-  :root[data-theme="norisk"] .wizard-slot.selected::before{ transform:scaleY(1); }
-  :root[data-theme="norisk"] .theme-swatch.selected{ border-color:transparent; }
-  :root[data-theme="norisk"] .timeline-wrap{ scrollbar-width:thin; }
-  :root[data-theme="norisk"] .timeline-wrap::-webkit-scrollbar{ height:4px; }
-  :root[data-theme="norisk"] .timeline-wrap::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.22); }
-  :root[data-theme="norisk"] .timeline-wrap::-webkit-scrollbar-thumb:hover{ background:var(--accent); }
-  :root[data-theme="norisk"] .players-drawer::-webkit-scrollbar{ width:2px; }
-  :root[data-theme="norisk"] .players-drawer::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.2); }
+  :root[data-design="norisk"] .save-slot:hover::before,
+  :root[data-design="norisk"] .theme-swatch:hover::before,
+  :root[data-design="norisk"] .suggest-opt:hover::before,
+  :root[data-design="norisk"] .theme-swatch.selected::before,
+  :root[data-design="norisk"] .wizard-slot.selected::before{ transform:scaleY(1); }
+  :root[data-design="norisk"] .theme-swatch.selected{ border-color:transparent; }
+  :root[data-design="norisk"] .timeline-wrap{ scrollbar-width:thin; }
+  :root[data-design="norisk"] .timeline-wrap::-webkit-scrollbar{ height:4px; }
+  :root[data-design="norisk"] .timeline-wrap::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.22); }
+  :root[data-design="norisk"] .timeline-wrap::-webkit-scrollbar-thumb:hover{ background:var(--accent); }
+  :root[data-design="norisk"] .players-drawer::-webkit-scrollbar{ width:2px; }
+  :root[data-design="norisk"] .players-drawer::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.2); }
 
   /* Farb-Variablen als echte <color>-Typen registrieren: dann lassen sie sich
      weich ineinander überblenden (inkl. Verläufe, Rahmen, Schatten usw.) */
@@ -661,8 +661,8 @@
   .qm-custom .setting-row{ gap:10px; }
   .qm-custom input[type="range"]{ width:110px !important; }
   @media (max-width: 900px){ html.has-qm body{ padding-top:76px; } }
-  :root[data-theme="glass"] .qm-button,
-  :root[data-theme="glass"] .qm-panel{
+  :root[data-design="glass"] .qm-button,
+  :root[data-design="glass"] .qm-panel{
     background-color:rgba(24,40,92,.55);
     background-image:linear-gradient(135deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,.07) 30%, rgba(255,255,255,.02) 58%, rgba(255,255,255,.12) 100%);
     border:1px solid rgba(255,255,255,.26);
@@ -676,7 +676,7 @@
     background:radial-gradient(circle, rgba(79,142,255,.34) 0%, rgba(79,142,255,.14) 40%, rgba(79,142,255,0) 70%);
     background:radial-gradient(circle, color-mix(in srgb, var(--accent) 36%, transparent) 0%, color-mix(in srgb, var(--accent) 14%, transparent) 40%, transparent 70%);
   }
-  html[data-theme="norisk"] #cursor-glow{ display:block; }
+  html[data-design="norisk"] #cursor-glow{ display:block; }
   #cursor-glow.seen{ opacity:1; }
   @media (hover:none){ #cursor-glow{ display:none !important; } }
   .theme-info{ flex:1; }
@@ -2870,7 +2870,7 @@ const THEME_INFO = [
   { key:"modern", label:"Modern", desc:"Konsolen-Look mit Türkis-Akzent, schärferen Kanten, Monospace-Schrift und leicht angeglasten Flächen." },
   { key:"glass", label:"Liquid Glass", desc:"Echtes Glas-Material: Lichtkanten, Glanzreflex, Milchglas-Blur — in Chrome/Edge zusätzlich mit Lichtbrechung." },
   { key:"norisk", label:"NRC", desc:"Reines Schwarz, Minecraft-Schrift, blauer Akzent und ein leuchtender Kreis, der dem Cursor folgt — angelehnt an die NRC-Website." },
-  { key:"custom", label:"Benutzerdefiniert", desc:"Eigene Farben, Transparenz und Schriftart frei wählen." }
+  { key:"custom", label:"Benutzerdefiniert", desc:"Eigene Farben, Transparenz, Stil (Standard, Modern, Glass, NRC) und Schriftart frei wählen." }
 ];
 
 let themeAnimTimer = null;
@@ -2925,7 +2925,13 @@ function customThemeControlsHtml(){
     </label>`;
   const fontOptions = FONT_OPTIONS.map(f =>
     `<option value="${f.key}" ${c.font === f.key ? 'selected' : ''}>${f.key}</option>`).join('');
+  const designOptions = DESIGN_OPTIONS.map(o =>
+    `<option value="${o.key}" ${c.design === o.key ? 'selected' : ''}>${o.label}</option>`).join('');
   return `
+      <div class="setting-row" style="margin-bottom:16px;">
+        <div class="label">Stil</div>
+        <select class="dropdown" onchange="setCustomDesign(this.value)">${designOptions}</select>
+      </div>
       <div class="custom-theme-grid">
         ${colorRow('Hintergrund', 'bg')}
         ${colorRow('Flächen', 'panel')}
@@ -2944,7 +2950,7 @@ function customThemeControlsHtml(){
         <select class="dropdown" onchange="setCustomFont(this.value)">${fontOptions}</select>
       </div>
       <div class="menu-actions" style="margin-top:16px;">
-        <button class="btn-ghost btn-small" onclick="resetCustomTheme()">Zurücksetzen</button>
+        <button class="btn-ghost btn-small" onclick="requestResetCustomTheme()">Zurücksetzen</button>
       </div>`;
 }
 function renderCustomThemePanel(){
@@ -2955,10 +2961,10 @@ function renderCustomThemePanel(){
     </div>`;
 }
 
-/* ============ SEITENMENÜ (links oben, außer auf Start/Laden/Hauptmenü) ============ */
+/* ============ SEITENMENÜ (links oben, außer auf Start/Laden/Hauptmenü/Einstellungen) ============ */
 let quickMenuOpen = false;
 function quickMenuVisible(){
-  return !["splash", "loading", "menu"].includes(state.screen);
+  return !["splash", "loading", "menu", "settings"].includes(state.screen);
 }
 function renderQuickMenuContent(){
   const el = document.getElementById("qm-content");
@@ -4150,11 +4156,18 @@ const FONT_OPTIONS = [
   { key:"Space Mono",       family:"'Space Mono', monospace",      google:"Space+Mono:wght@400;700" },
   { key:"IBM Plex Mono",    family:"'IBM Plex Mono', monospace",   google:"IBM+Plex+Mono:wght@400;500;600;700" },
   { key:"Playfair Display", family:"'Playfair Display', serif",    google:"Playfair+Display:wght@500;600;700" },
+  { key:"Minecraft",        family:"'NRCMinecraft', 'Pixelify Sans', monospace", google:null },
   { key:"System",           family:"system-ui, -apple-system, 'Segoe UI', sans-serif", google:null }
+];
+const DESIGN_OPTIONS = [
+  { key:"standard", label:"Standard" },
+  { key:"modern",   label:"Modern" },
+  { key:"glass",    label:"Liquid Glass" },
+  { key:"norisk",   label:"NRC" }
 ];
 const CUSTOM_THEME_DEFAULTS = {
   bg: "#14151d", panel: "#21232f", accent: "#e8a33d", text: "#ece7db",
-  correct: "#5a9c78", wrong: "#c1483b", opacity: 1, font: "Space Grotesk"
+  correct: "#5a9c78", wrong: "#c1483b", opacity: 1, font: "Space Grotesk", design: "standard"
 };
 const CUSTOM_PROPS = [
   "--bg","--bg-2","--bg-highlight","--panel","--panel-2","--line","--text","--muted",
@@ -4167,6 +4180,7 @@ function loadCustomTheme(){
   try{
     const raw = localStorage.getItem(CUSTOM_THEME_KEY);
     if(raw){ customTheme = { ...CUSTOM_THEME_DEFAULTS, ...JSON.parse(raw) }; }
+    if(!DESIGN_OPTIONS.some(o => o.key === customTheme.design)) customTheme.design = "standard";
   }catch(e){}
 }
 function saveCustomTheme(){
@@ -4203,28 +4217,59 @@ function ensureGoogleFont(query){
 function clearCustomOverrides(){
   const root = document.documentElement.style;
   CUSTOM_PROPS.forEach(p => root.removeProperty(p));
+  root.removeProperty("font-synthesis");
 }
 function applyCustomTheme(){
   const c = customTheme;
+  const d = DESIGN_OPTIONS.some(o => o.key === c.design) ? c.design : "standard";
   const root = document.documentElement.style;
+
+  // Je nach Stil sind die Flächen unterschiedlich durchsichtig, die Opazität-Regler wirkt darauf
+  const alphaMul = d === "glass" ? 0.16 : d === "modern" ? 0.82 : 1;
+  const panelAlpha = c.opacity * alphaMul;
+  const panel2Alpha = d === "glass" ? c.opacity * 0.26 : panelAlpha;
+
+  let blur = c.opacity < 1 ? Math.round((1 - c.opacity) * 24 + 4) + "px" : "0px";
+  let line = hexToRgba(mixHex(c.bg, "#ffffff", 0.3), Math.max(c.opacity, 0.5));
+  let bgImage = "none";
+
+  if(d === "glass"){
+    blur = "16px";
+    line = hexToRgba(c.text, 0.32);
+    bgImage =
+      `radial-gradient(640px 460px at 12% 18%, ${hexToRgba(mixHex(c.accent, "#ff5fbe", 0.5), 0.5)}, transparent 65%),` +
+      `radial-gradient(720px 520px at 88% 26%, ${hexToRgba(c.accent, 0.45)}, transparent 65%),` +
+      `radial-gradient(820px 620px at 55% 95%, ${hexToRgba(mixHex(c.accent, "#8c5fff", 0.5), 0.55)}, transparent 65%),` +
+      `linear-gradient(160deg, ${c.bg} 0%, ${mixHex(c.bg, c.accent, 0.25)} 50%, ${mixHex(c.bg, c.accent, 0.5)} 100%)`;
+  } else if(d === "modern"){
+    blur = "10px";
+    bgImage = `radial-gradient(900px 500px at 85% 0%, ${hexToRgba(c.accent, 0.08)}, transparent 60%)`;
+  } else if(d === "norisk"){
+    line = hexToRgba(c.text, 0.1);
+    bgImage = `radial-gradient(900px 420px at 50% -10%, ${hexToRgba(c.accent, 0.12)}, transparent 70%)`;
+  }
+
   root.setProperty("--bg", c.bg);
   root.setProperty("--bg-2", mixHex(c.bg, "#ffffff", 0.06));
   root.setProperty("--bg-highlight", mixHex(c.bg, "#ffffff", 0.12));
-  root.setProperty("--panel", hexToRgba(c.panel, c.opacity));
-  root.setProperty("--panel-2", hexToRgba(mixHex(c.panel, "#ffffff", 0.08), c.opacity));
-  root.setProperty("--line", hexToRgba(mixHex(c.bg, "#ffffff", 0.3), Math.max(c.opacity, 0.5)));
+  root.setProperty("--panel", hexToRgba(c.panel, panelAlpha));
+  root.setProperty("--panel-2", hexToRgba(mixHex(c.panel, "#ffffff", 0.08), panel2Alpha));
+  root.setProperty("--line", line);
   root.setProperty("--text", c.text);
   root.setProperty("--muted", mixHex(c.text, c.bg, 0.45));
   root.setProperty("--accent", c.accent);
   root.setProperty("--accent-ink", relativeLuminance(c.accent) > 0.55 ? "#14151d" : "#ffffff");
   root.setProperty("--correct", c.correct);
   root.setProperty("--wrong", c.wrong);
-  root.setProperty("--panel-blur", c.opacity < 1 ? Math.round((1 - c.opacity) * 24 + 4) + "px" : "0px");
+  root.setProperty("--panel-blur", blur);
   const f = FONT_OPTIONS.find(x => x.key === c.font) || FONT_OPTIONS[0];
   ensureGoogleFont(f.google);
   root.setProperty("--heading-font", f.family);
   root.setProperty("--body-font", f.family);
-  root.setProperty("--body-bg-image", "none");
+  // Pixelschrift hat nur einen Schnitt: kein künstliches Fett/Kursiv
+  if(f.key === "Minecraft") root.setProperty("font-synthesis", "none");
+  else root.removeProperty("font-synthesis");
+  root.setProperty("--body-bg-image", bgImage);
 }
 
 /* Cursor-Leuchtkreis: folgt der Maus mit weichem Nachziehen (Easing) */
@@ -4251,9 +4296,22 @@ document.documentElement.addEventListener("mouseleave", () => {
   if(el) el.classList.remove("seen");
 });
 
+/* Stil (data-design): bei den fertigen Themes Modern/Liquid Glass/NRC identisch zum Theme,
+   beim benutzerdefinierten Theme frei wählbar. Alle anderen: "standard". */
+function currentDesign(){
+  if(currentTheme === "custom"){
+    return DESIGN_OPTIONS.some(o => o.key === customTheme.design) ? customTheme.design : "standard";
+  }
+  return ["modern", "glass", "norisk"].includes(currentTheme) ? currentTheme : "standard";
+}
+function syncDesign(){
+  const d = currentDesign();
+  document.documentElement.setAttribute("data-design", d);
+  if(d === "norisk") startCursorGlow(); else stopCursorGlow();
+}
 function applyTheme(theme){
   currentTheme = theme;
-  if(theme === "norisk") startCursorGlow(); else stopCursorGlow();
+  syncDesign();
   document.documentElement.setAttribute("data-theme", theme);
   if(theme === "custom"){ applyCustomTheme(); }
   else { clearCustomOverrides(); }
@@ -4281,12 +4339,51 @@ function setCustomFont(value){
   applyCustomTheme();
   saveCustomTheme();
 }
+function setCustomDesign(value){
+  if(!DESIGN_OPTIONS.some(o => o.key === value)) return;
+  customTheme.design = value;
+  syncDesign();
+  applyCustomTheme();
+  saveCustomTheme();
+}
 function resetCustomTheme(){
   customTheme = { ...CUSTOM_THEME_DEFAULTS };
   saveCustomTheme();
+  syncDesign();
   applyCustomTheme();
   render();
 }
+
+/* Rückfrage "Wirklich zurücksetzen?" – eigenständig im <body>, damit sie sowohl in den
+   Einstellungen als auch im Seitenmenü funktioniert, ohne den Spielbildschirm neu zu rendern. */
+function requestResetCustomTheme(){
+  if(document.getElementById("reset-theme-modal")) return;
+  const wrap = document.createElement("div");
+  wrap.id = "reset-theme-modal";
+  wrap.className = "modal-backdrop";
+  wrap.setAttribute("role", "dialog");
+  wrap.setAttribute("aria-modal", "true");
+  wrap.addEventListener("click", e => { if(e.target === wrap) cancelResetCustomTheme(); });
+  wrap.innerHTML = `
+    <div class="modal-box">
+      <h3>Wirklich zurücksetzen?</h3>
+      <p>Stil, Farben, Opazität und Schriftart deines benutzerdefinierten Themes gehen zurück auf die Standardwerte.</p>
+      <div class="modal-actions">
+        <button class="btn-danger" onclick="confirmResetCustomTheme()">Ja, zurücksetzen</button>
+        <button class="btn-ghost" onclick="cancelResetCustomTheme()">Abbrechen</button>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+}
+function cancelResetCustomTheme(){
+  const el = document.getElementById("reset-theme-modal");
+  if(el) el.remove();
+}
+function confirmResetCustomTheme(){
+  cancelResetCustomTheme();
+  resetCustomTheme();
+}
+document.addEventListener("keydown", e => { if(e.key === "Escape") cancelResetCustomTheme(); });
 
 /* ============ INIT ============ */
 (async function init(){
