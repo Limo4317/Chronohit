@@ -636,8 +636,10 @@ async function saveToSlot(n){
   const snapshot = JSON.parse(JSON.stringify(state));
   snapshot.savedAt = Date.now();
   snapshot.saveSlotDialogOpen = false;
+  snapshot.name = (state.saveNameDraft || "").trim();
   await writeSlot(n, snapshot);
   state.saveSlotDialogOpen = false;
+  state.saveNameDraft = "";
   render();
 }
 function loadSlot(n){
@@ -648,6 +650,7 @@ function loadSlot(n){
   if(!state.guess) state.guess = { t:"", a:"" };
   if(state.guessResult === undefined) state.guessResult = null;
   if(typeof state.correctCount !== "number") state.correctCount = 0;
+  if(typeof state.settings.maxTokens !== "number") state.settings.maxTokens = 5;
   state.pendingSpend = null;
   state.showExitDialog = false;
   state.saveSlotDialogOpen = false;
@@ -676,6 +679,7 @@ let state = {
     tokens: false,
     // strictYear: false, // vorerst deaktiviert – siehe isPlacementCorrect() weiter unten
     target: 10,
+    maxTokens: 5,
     genres: { de:true, en:true, es:true }
   },
   deck: [], discard: [], timeline: [],
@@ -693,6 +697,7 @@ let state = {
   guessResult: null,        // {titleOk, artistOk, both, awarded, said:{t,a}}
   pendingSpend: null,        // {type:"skip"|"buy", amount} — wartet auf Bestätigung
   saveSlotDialogOpen: false,
+  saveNameDraft: "",
   confirmDeleteSlot: null
 };
 
@@ -836,6 +841,7 @@ function newGame(){
     guessResult: null,
     pendingSpend: null,
     saveSlotDialogOpen: false,
+    saveNameDraft: "",
     confirmDeleteSlot: null
   };
   drawNext();
@@ -1068,7 +1074,7 @@ function evaluateGuess(song){
   let awarded = false;
   if(both && !state.bonusClaimed){
     state.bonusClaimed = true;
-    if(state.tokens < 5){ state.tokens += 1; awarded = true; }
+    if(state.tokens < state.settings.maxTokens){ state.tokens += 1; awarded = true; }
   }
   state.guessResult = { titleOk, artistOk, both, awarded, said };
   state.guess = { t:"", a:"" };
@@ -1118,7 +1124,7 @@ async function discardAndMenu(){
     settings: keepSettings,
     deck: [], discard: [], timeline: [],
     current: null, phase: "draw", pendingGap: null, lastResult: null,
-    tokens: 0, correctCount: 0, wrongCount: 0, hasSave: false, showExitDialog: false, bonusClaimed: false, pendingSpend: null, saveSlotDialogOpen: false, confirmDeleteSlot: null
+    tokens: 0, correctCount: 0, wrongCount: 0, hasSave: false, showExitDialog: false, bonusClaimed: false, pendingSpend: null, saveSlotDialogOpen: false, saveNameDraft: "", confirmDeleteSlot: null
   };
   render();
 }
@@ -1145,8 +1151,8 @@ function renderSaveSlotModal(){
     return `
       <div class="save-slot">
         <div class="slot-info">
-          <div class="slot-title">Slot ${n}</div>
-          <div class="slot-meta">${slot ? `${slot.correctCount}/${slot.settings.target} · ${formatSlotDate(slot.savedAt)}` : 'leer'}</div>
+          <div class="slot-title">${slot && slot.name ? esc(slot.name) : `Slot ${n}`}</div>
+          <div class="slot-meta">${slot ? `Slot ${n} · ${slot.correctCount}/${slot.settings.target} · ${formatSlotDate(slot.savedAt)}` : 'leer'}</div>
         </div>
         <button class="btn-primary btn-small" onclick="saveToSlot(${n})">${slot ? 'Überschreiben' : 'Speichern'}</button>
       </div>`;
@@ -1155,6 +1161,11 @@ function renderSaveSlotModal(){
     <div class="modal-backdrop" onclick="if(event.target===this) closeSaveSlotDialog()">
       <div class="modal-box">
         <h3>In welchen Slot speichern?</h3>
+        <input class="guess-input" type="text" maxlength="40" autocomplete="off"
+          placeholder="Name für den Spielstand (optional)"
+          value="${esc(state.saveNameDraft || '')}"
+          oninput="state.saveNameDraft=this.value"
+          style="margin-bottom:14px;">
         <div class="save-slot-list">${rows}</div>
         <div class="modal-actions" style="margin-top:14px;">
           <button class="btn-ghost" onclick="closeSaveSlotDialog()">Abbrechen</button>
@@ -1205,8 +1216,8 @@ function renderMenu(){
           return `
             <div class="save-slot">
               <div class="slot-info">
-                <div class="slot-title">Slot ${n}</div>
-                <div class="slot-meta">${slot ? `${slot.correctCount}/${slot.settings.target} · ${formatSlotDate(slot.savedAt)}` : 'leer'}</div>
+                <div class="slot-title">${slot && slot.name ? esc(slot.name) : `Slot ${n}`}</div>
+                <div class="slot-meta">${slot ? `Slot ${n} · ${slot.correctCount}/${slot.settings.target} · ${formatSlotDate(slot.savedAt)}` : 'leer'}</div>
               </div>
               ${slot ? `
                 <div class="slot-actions">
@@ -1230,6 +1241,20 @@ function renderMenu(){
           </div>
           <div class="switch ${s.tokens?'on':''}" onclick="toggleSetting('tokens')"><div class="knob"></div></div>
         </div>
+
+        ${s.tokens ? `
+        <div class="setting-row">
+          <div>
+            <div class="label">Maximale Chrono-Tokens</div>
+            <div class="hint">Wie viele Tokens du gleichzeitig horten kannst</div>
+          </div>
+          <div class="stepper">
+            <button onclick="stepMaxTokens(-1)">–</button>
+            <div class="val">${s.maxTokens}</div>
+            <button onclick="stepMaxTokens(1)">+</button>
+          </div>
+        </div>
+        ` : ``}
 
         <!--
         <div class="setting-row">
@@ -1279,7 +1304,7 @@ function renderMenu(){
         <p><strong>2. Platzieren:</strong> Ohne das Jahr zu kennen, legst du die Karte an die Stelle deiner Zeitleiste, die du für chronologisch richtig hältst.</p>
         <p><strong>3. Aufdecken:</strong> Die Karte wird umgedreht. Liegt sie richtig, bleibt sie liegen und zählt einen Punkt für deinen Sieg (die Startkarte zählt nicht). Liegt sie falsch, kommt sie auf den Ablagestapel.</p>
         ${s.tokens ? `
-        <p><strong>Chrono-Tokens (aktiv):</strong> Du startest mit 2 Chrono-Tokens, maximal kannst du 5 gleichzeitig besitzen.</p>
+        <p><strong>Chrono-Tokens (aktiv):</strong> Du startest mit 2 Chrono-Tokens, maximal kannst du ${s.maxTokens} gleichzeitig besitzen.</p>
         <p>&bull; <strong>Song unbekannt?</strong> Wirf für 1 Chrono-Token die aktuelle Karte ab und ziehe eine neue, ohne sie zu platzieren.</p>
         <p>&bull; <strong>Karte kaufen:</strong> Für 3 Chrono-Tokens wird die nächste gezogene Karte garantiert korrekt in deine Zeitleiste einsortiert — ganz ohne Rateversuch und ohne Risiko.</p>
         <p>&bull; <strong>Bonus-Chrono-Token:</strong> Bevor du aufdeckst, kannst du Titel und Interpret eintippen. Stimmt beides, gibt es einen weiteren Chrono-Token. Verglichen wird großzügig: Groß-/Kleinschreibung, Akzente, Umlaut-Schreibweisen und Tippfehler werden verziehen, Zusätze wie &bdquo;feat.&ldquo; oder Klammer-Untertitel sind optional.</p>
@@ -1355,7 +1380,7 @@ function renderGame(){
     }
   }
 
-  const tokenDots = Array.from({length:5}, (_,i) => `<span class="${i < state.tokens ? 'filled':''}"></span>`).join("");
+  const tokenDots = Array.from({length:s.maxTokens}, (_,i) => `<span class="${i < state.tokens ? 'filled':''}"></span>`).join("");
 
   let drawZoneHtml = "";
   if(state.phase === "empty"){
@@ -1561,6 +1586,13 @@ function stepTarget(delta){
   state.settings.target = t;
   render(); saveState();
 }
+function stepMaxTokens(delta){
+  const m = state.settings.maxTokens + delta;
+  if(m < 3 || m > 15) return;
+  state.settings.maxTokens = m;
+  if(state.tokens > m){ state.tokens = m; }   // laufende Runde ggf. kappen
+  render(); saveState();
+}
 
 async function resumeGame(){
   const saved = await loadSave();
@@ -1570,6 +1602,7 @@ async function resumeGame(){
     if(!state.guess) state.guess = { t:"", a:"" };
     if(state.guessResult === undefined) state.guessResult = null;
     if(typeof state.correctCount !== "number") state.correctCount = 0;
+    if(typeof state.settings.maxTokens !== "number") state.settings.maxTokens = 5;
     state.pendingSpend = null;
     state.saveSlotDialogOpen = false;
     state.confirmDeleteSlot = null;
@@ -1584,6 +1617,7 @@ async function resumeGame(){
   const saved = await loadSave();
   if(saved){
     state.settings = saved.settings || state.settings;
+    if(typeof state.settings.maxTokens !== "number") state.settings.maxTokens = 5;
     state.hasSave = saved.screen === "game";
   }
   render();
