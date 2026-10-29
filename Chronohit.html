@@ -354,6 +354,13 @@
   }
   .win-card .num{font-size:64px; color:var(--accent);}
   .win-card p{color:var(--muted); margin-top:6px;}
+  .end-heading{
+    font-family:'Fraunces',serif; font-weight:700; font-size:42px;
+    margin-bottom:4px;
+  }
+  .end-heading.won{ color:var(--correct); }
+  .end-heading.lost{ color:var(--wrong); }
+  .timeline.final-view{ gap:10px; }
   .win-stats{display:flex; justify-content:center; gap:26px; margin:22px 0; flex-wrap:wrap;}
   .win-stats div{text-align:center;}
   .win-stats .n{font-family:'Fraunces',serif; font-size:24px;}
@@ -690,6 +697,7 @@ let state = {
   tokens: 0,
   correctCount: 0,
   wrongCount: 0,
+  won: false,
   hasSave: false,
   showExitDialog: false,
   bonusClaimed: false,
@@ -834,6 +842,7 @@ function newGame(){
     tokens: state.settings.tokens ? 2 : 0,
     correctCount: 0,
     wrongCount: 0,
+    won: false,
     hasSave: true,
     showExitDialog: false,
     bonusClaimed: false,
@@ -939,6 +948,8 @@ function drawNext(){
   if(state.deck.length === 0){
     state.current = null;
     state.phase = "empty";
+    state.won = false;
+    state.screen = "end";
     return;
   }
   state.current = state.deck.shift();
@@ -1089,7 +1100,8 @@ function checkWin(){
   // Die Startkarte zählt nicht mit: bei Ziel 10 müssen 10 Karten
   // wirklich richtig platziert worden sein.
   if(state.correctCount >= state.settings.target){
-    state.screen = "win";
+    state.won = true;
+    state.screen = "end";
     render(); saveState();
     return true;
   }
@@ -1124,7 +1136,7 @@ async function discardAndMenu(){
     settings: keepSettings,
     deck: [], discard: [], timeline: [],
     current: null, phase: "draw", pendingGap: null, lastResult: null,
-    tokens: 0, correctCount: 0, wrongCount: 0, hasSave: false, showExitDialog: false, bonusClaimed: false, pendingSpend: null, saveSlotDialogOpen: false, saveNameDraft: "", confirmDeleteSlot: null
+    tokens: 0, correctCount: 0, wrongCount: 0, won: false, hasSave: false, showExitDialog: false, bonusClaimed: false, pendingSpend: null, saveSlotDialogOpen: false, saveNameDraft: "", confirmDeleteSlot: null
   };
   render();
 }
@@ -1383,13 +1395,7 @@ function renderGame(){
   const tokenDots = Array.from({length:s.maxTokens}, (_,i) => `<span class="${i < state.tokens ? 'filled':''}"></span>`).join("");
 
   let drawZoneHtml = "";
-  if(state.phase === "empty"){
-    drawZoneHtml = `
-      <div class="draw-zone">
-        <div class="draw-caption">Der Stapel ist leer — starte eine neue Runde oder passe die Songauswahl im Menü an.</div>
-        <button class="btn-primary" onclick="backToMenu()">Zurück zum Menü</button>
-      </div>`;
-  } else if(state.phase === "feedback"){
+  if(state.phase === "feedback"){
     const ok = state.lastResult.ok;
     const song = state.lastResult.song;
     drawZoneHtml = `
@@ -1540,13 +1546,26 @@ function renderGame(){
   });
 }
 
-function renderWin(){
+function simpleCardHtml(song, isStart){
+  return `
+    <div class="card">
+      ${isStart ? `<span class="tag start">Start</span>` : ``}
+      <div><div class="year">${song.y}</div></div>
+      <div>
+        <div class="title">${song.t}</div>
+        <div class="artist">${song.a}</div>
+      </div>
+    </div>`;
+}
+
+function renderEnd(){
   const s = state.settings;
   app.innerHTML = `
     <div class="brand">
       <div class="mark">RUNDE BEENDET</div>
     </div>
     <div class="menu-card win-card">
+      <div class="end-heading ${state.won ? 'won' : 'lost'}">${state.won ? 'Gewonnen!' : 'Verloren!'}</div>
       <div class="num">${state.correctCount}</div>
       <p>richtig platzierte Karten auf deiner Zeitleiste</p>
       <div class="win-stats">
@@ -1555,9 +1574,30 @@ function renderWin(){
         <div><div class="n">${s.target}</div><div class="l">Ziel</div></div>
       </div>
       <div class="menu-actions">
-        <button class="btn-primary" onclick="newGame()">Neue Runde</button>
-        <button class="btn-ghost" onclick="abandonGame()">Zurück zum Menü</button>
+        <button class="btn-primary" onclick="showFinalTimeline()">Finale Zeitleiste ansehen</button>
+        <button class="btn-ghost" onclick="abandonGame()">Hauptmenü</button>
       </div>
+    </div>
+  `;
+}
+
+function showFinalTimeline(){
+  state.screen = "timeline";
+  render();
+}
+
+function renderTimelineOnly(){
+  const cardsHtml = state.timeline.map((song, i) => simpleCardHtml(song, i===0)).join('');
+  app.innerHTML = `
+    <div class="brand">
+      <div class="mark">${state.won ? 'GEWONNEN' : 'VERLOREN'}</div>
+      <h1 style="font-size:28px;">Finale Zeitleiste</h1>
+    </div>
+    <div class="timeline-wrap">
+      <div class="timeline final-view">${cardsHtml}</div>
+    </div>
+    <div class="menu-actions" style="margin-top:24px;">
+      <button class="btn-primary" onclick="abandonGame()">Hauptmenü</button>
     </div>
   `;
 }
@@ -1565,7 +1605,8 @@ function renderWin(){
 function render(){
   if(state.screen === "menu") renderMenu();
   else if(state.screen === "game") renderGame();
-  else if(state.screen === "win") renderWin();
+  else if(state.screen === "end") renderEnd();
+  else if(state.screen === "timeline") renderTimelineOnly();
 }
 
 /* ============ SETTINGS HELPERS ============ */
