@@ -372,7 +372,7 @@
     display:inline-flex;
     align-items:center;
     gap:10px;
-    font-size:13px;
+    font-size:calc(13px * var(--font-scale));
     letter-spacing:.14em;
     color:var(--accent);
     margin-bottom:6px;
@@ -382,13 +382,13 @@
     width:26px;height:1px;background:var(--line);
   }
   .brand h1{
-    font-size:42px;
+    font-size:calc(42px * var(--font-scale));
     color:var(--text);
   }
   .brand p{
     color:var(--muted);
     margin-top:8px;
-    font-size:15px;
+    font-size:calc(15px * var(--font-scale));
   }
 
   /* ---- splash ---- */
@@ -398,7 +398,7 @@
     gap:36px;
   }
   .splash-title{
-    font-family:var(--heading-font); font-weight:700; font-size:44px;
+    font-family:var(--heading-font); font-weight:700; font-size:calc(44px * var(--font-scale));
     color:var(--accent); letter-spacing:.03em; text-align:center;
   }
   .splash-play{
@@ -421,7 +421,7 @@
   @keyframes loadingBoxFadeOut{ from{opacity:1} to{opacity:0} }
   #app.fade-in{ animation: appFadeIn .4s ease; }
   @keyframes appFadeIn{ from{opacity:0} to{opacity:1} }
-  .loading-label{ font-family:var(--heading-font); font-size:20px; color:var(--accent); }
+  .loading-label{ font-family:var(--heading-font); font-size:calc(20px * var(--font-scale)); color:var(--accent); }
   .loading-frame{
     width:100%; height:16px; border:2px solid var(--accent); border-radius:5px;
     overflow:hidden; background:var(--panel-2); padding:2px;
@@ -439,7 +439,7 @@
   }
   .todo-fab{
     background:var(--panel); border:1px solid var(--line); color:var(--muted);
-    border-radius:var(--btn-radius); padding:10px 16px; font-size:13px; font-weight:600;
+    border-radius:var(--btn-radius); padding:10px 16px; font-size:calc(13px * var(--font-scale)); font-weight:600;
     text-decoration:none; display:inline-block;
   }
   .todo-fab:hover{ color:var(--accent); border-color:var(--accent); }
@@ -491,7 +491,7 @@
   .custom-theme-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px 18px; }
   .custom-color-row{
     display:flex; justify-content:space-between; align-items:center; gap:10px;
-    font-size:13px; color:var(--muted);
+    font-size:calc(13px * var(--font-scale)); color:var(--muted);
   }
   .custom-color-row input[type="color"]{
     width:42px; height:32px; padding:2px; cursor:pointer;
@@ -500,37 +500,37 @@
   .skip-notice{
     display:flex; flex-direction:column; align-items:center; gap:2px; text-align:center;
     background:var(--panel-2); border:1px dashed var(--line); border-radius:12px;
-    padding:8px 14px; font-size:13px; max-width:340px;
+    padding:8px 14px; font-size:calc(13px * var(--font-scale)); max-width:340px;
   }
-  .skip-notice .skip-label{ color:var(--muted); font-size:11px; letter-spacing:.04em; text-transform:uppercase; }
+  .skip-notice .skip-label{ color:var(--muted); font-size:calc(11px * var(--font-scale)); letter-spacing:.04em; text-transform:uppercase; }
   .skip-notice .skip-song{ color:var(--text); }
   .skip-notice .skip-song b{ color:var(--accent); font-weight:600; }
   .wrong-toggle{
     display:flex; align-items:center; justify-content:center; gap:14px;
-    margin:0 auto 18px; font-size:14px; color:var(--muted);
+    margin:0 auto 18px; font-size:calc(14px * var(--font-scale)); color:var(--muted);
   }
-  .wrong-toggle.none{ font-size:13px; }
+  .wrong-toggle.none{ font-size:calc(13px * var(--font-scale)); }
   .wrong-toggle .wrong-count{ color:var(--wrong); }
   /* ---- mehrspieler ---- */
   .player-list{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
   .player-row{ display:flex; align-items:center; gap:8px; }
   .player-row .guess-input{ flex:1; min-width:0; }
   .player-num{
-    width:24px; height:24px; border-radius:50%; flex:none; font-size:12px;
+    width:24px; height:24px; border-radius:50%; flex:none; font-size:calc(12px * var(--font-scale));
     background:var(--panel-2); border:1px solid var(--line); color:var(--muted);
     display:flex; align-items:center; justify-content:center;
   }
   .turn-banner{
     display:flex; flex-direction:column; align-items:center; gap:2px; margin:4px 0 6px;
   }
-  .turn-label{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
-  .turn-name{ font-family:var(--heading-font); font-size:26px; color:var(--accent); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .turn-label{ font-size:calc(11px * var(--font-scale)); letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+  .turn-name{ font-family:var(--heading-font); font-size:calc(26px * var(--font-scale)); color:var(--accent); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
   .drawer-handle{
     position:fixed; right:0; top:50%; transform:translateY(-50%); z-index:30;
     writing-mode:vertical-rl; padding:16px 8px; border-radius:12px 0 0 12px;
     background:var(--panel); color:var(--muted); border:1px solid var(--line); border-right:none;
-    font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    font-size:calc(12px * var(--font-scale)); letter-spacing:.14em; text-transform:uppercase;
     backdrop-filter:blur(var(--panel-blur)); -webkit-backdrop-filter:blur(var(--panel-blur));
   }
   .drawer-handle:hover{ color:var(--accent); }
@@ -550,33 +550,33 @@
   .players-drawer.open{ transform:none; }
   .drawer-title{
     display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;
-    font-family:var(--heading-font); font-size:20px;
+    font-family:var(--heading-font); font-size:calc(20px * var(--font-scale));
   }
   .pp{ border:1px solid var(--line); border-radius:12px; background:var(--panel-2); margin-bottom:8px; overflow:hidden; }
   .pp.current{ border-color:var(--accent); }
   .pp-head{ display:flex; align-items:center; gap:8px; padding:10px 12px; cursor:pointer; }
   .pp.current .pp-head{ cursor:default; }
   .pp-order{
-    width:22px; height:22px; border-radius:50%; flex:none; font-size:12px;
+    width:22px; height:22px; border-radius:50%; flex:none; font-size:calc(12px * var(--font-scale));
     background:var(--panel); color:var(--muted); display:flex; align-items:center; justify-content:center;
   }
   .pp-name{ flex:1; min-width:0; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .pp-now{
-    font-size:10px; letter-spacing:.06em; text-transform:uppercase; flex:none;
+    font-size:calc(10px * var(--font-scale)); letter-spacing:.06em; text-transform:uppercase; flex:none;
     background:var(--accent); color:var(--accent-ink); padding:2px 8px; border-radius:999px;
   }
-  .pp-stats{ font-size:12px; color:var(--muted); white-space:nowrap; flex:none; }
+  .pp-stats{ font-size:calc(12px * var(--font-scale)); color:var(--muted); white-space:nowrap; flex:none; }
   .pp-chevron{ color:var(--muted); transition:transform .2s ease; flex:none; }
   .pp.open .pp-chevron{ transform:rotate(90deg); }
   .pp-body{ display:none; padding:2px 12px 10px; border-top:1px solid var(--line); }
   .pp.open .pp-body{ display:block; }
-  .pp-card{ display:flex; align-items:baseline; gap:10px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:13px; }
+  .pp-card{ display:flex; align-items:baseline; gap:10px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:calc(13px * var(--font-scale)); }
   .pp-card:last-child{ border-bottom:none; }
   .pp-year{ font-family:var(--heading-font); font-weight:700; color:var(--accent); min-width:44px; }
   .pp-song{ flex:1; min-width:0; }
-  .pp-song small{ display:block; color:var(--muted); font-size:11px; }
-  .pp-tag{ font-size:10px; color:var(--muted); flex:none; }
-  .pp-empty{ padding:8px 0; font-size:12px; color:var(--muted); }
+  .pp-song small{ display:block; color:var(--muted); font-size:calc(11px * var(--font-scale)); }
+  .pp-tag{ font-size:calc(10px * var(--font-scale)); color:var(--muted); flex:none; }
+  .pp-empty{ padding:8px 0; font-size:calc(12px * var(--font-scale)); color:var(--muted); }
 
   .rank-list{ display:flex; flex-direction:column; gap:8px; margin:18px 0 6px; text-align:left; }
   .rank-row{
@@ -584,14 +584,14 @@
     background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
   }
   .rank-row.winner{ border-color:var(--correct); }
-  .rank-pos{ font-family:var(--heading-font); font-size:18px; color:var(--muted); min-width:22px; }
+  .rank-pos{ font-family:var(--heading-font); font-size:calc(18px * var(--font-scale)); color:var(--muted); min-width:22px; }
   .rank-row.winner .rank-pos{ color:var(--correct); }
   .rank-name{ flex:1; min-width:0; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .rank-score{ font-size:13px; color:var(--muted); white-space:nowrap; }
-  .rank-score b{ color:var(--text); font-family:var(--heading-font); font-size:16px; }
+  .rank-score{ font-size:calc(13px * var(--font-scale)); color:var(--muted); white-space:nowrap; }
+  .rank-score b{ color:var(--text); font-family:var(--heading-font); font-size:calc(16px * var(--font-scale)); }
   .player-section{ margin-bottom:18px; }
-  .player-section h3{ font-size:18px; margin:0 0 4px; text-align:center; }
-  .player-section .sub{ text-align:center; font-size:12px; color:var(--muted); margin-bottom:4px; }
+  .player-section h3{ font-size:calc(18px * var(--font-scale)); margin:0 0 4px; text-align:center; }
+  .player-section .sub{ text-align:center; font-size:calc(12px * var(--font-scale)); color:var(--muted); margin-bottom:4px; }
   .suggest-list{ display:flex; flex-direction:column; gap:10px; }
   .suggest-opt{
     display:flex; align-items:center; gap:14px; text-decoration:none; color:var(--text);
@@ -600,28 +600,28 @@
   .suggest-opt:hover{ border-color:var(--accent); }
   .suggest-icon{ display:flex; flex:none; }
   .suggest-text{ flex:1; display:flex; flex-direction:column; gap:1px; }
-  .suggest-text small{ color:var(--muted); font-size:12px; }
+  .suggest-text small{ color:var(--muted); font-size:calc(12px * var(--font-scale)); }
   .suggest-arrow{ color:var(--muted); }
-  .step-hint{ margin:-6px 0 18px; font-size:13px; line-height:1.5; color:var(--muted); }
+  .step-hint{ margin:-6px 0 18px; font-size:calc(13px * var(--font-scale)); line-height:1.5; color:var(--muted); }
   .chip-group{ display:flex; flex-direction:column; gap:10px; padding-bottom:16px; border-bottom:1px dashed var(--line); }
   .chip-group:last-child{ border-bottom:none; padding-bottom:0; }
   .stage-num{
-    width:22px; height:22px; border-radius:50%; flex:none; font-size:12px; font-weight:600;
+    width:22px; height:22px; border-radius:50%; flex:none; font-size:calc(12px * var(--font-scale)); font-weight:600;
     background:var(--accent); color:var(--accent-ink); display:flex; align-items:center; justify-content:center;
   }
   .stage-move{ display:flex; gap:6px; }
-  .stage-move .icon-btn{ padding:5px 10px; font-size:12px; }
+  .stage-move .icon-btn{ padding:5px 10px; font-size:calc(12px * var(--font-scale)); }
   .chip-group-sub{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
-  .stage-after{ font-size:12px; color:var(--muted); }
+  .stage-after{ font-size:calc(12px * var(--font-scale)); color:var(--muted); }
   .stage-after b{ color:var(--text); }
   .chip.empty{ opacity:.35; }
   .chip-group-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
   .chip-quick{ display:flex; gap:6px; }
-  .chip-quick .btn-small{ padding:5px 11px; font-size:12px; }
-  .chip-n{ margin-left:7px; font-size:11px; opacity:.6; }
+  .chip-quick .btn-small{ padding:5px 11px; font-size:calc(12px * var(--font-scale)); }
+  .chip-n{ margin-left:7px; font-size:calc(11px * var(--font-scale)); opacity:.6; }
   .chip.on .chip-n{ opacity:.75; }
   .pool-info{
-    margin-top:20px; padding:10px 14px; border-radius:12px; font-size:13px; text-align:center;
+    margin-top:20px; padding:10px 14px; border-radius:12px; font-size:calc(13px * var(--font-scale)); text-align:center;
     background:var(--panel-2); border:1px solid var(--line); color:var(--muted);
   }
   .pool-info b{ color:var(--text); }
@@ -651,9 +651,9 @@
   }
   .qm-panel.open{ transform:none; }
   .qm-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-  .qm-brand{ display:flex; align-items:center; gap:10px; font-family:var(--heading-font); font-size:20px; }
+  .qm-brand{ display:flex; align-items:center; gap:10px; font-family:var(--heading-font); font-size:calc(20px * var(--font-scale)); }
   .qm-section{ margin-bottom:24px; }
-  .qm-title{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+  .qm-title{ font-size:calc(11px * var(--font-scale)); letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
   .qm-panel .theme-desc{ display:none; }
   .qm-panel .theme-swatch{ padding:9px 12px; }
   .qm-custom{ margin-top:14px; padding-top:14px; border-top:1px dashed var(--line); }
@@ -680,35 +680,35 @@
   #cursor-glow.seen{ opacity:1; }
   @media (hover:none){ #cursor-glow{ display:none !important; } }
   .theme-info{ flex:1; }
-  .theme-label{ font-family:var(--heading-font); font-size:16px; color:var(--text); }
-  .theme-label .wizard-check{ font-size:14px; }
-  .theme-desc{ font-size:12px; color:var(--muted); margin-top:2px; }
+  .theme-label{ font-family:var(--heading-font); font-size:calc(16px * var(--font-scale)); color:var(--text); }
+  .theme-label .wizard-check{ font-size:calc(14px * var(--font-scale)); }
+  .theme-desc{ font-size:calc(12px * var(--font-scale)); color:var(--muted); margin-top:2px; }
   .wizard-slot.selected{ border-color:var(--accent); }
-  .wizard-check{ color:var(--correct); font-family:var(--heading-font); font-size:18px; flex:none; }
+  .wizard-check{ color:var(--correct); font-family:var(--heading-font); font-size:calc(18px * var(--font-scale)); flex:none; }
 
   /* ---- info-i ---- */
   .label-with-info{ display:flex; align-items:center; gap:8px; }
   .info-btn{
     width:18px; height:18px; padding:0; border-radius:50%;
     background:var(--panel-2); border:1px solid var(--line); color:var(--muted);
-    font-family:var(--heading-font); font-style:italic; font-size:12px; line-height:1;
+    font-family:var(--heading-font); font-style:italic; font-size:calc(12px * var(--font-scale)); line-height:1;
     display:flex; align-items:center; justify-content:center; flex:none;
   }
   .info-btn:hover{ border-color:var(--accent); color:var(--accent); }
   .info-desc{
     background:var(--panel-2); border:1px dashed var(--line); border-radius:10px;
-    padding:10px 12px; font-size:13px; color:var(--muted); line-height:1.5;
+    padding:10px 12px; font-size:calc(13px * var(--font-scale)); color:var(--muted); line-height:1.5;
     margin-top:-8px;
   }
 
   /* ---- slot settings panel ---- */
   .slot-settings-panel{
     background:var(--panel-2); border:1px solid var(--line); border-radius:10px;
-    padding:10px 14px; margin-top:-4px; font-size:13px;
+    padding:10px 14px; margin-top:-4px; font-size:calc(13px * var(--font-scale));
   }
   .slot-settings-panel .row{ display:flex; justify-content:space-between; padding:3px 0; color:var(--muted); }
   .slot-settings-panel .row b{ color:var(--text); font-weight:600; }
-  .icon-btn{ font-size:15px; padding:8px 10px; }
+  .icon-btn{ font-size:calc(15px * var(--font-scale)); padding:8px 10px; }
 
   /* ---- buttons ---- */
   button{
@@ -716,7 +716,7 @@
     cursor:pointer;
     border:none;
     border-radius:var(--btn-radius);
-    font-size:15px;
+    font-size:calc(15px * var(--font-scale));
     font-weight:600;
     padding:13px 22px;
     transition:transform .12s ease, opacity .12s ease;
@@ -728,7 +728,7 @@
   .btn-ghost{ background:transparent; color:var(--text); border:1px solid var(--line); }
   .btn-ghost:hover:not(:disabled){border-color:var(--accent); color:var(--accent);}
   .btn-danger{ background:transparent; color:var(--wrong); border:1px solid var(--wrong); }
-  .btn-small{ padding:8px 14px; font-size:13px; border-radius:var(--btn-radius); }
+  .btn-small{ padding:8px 14px; font-size:calc(13px * var(--font-scale)); border-radius:var(--btn-radius); }
 
   /* ---- menu ---- */
   .menu-card{
@@ -740,7 +740,7 @@
     backdrop-filter:blur(var(--panel-blur)) saturate(150%);
     -webkit-backdrop-filter:blur(var(--panel-blur)) saturate(150%);
   }
-  .menu-card h3{ font-size:18px; margin-bottom:14px; }
+  .menu-card h3{ font-size:calc(18px * var(--font-scale)); margin-bottom:14px; }
   .menu-actions{display:flex; flex-direction:column; gap:12px; align-items:stretch;}
   .menu-actions button{width:100%;}
 
@@ -751,8 +751,8 @@
     align-items:center;
     gap:16px;
   }
-  .setting-row .label{font-weight:600; font-size:15px;}
-  .setting-row .hint{color:var(--muted); font-size:13px; margin-top:3px;}
+  .setting-row .label{font-weight:600; font-size:calc(15px * var(--font-scale));}
+  .setting-row .hint{color:var(--muted); font-size:calc(13px * var(--font-scale)); margin-top:3px;}
 
   .switch{
     position:relative; width:46px; height:26px; border-radius:var(--btn-radius);
@@ -768,20 +768,20 @@
   .chip-row{display:flex; gap:8px; flex-wrap:wrap;}
   .chip{
     padding:7px 14px; border-radius:var(--btn-radius); border:1px solid var(--line);
-    font-size:13px; font-weight:600; color:var(--muted); background:transparent;
+    font-size:calc(13px * var(--font-scale)); font-weight:600; color:var(--muted); background:transparent;
   }
   .chip.on{ color:var(--accent-ink); background:var(--accent); border-color:var(--accent); }
 
   .dropdown{
     background:var(--panel-2); color:var(--text); border:1px solid var(--line);
     border-radius:var(--btn-radius); padding:9px 14px; font-family:'Space Grotesk',sans-serif;
-    font-size:14px; font-weight:600; cursor:pointer; flex:none;
+    font-size:calc(14px * var(--font-scale)); font-weight:600; cursor:pointer; flex:none;
   }
   .dropdown:hover{ border-color:var(--accent); }
 
   .planned-notice{
     background:var(--panel-2); border:1px dashed var(--line); border-radius:12px;
-    padding:12px 14px; font-size:13px; color:var(--muted); line-height:1.5;
+    padding:12px 14px; font-size:calc(13px * var(--font-scale)); color:var(--muted); line-height:1.5;
     margin-top:-8px;
   }
   .planned-notice a{ color:var(--accent); font-weight:600; }
@@ -790,20 +790,20 @@
   .stepper button{
     width:32px; height:32px; padding:0; border-radius:50%;
     background:var(--panel-2); color:var(--text); border:1px solid var(--line);
-    font-size:16px; line-height:1;
+    font-size:calc(16px * var(--font-scale)); line-height:1;
   }
-  .stepper .val{ font-family:var(--heading-font); font-size:20px; min-width:28px; text-align:center; }
+  .stepper .val{ font-family:var(--heading-font); font-size:calc(20px * var(--font-scale)); min-width:28px; text-align:center; }
 
   details.info{
     background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
     padding:18px 22px; margin-top:8px;
   }
-  details.info summary{cursor:pointer; font-weight:600; color:var(--accent); font-size:14px;}
-  details.info .body, .menu-card .body{margin-top:2px; color:var(--muted); font-size:14px; line-height:1.6;}
+  details.info summary{cursor:pointer; font-weight:600; color:var(--accent); font-size:calc(14px * var(--font-scale));}
+  details.info .body, .menu-card .body{margin-top:2px; color:var(--muted); font-size:calc(14px * var(--font-scale)); line-height:1.6;}
   details.info .body p, .menu-card .body p{margin:0 0 10px;}
 
   .note{
-    font-size:13px; color:var(--muted); border-top:1px dashed var(--line);
+    font-size:calc(13px * var(--font-scale)); color:var(--muted); border-top:1px dashed var(--line);
     padding-top:14px; margin-top:18px; line-height:1.6;
   }
   .note strong{color:var(--text);}
@@ -815,9 +815,9 @@
   }
   .stat{
     background:var(--panel); border:1px solid var(--line); border-radius:999px;
-    padding:8px 16px; font-size:13px; color:var(--muted); display:flex; gap:8px; align-items:center;
+    padding:8px 16px; font-size:calc(13px * var(--font-scale)); color:var(--muted); display:flex; gap:8px; align-items:center;
   }
-  .stat b{color:var(--text); font-family:var(--heading-font); font-size:15px;}
+  .stat b{color:var(--text); font-family:var(--heading-font); font-size:calc(15px * var(--font-scale));}
   .token-dots{display:flex; gap:4px;}
   .token-dots span{width:9px;height:9px;border-radius:50%; background:var(--line);}
   .token-dots span.filled{background:var(--accent);}
@@ -866,7 +866,7 @@
   .preview-bar.running .fill{ animation: fillbar 30s linear forwards; }
   @keyframes fillbar{ from{width:0%} to{width:100%} }
 
-  .draw-caption{text-align:center; color:var(--muted); font-size:14px; max-width:320px;}
+  .draw-caption{text-align:center; color:var(--muted); font-size:calc(14px * var(--font-scale)); max-width:320px;}
   .draw-actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:center;}
 
   .embed-crop{
@@ -881,7 +881,7 @@
   @keyframes embedFadeIn{ to{opacity:1} }
   .embed-crop .crop-hint{
     position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:center;
-    padding-bottom:2px; pointer-events:none; font-size:10px; color:var(--muted); opacity:.6;
+    padding-bottom:2px; pointer-events:none; font-size:calc(10px * var(--font-scale)); color:var(--muted); opacity:.6;
   }
   .embed-full{
     width:100%; max-width:300px; margin:2px auto 0; border-radius:10px; overflow:hidden;
@@ -937,18 +937,18 @@
     box-shadow:0 6px 16px rgba(0,0,0,.28);
     border:1px solid rgba(0,0,0,.08);
   }
-  .card .year{font-family:var(--heading-font); font-size:26px; font-weight:700;}
-  .card .title{font-size:12px; font-weight:600; line-height:1.3; margin-top:6px;}
-  .card .artist{font-size:11px; color:#5c5645; margin-top:2px;}
+  .card .year{font-family:var(--heading-font); font-size:calc(26px * var(--font-scale)); font-weight:700;}
+  .card .title{font-size:calc(12px * var(--font-scale)); font-weight:600; line-height:1.3; margin-top:6px;}
+  .card .artist{font-size:calc(11px * var(--font-scale)); color:#5c5645; margin-top:2px;}
   .card.pending{
     background:var(--panel-2); border:1px dashed var(--accent);
     align-items:center; justify-content:center;
   }
-  .card.pending .q{font-family:var(--heading-font); font-size:28px; color:var(--muted);}
+  .card.pending .q{font-family:var(--heading-font); font-size:calc(28px * var(--font-scale)); color:var(--muted);}
   .card.correct{outline:2px solid var(--correct);}
   .card.wrong{outline:2px solid var(--wrong); opacity:.55;}
   .card .tag{
-    position:absolute; top:-9px; right:8px; font-size:10px; padding:2px 7px;
+    position:absolute; top:-9px; right:8px; font-size:calc(10px * var(--font-scale)); padding:2px 7px;
     border-radius:999px; font-weight:700; letter-spacing:.02em;
   }
   .card .tag.ok{background:var(--correct); color:#fff;}
@@ -962,17 +962,17 @@
     padding:16px 18px; margin-top:10px; display:flex; flex-direction:column; gap:12px;
   }
   .token-panel .row{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;}
-  .token-panel .row .desc{font-size:13px; color:var(--muted);}
+  .token-panel .row .desc{font-size:calc(13px * var(--font-scale)); color:var(--muted);}
 
   .feedback{
-    text-align:center; font-size:15px; font-weight:600; margin:6px 0 4px;
+    text-align:center; font-size:calc(15px * var(--font-scale)); font-weight:600; margin:6px 0 4px;
   }
   .feedback.ok{color:var(--correct);}
   .feedback.bad{color:var(--wrong);}
 
   .self-report{
     display:flex; align-items:center; justify-content:center; gap:10px;
-    font-size:13px; color:var(--muted); margin-top:10px;
+    font-size:calc(13px * var(--font-scale)); color:var(--muted); margin-top:10px;
   }
   .self-report input{width:16px;height:16px;}
 
@@ -983,29 +983,29 @@
     display:flex; flex-direction:column; gap:9px;
   }
   .guess-box .head{
-    font-size:13px; font-weight:600; color:var(--text);
+    font-size:calc(13px * var(--font-scale)); font-weight:600; color:var(--text);
     display:flex; justify-content:space-between; align-items:center; gap:10px;
   }
-  .guess-box .head span{color:var(--accent); font-size:12px;}
+  .guess-box .head span{color:var(--accent); font-size:calc(12px * var(--font-scale));}
   .guess-input{
-    font-family:'Space Grotesk',sans-serif; font-size:14px;
+    font-family:'Space Grotesk',sans-serif; font-size:calc(14px * var(--font-scale));
     background:var(--bg-2); border:1px solid var(--line); border-radius:10px;
     padding:10px 12px; color:var(--text); width:100%;
   }
   .guess-input:focus{outline:none; border-color:var(--accent);}
   .guess-input::placeholder{color:var(--muted);}
-  .guess-hint{font-size:11px; color:var(--muted); line-height:1.45;}
+  .guess-hint{font-size:calc(11px * var(--font-scale)); color:var(--muted); line-height:1.45;}
 
   .guess-result{
     background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
     padding:12px 16px; margin-top:6px; width:100%; max-width:320px;
-    display:flex; flex-direction:column; gap:6px; font-size:13px;
+    display:flex; flex-direction:column; gap:6px; font-size:calc(13px * var(--font-scale));
   }
   .guess-result .row{display:flex; gap:8px; align-items:baseline;}
   .guess-result .row .mark{font-weight:700; width:14px; flex:none;}
   .guess-result .row.ok .mark{color:var(--correct);}
   .guess-result .row.bad .mark{color:var(--wrong);}
-  .guess-result .row .said{color:var(--muted); font-size:12px;}
+  .guess-result .row .said{color:var(--muted); font-size:calc(12px * var(--font-scale));}
   .guess-result .verdict{
     margin-top:4px; padding-top:8px; border-top:1px dashed var(--line);
     font-weight:600;
@@ -1017,10 +1017,10 @@
   .win-card{
     text-align:center; padding:40px 26px;
   }
-  .win-card .num{font-size:64px; color:var(--accent);}
+  .win-card .num{font-size:calc(64px * var(--font-scale)); color:var(--accent);}
   .win-card p{color:var(--muted); margin-top:6px;}
   .end-heading{
-    font-family:var(--heading-font); font-weight:700; font-size:42px;
+    font-family:var(--heading-font); font-weight:700; font-size:calc(42px * var(--font-scale));
     margin-bottom:4px;
   }
   .end-heading.won{ color:var(--correct); }
@@ -1028,8 +1028,8 @@
   .timeline.final-view{ gap:10px; }
   .win-stats{display:flex; justify-content:center; gap:26px; margin:22px 0; flex-wrap:wrap;}
   .win-stats div{text-align:center;}
-  .win-stats .n{font-family:var(--heading-font); font-size:24px;}
-  .win-stats .l{font-size:12px; color:var(--muted);}
+  .win-stats .n{font-family:var(--heading-font); font-size:calc(24px * var(--font-scale));}
+  .win-stats .l{font-size:calc(12px * var(--font-scale)); color:var(--muted);}
 
   .modal-backdrop{
     position:fixed; inset:0; background:rgba(10,10,14,.72);
@@ -1041,8 +1041,8 @@
     backdrop-filter:blur(var(--panel-blur)) saturate(150%);
     -webkit-backdrop-filter:blur(var(--panel-blur)) saturate(150%);
   }
-  .modal-box h3{font-size:19px; margin-bottom:8px;}
-  .modal-box p{color:var(--muted); font-size:14px; line-height:1.5; margin:0 0 20px;}
+  .modal-box h3{font-size:calc(19px * var(--font-scale)); margin-bottom:8px;}
+  .modal-box p{color:var(--muted); font-size:calc(14px * var(--font-scale)); line-height:1.5; margin:0 0 20px;}
   .modal-actions{display:flex; flex-direction:column; gap:10px;}
   .modal-actions button{width:100%;}
 
@@ -1054,18 +1054,80 @@
     backdrop-filter:blur(var(--panel-blur)) saturate(150%);
     -webkit-backdrop-filter:blur(var(--panel-blur)) saturate(150%);
   }
-  .slot-title{font-family:var(--heading-font); font-size:16px;}
-  .slot-meta{font-size:12px; color:var(--muted); margin-top:2px;}
+  .slot-title{font-family:var(--heading-font); font-size:calc(16px * var(--font-scale));}
+  .slot-meta{font-size:calc(12px * var(--font-scale)); color:var(--muted); margin-top:2px;}
   .slot-actions{display:flex; gap:8px; flex:none;}
 
   .top-links{display:flex; justify-content:space-between; width:100%; max-width:760px; margin-bottom:6px;}
-  .top-links button{background:none;border:none;color:var(--muted);font-size:13px;padding:6px 0;}
+  .top-links button{background:none;border:none;color:var(--muted);font-size:calc(13px * var(--font-scale));padding:6px 0;}
   .top-links button:hover{color:var(--accent);}
 
   @media (max-width:480px){
-    .brand h1{font-size:32px;}
+    .brand h1{font-size:calc(32px * var(--font-scale));}
     .vinyl-wrap{width:120px;height:120px;}
   }
+
+  /* ---- Schriftgröße (skaliert alle Schrift in px/rem über --font-scale) ---- */
+  :root{ --font-scale:1; }
+  html{ font-size:calc(16px * var(--font-scale)); }
+
+  /* ---- Zeitlimit pro Zug ---- */
+  .turn-timer{ width:min(300px, 80vw); display:flex; align-items:center; gap:10px; font-size:calc(13px * var(--font-scale)); color:var(--muted); }
+  .turn-timer .bar{ flex:1; height:6px; border-radius:999px; background:var(--panel-2); overflow:hidden; }
+  .turn-timer .fill{ height:100%; width:100%; background:var(--accent); transition:width .25s linear; }
+  .turn-timer .time{ font-family:var(--heading-font); min-width:3.4ch; text-align:right; color:var(--text); }
+  .turn-timer.low .fill{ background:var(--wrong); }
+  .turn-timer.low .time{ color:var(--wrong); }
+
+  /* ---- Statistiken ---- */
+  .stats-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .stat-tile{ background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius); padding:12px 14px; text-align:center; }
+  .stat-tile .n{ font-family:var(--heading-font); font-size:calc(26px * var(--font-scale)); color:var(--accent); }
+  .stat-tile .l{ font-size:calc(12px * var(--font-scale)); color:var(--muted); margin-top:2px; }
+  .stats-row{ display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:calc(14px * var(--font-scale)); }
+  .stats-row:last-child{ border-bottom:none; }
+  .stats-row span{ color:var(--muted); }
+  .stats-note{ font-size:calc(12px * var(--font-scale)); color:var(--muted); line-height:1.5; margin-top:12px; }
+
+  /* ---- Barrierefreiheit: Animationen reduzieren ---- */
+  html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after{
+    transition:none !important;
+    animation-duration:.001ms !important; animation-delay:0s !important; animation-iteration-count:1 !important;
+    scroll-behavior:auto !important;
+  }
+  /* Der 30-s-Fortschrittsbalken im Fallback-Player ist eine Information, keine Dekoration */
+  html.reduce-motion .preview-bar.running .fill{
+    animation:fillbar 30s linear forwards !important; animation-iteration-count:1 !important;
+  }
+  html.reduce-motion .vinyl.spin{ animation:none !important; }
+  html.reduce-motion #app.fade-in{ animation:none !important; }
+  html.reduce-motion #cursor-glow{ display:none !important; }
+
+  /* ---- Barrierefreiheit: Hoher Kontrast ---- */
+  html.high-contrast{
+    --muted: color-mix(in srgb, var(--text) 88%, var(--bg)) !important;
+    --line: color-mix(in srgb, var(--text) 70%, var(--bg)) !important;
+    --panel: color-mix(in srgb, var(--bg) 92%, var(--text)) !important;
+    --panel-2: color-mix(in srgb, var(--bg) 85%, var(--text)) !important;
+    --panel-blur: 0px !important;
+    --body-weight: 500 !important;
+  }
+  html.high-contrast body{ text-shadow:none !important; }
+  html.high-contrast a{ text-decoration:underline; }
+  html.high-contrast :is(button, select, input, .menu-card, .modal-box, .card, .stat, .stat-tile, .save-slot, .theme-swatch, .guess-box){
+    border-color:var(--text) !important;
+  }
+  html.high-contrast :focus-visible{ outline:3px solid var(--accent) !important; outline-offset:2px; }
+
+  /* ---- Barrierefreiheit: Farbenblind-freundlich (Blau/Orange statt Grün/Rot + Symbole) ---- */
+  html.cb-safe{ --correct:#3da5f4 !important; --wrong:#f08a00 !important; }
+  html.cb-safe .feedback.ok::before{ content:"✓ "; }
+  html.cb-safe .feedback.bad::before{ content:"✕ "; }
+  html.cb-safe .card .tag.ok::before{ content:"✓ "; }
+  html.cb-safe .card .tag.bad::before{ content:"✕ "; }
+  html.cb-safe .card .tag.ok, html.cb-safe .card .tag.bad{ color:#0b0b0b !important; }
+  html.cb-safe .card.correct{ outline-style:solid; }
+  html.cb-safe .card.wrong{ outline-style:dashed; }
 </style>
 </head>
 <body>
@@ -1934,6 +1996,7 @@ function loadSlot(n){
   if(!state.settings.mode) state.settings.mode = "solo";
   if(!state.settings.difficulty) state.settings.difficulty = "normal";
   state.pendingSpend = null;
+  state.turnDeadline = null;
   state.showExitDialog = false;
   state.saveSlotDialogOpen = false;
   state.confirmOverwriteSave = false;
@@ -2413,6 +2476,7 @@ function drawNext(){
   state.current = state.deck.shift();
   state.phase = "draw";
   state.pendingGap = null;
+  state.turnDeadline = null;
   state.lastResult = null;
   state.bonusClaimed = false;
   state.guess = { t:"", a:"", y:"" };
@@ -2422,6 +2486,9 @@ function drawNext(){
 function playCurrent(){
   if(!state.current) return;
   state.phase = "placing";
+  state.turnDeadline = turnLimitMs() > 0 ? Date.now() + turnLimitMs() : null;
+  turnLastTick = Date.now();
+  turnLastSec = turnLimitMs() > 0 ? Math.round(turnLimitMs() / 1000) : null;
   render(); saveState();
   if(state.current.id){
     if(!useFallbackEmbed){
@@ -2459,6 +2526,7 @@ function doSkipWithToken(){
   if(state.tokens < 1 || !state.current) return;
   const skipped = state.current;
   state.tokens -= 1;
+  sfx("spend");
   state.discard.push(skipped);
   drawNext();
   // Nach drawNext setzen (drawNext leert den Hinweis), damit er bei der neuen Karte erscheint
@@ -2469,6 +2537,7 @@ function doSkipWithToken(){
 function doBuyWithTokens(){
   if(state.tokens < 3 || !state.current) return;
   state.tokens -= 3;
+  sfx("spend");
   // Gekaufte Karte: garantiert korrekt, wird automatisch chronologisch einsortiert
   const song = state.current;
   let idx = state.timeline.findIndex(c => c.y > song.y);
@@ -2480,8 +2549,14 @@ function doBuyWithTokens(){
   render(); saveState();
 }
 
+function changePosition(){
+  sfx("unplace");
+  state.phase = "placing";
+  render();
+}
 function chooseGap(gapIndex){
   if(state.phase !== "placing") return;
+  sfx("place");
   state.pendingGap = gapIndex;
   state.phase = "revealed_pending";
   render(); saveState();
@@ -2539,6 +2614,7 @@ function revealCard(){
     ok = positionOk && guessCheck.titleOk && guessCheck.artistOk && guessCheck.yearOk;
   }
 
+  statsAddTurn(ok, false);
   if(ok){
     state.timeline.splice(gapIndex, 0, song);
     state.correctCount += 1;
@@ -2564,6 +2640,14 @@ function revealCard(){
     }
   }
 
+  // Sounds: Aufdecken-Flip, dann Ergebnis; Bonus-Token und Serien-Fanfare etwas später
+  sfx("flip");
+  sfx(ok ? "correct" : "wrong", 0.14);
+  let sfxLate = 0.6;
+  if(bonusAwarded){ sfx("token", sfxLate); sfxLate += 0.45; }
+  if(ok && !isMultiRound() && (stats.curStreak === 3 || stats.curStreak === 5 || (stats.curStreak > 5 && stats.curStreak % 5 === 0))){
+    sfx("streak", sfxLate);
+  }
   state.lastResult = { ok, song, positionOk, guessCheck, difficulty: diff, bonusAwarded };
   state.guessResult = null;
   state.guess = { t:"", a:"", y:"" };
@@ -2593,7 +2677,7 @@ function evaluateGuess(song){
 }
 
 function nextTurn(){
-  if(isMulti() && state.players.length > 1) advancePlayer();
+  if(isMulti() && state.players.length > 1){ advancePlayer(); sfx("turn"); }
   drawNext();
   render(); saveState();
 }
@@ -2881,6 +2965,7 @@ function selectTheme(key){
   root.classList.add("theme-animating");
   applyTheme(key);
   render();
+  sfx("theme");
   clearTimeout(themeAnimTimer);
   themeAnimTimer = setTimeout(() => root.classList.remove("theme-animating"), 1000);
 }
@@ -2896,7 +2981,7 @@ function renderSettings(){
     </div>`).join('');
 
   app.innerHTML = `
-    <div class="brand"><h1 style="font-size:30px;">Einstellungen</h1></div>
+    <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Einstellungen</h1></div>
 
     <div class="menu-card">
       <h3>Sprache</h3>
@@ -2909,6 +2994,10 @@ function renderSettings(){
     </div>
 
     ${currentTheme === 'custom' ? renderCustomThemePanel() : ``}
+
+    ${renderAccessibilityCard()}
+
+    ${renderSoundCard()}
 
     <div class="menu-actions">
       <button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button>
@@ -2964,7 +3053,7 @@ function renderCustomThemePanel(){
 /* ============ SEITENMENÜ (links oben, außer auf Start/Laden/Hauptmenü/Einstellungen) ============ */
 let quickMenuOpen = false;
 function quickMenuVisible(){
-  return !["splash", "loading", "menu", "settings"].includes(state.screen);
+  return !["splash", "loading", "menu", "settings", "stats"].includes(state.screen);
 }
 function renderQuickMenuContent(){
   const el = document.getElementById("qm-content");
@@ -2981,6 +3070,17 @@ function renderQuickMenuContent(){
       <div class="qm-title">Theme</div>
       <div class="theme-list">${swatches}</div>
       ${currentTheme === "custom" ? `<div class="qm-custom">${customThemeControlsHtml()}</div>` : ``}
+    </div>
+    <div class="qm-section">
+      <div class="qm-title">Darstellung</div>
+      <div class="settings-grid" style="gap:14px;">
+        <div class="setting-row"><div class="label">Animationen reduzieren</div>${prefSwitchHtml('reduceMotion')}</div>
+        <div class="setting-row"><div class="label">Hoher Kontrast</div>${prefSwitchHtml('highContrast')}</div>
+      </div>
+    </div>
+    <div class="qm-section">
+      <div class="qm-title">Sound</div>
+      <div class="setting-row"><div class="label">Lautstärke</div>${soundVolumeHtml()}</div>
     </div>
     <div class="qm-section">
       <div class="qm-title">Sprache</div>
@@ -3014,6 +3114,7 @@ function renderMenu(){
         <button class="btn-primary" onclick="startCreateWizard()">Spiel starten</button>
         <button class="btn-ghost" onclick="openLoadGame()">Spiel laden</button>
         <button class="btn-ghost" onclick="openSettings()">Einstellungen</button>
+        <button class="btn-ghost" onclick="openStats()">Statistiken</button>
         <button class="btn-ghost" onclick="openTutorial()">Tutorial</button>
       </div>
     </div>
@@ -3039,6 +3140,7 @@ function renderSlotSettingsPanel(slot){
       <div class="row"><span>Schwierigkeit</span><b>${difficultyLabel(s.difficulty)}</b></div>
       <div class="row"><span>Chrono-Tokens</span><b>${s.tokens ? `Ja (max. ${s.maxTokens})` : 'Nein'}</b></div>
       <div class="row"><span>Ziel</span><b>${s.target} Karten</b></div>
+      <div class="row"><span>Zeitlimit</span><b>${s.turnLimit > 0 ? s.turnLimit + ' s pro Zug' : 'Aus'}</b></div>
       <div class="row"><span>Sprachen</span><b>${genreLabel(s.genres)}</b></div>
       ${s.styles ? `<div class="row"><span>Genre</span><b>${s.styles.map(k => (STYLE_DEFS.find(d => d.key === k) || {label:k}).label).join(', ')}</b></div>` : ``}
       ${s.decades ? `<div class="row"><span>Jahrzehnte</span><b>${s.decades.map(decadeLabel).join(', ')}</b></div>` : ``}
@@ -3066,7 +3168,7 @@ function renderLoadGame(){
   }).join('');
 
   app.innerHTML = `
-    <div class="brand"><h1 style="font-size:30px;">Spielstände</h1></div>
+    <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Spielstände</h1></div>
     <div class="menu-card">
       <div class="save-slot-list">${rows}</div>
     </div>
@@ -3080,11 +3182,11 @@ function renderLoadGame(){
 /* ============ TUTORIAL ============ */
 function renderTutorial(){
   app.innerHTML = `
-    <div class="brand"><h1 style="font-size:30px;">Tutorial</h1></div>
+    <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Tutorial</h1></div>
     <div class="menu-card">
       <div class="body">
         <p><strong>1. Abspielen:</strong> Du ziehst eine Karte und klickst auf die Schallplatte — der Song spielt unsichtbar im Hintergrund über Spotify, du siehst weder Titel noch Cover. Nochmal auf die Schallplatte klicken pausiert/setzt fort. Mit Spotify Premium läuft der ganze Song, sonst die 30-Sekunden-Vorschau. Falls die Steuerung mal blockiert wird (z. B. durch einen Adblocker), springt das Spiel automatisch auf einen sichtbaren, aber zugeschnittenen Player um.</p>
-        <p style="font-size:13px;">Hinweis: Bei einem Song (Enrique Iglesias' "Bailando") lag nur ein Album- statt Track-Link vor — dort öffnet sich stattdessen eine Spotify-Suche in neuem Tab, wo der Titel sichtbar ist.</p>
+        <p style="font-size:calc(13px * var(--font-scale));">Hinweis: Bei einem Song (Enrique Iglesias' "Bailando") lag nur ein Album- statt Track-Link vor — dort öffnet sich stattdessen eine Spotify-Suche in neuem Tab, wo der Titel sichtbar ist.</p>
         <p><strong>2. Platzieren:</strong> Ohne das Jahr zu kennen, legst du die Karte an die Stelle deiner Zeitleiste, die du für chronologisch richtig hältst.</p>
         <p><strong>3. Aufdecken:</strong> Die Karte wird umgedreht. Liegt sie richtig, bleibt sie liegen und zählt einen Punkt für deinen Sieg (die Startkarte zählt nicht). Liegt sie falsch, kommt sie auf den Ablagestapel.</p>
         <p><strong>Schwierigkeit:</strong><br>
@@ -3120,6 +3222,8 @@ function startCreateWizard(){
     startTokens: 2,
     coopTokens: 5,
     target: 10,
+    timer: false,
+    turnLimit: 30,
     playerCount: 2,
     playerNames: ["", ""],
     playerIds: [0, 1],
@@ -3157,7 +3261,7 @@ function flipAnimate(itemSelector, mutate){
   const before = {};
   document.querySelectorAll(itemSelector).forEach(el => { before[el.dataset.flip] = el.getBoundingClientRect(); });
   mutate();
-  if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if(prefs.reduceMotion) return;
   document.querySelectorAll(itemSelector).forEach(el => {
     const b = before[el.dataset.flip];
     if(!b) return;
@@ -3224,6 +3328,12 @@ function wizardStepTarget(delta){
   const t = state.wizard.target + delta;
   if(t < 5 || t > 15) return;
   state.wizard.target = t; render();
+}
+function wizardToggleTimer(){ state.wizard.timer = !state.wizard.timer; render(); }
+function wizardStepTurnLimit(delta){
+  const t = state.wizard.turnLimit + delta;
+  if(t < 10 || t > 120) return;
+  state.wizard.turnLimit = t; render();
 }
 function wizardToggleItem(group, key){
   const m = state.wizard[group];
@@ -3389,6 +3499,16 @@ function renderWizardStep3(n){
             <div class="val">${w.target}</div>
             <button onclick="wizardStepTarget(1)">+</button>
           </div>`)}
+        ${infoRow('w-timer', 'Zeitlimit pro Zug',
+          'Pro Zug bleibt nur begrenzte Zeit, die Karte zu platzieren (und in Profi/Experte oder für den Bonus Titel/Interpret zu raten). Die Zeit läuft ab dem Start des Songs. Läuft sie ab, gilt der Zug als verloren: Die Karte wird verworfen und zählt als falsch — im Koop-Modus kostet das einen Token.',
+          `<div class="switch ${w.timer?'on':''}" onclick="wizardToggleTimer()"><div class="knob"></div></div>`)}
+        ${w.timer ? infoRow('w-turnlimit', 'Zeit pro Zug (Sekunden)',
+          'Wie lange ein Zug dauern darf (10–120 Sekunden, in 5er-Schritten).',
+          `<div class="stepper">
+            <button onclick="wizardStepTurnLimit(-5)">–</button>
+            <div class="val">${w.turnLimit}</div>
+            <button onclick="wizardStepTurnLimit(5)">+</button>
+          </div>`) : ``}
       </div>
     </div>`;
 }
@@ -3491,7 +3611,7 @@ function renderCreateGame(){
     renderWizardStep4(w.step);
   app.innerHTML = `
     <div class="brand">
-      <h1 style="font-size:30px;">Spiel erstellen</h1>
+      <h1 style="font-size:calc(30px * var(--font-scale));">Spiel erstellen</h1>
       <div class="wizard-steps">${keys.map((_, i) => { const n = i + 1; return `<span class="wizard-dot ${w.step===n?'active':''} ${w.step>n?'done':''}"></span>`; }).join('')}</div>
     </div>
     ${stepContent}
@@ -3512,6 +3632,7 @@ async function createGameFromWizard(){
     startTokens: w.coopTokens,
     mode: w.mode,
     difficulty: w.difficulty,
+    turnLimit: w.timer ? w.turnLimit : 0,
     ...songFilterFromWizard(w)
   } : {
     tokens: w.tokens,
@@ -3520,6 +3641,7 @@ async function createGameFromWizard(){
     startTokens: w.startTokens,
     mode: w.mode,
     difficulty: w.difficulty,
+    turnLimit: w.timer ? w.turnLimit : 0,
     ...songFilterFromWizard(w)
   };
   const slotNum = w.slot;
@@ -3688,14 +3810,14 @@ function renderGame(){
     const diff = r.difficulty || "normal";
     drawZoneHtml = `
       <div class="draw-zone">
-        <div class="feedback ${ok?'ok':'bad'}">${ok ? 'Richtig!' : 'Leider falsch.'}</div>
+        <div class="feedback ${ok?'ok':'bad'}">${ok ? 'Richtig!' : (r.timedOut ? 'Zeit abgelaufen — Zug verloren.' : 'Leider falsch.')}</div>
         <div class="draw-caption">${song.t} — ${song.a} · ${song.y}</div>
         ${song.id ? `
           <div class="embed-full">
             <iframe src="https://open.spotify.com/embed/track/${song.id}?utm_source=generator&theme=0"
               loading="lazy" allow="encrypted-media" title="Spotify player"></iframe>
           </div>` : ``}
-        ${(diff !== "normal" || (s.tokens && s.mode !== 'coop')) ? `
+        ${(!r.timedOut && (diff !== "normal" || (s.tokens && s.mode !== 'coop'))) ? `
           <div class="guess-result">
             ${diff !== "normal" ? `
             <div class="row ${r.positionOk ? 'ok':'bad'}">
@@ -3744,16 +3866,17 @@ function renderGame(){
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
           </button>
         </div>
+        ${(state.phase === "placing" || state.phase === "revealed_pending") ? turnTimerHtml() : ``}
         ${showPlaybackUI ? (useFallbackEmbed ? `
           <div class="embed-crop">
             <iframe src="https://open.spotify.com/embed/track/${state.current.id}?utm_source=generator&theme=0"
               loading="lazy" allow="encrypted-media" title="Spotify player"></iframe>
           </div>
           <div class="preview-bar running"><div class="fill"></div></div>
-          <div class="draw-caption" style="font-size:12px;">Eingeschränkter Modus: Die unsichtbare Spotify-Steuerung wurde blockiert (z.B. Adblocker) — hier ist der zugeschnittene Player, Balken ist ein 30s-Richtwert.</div>
+          <div class="draw-caption" style="font-size:calc(12px * var(--font-scale));">Eingeschränkter Modus: Die unsichtbare Spotify-Steuerung wurde blockiert (z.B. Adblocker) — hier ist der zugeschnittene Player, Balken ist ein 30s-Richtwert.</div>
         ` : `
           <div class="preview-bar"><div class="fill" id="live-progress-fill"></div></div>
-          <div class="draw-caption" style="font-size:12px;">Spielt unsichtbar über Spotify. Nochmal auf die Schallplatte klicken = Pause/Weiter.</div>
+          <div class="draw-caption" style="font-size:calc(12px * var(--font-scale));">Spielt unsichtbar über Spotify. Nochmal auf die Schallplatte klicken = Pause/Weiter.</div>
         `) : ``}
         ${state.phase === "draw" ? `
           <div class="draw-caption">${state.current.id ? 'Klick auf die Schallplatte zum Abspielen.' : 'Klick auf die Schallplatte, um den Song bei Spotify zu suchen.'}</div>
@@ -3796,7 +3919,7 @@ function renderGame(){
             }</div>
           </div>` : ``}
           <div class="reveal-actions">
-            <button class="btn-ghost btn-small" onclick="chooseGap(null); state.phase='placing'; render();">Position ändern</button>
+            <button class="btn-ghost btn-small" onclick="changePosition()">Position ändern</button>
             <button class="btn-primary" onclick="revealCard()">Aufdecken</button>
           </div>
         ` : ``}
@@ -3870,7 +3993,7 @@ function renderGame(){
     if(!target) return;
     const r = target.getBoundingClientRect();
     const w = wrap.getBoundingClientRect();
-    wrap.scrollBy({ left: (r.left - w.left) - (w.width/2) + (r.width/2), behavior:'smooth' });
+    wrap.scrollBy({ left: (r.left - w.left) - (w.width/2) + (r.width/2), behavior: prefs.reduceMotion ? 'auto' : 'smooth' });
   });
 }
 
@@ -4001,7 +4124,7 @@ function renderTimelineOnly(){
   app.innerHTML = `
     <div class="brand">
       <div class="mark">${multi ? 'SPIELENDE' : (state.won ? 'GEWONNEN' : 'VERLOREN')}</div>
-      <h1 style="font-size:28px;">${multi ? 'Finale Zeitleisten' : 'Finale Zeitleiste'}</h1>
+      <h1 style="font-size:calc(28px * var(--font-scale));">${multi ? 'Finale Zeitleisten' : 'Finale Zeitleiste'}</h1>
     </div>
     ${toggleHtml}
     ${body}
@@ -4051,6 +4174,7 @@ function updateDocumentTitle(){
     loadgame: "Spielstände - Chronohit",
     tutorial: "Tutorial - Chronohit",
     settings: "Einstellungen - Chronohit",
+    stats: "Statistiken - Chronohit",
     create: "Spiel erstellen - Chronohit",
     game: `${state.activeSaveName ? state.activeSaveName : "Unbenannt"} - Chronohit`,
     end: `${isMultiRound() ? "Spielende" : (state.won ? "Gewonnen" : "Verloren")} - Chronohit`,
@@ -4066,11 +4190,13 @@ function render(){
   else if(state.screen === "loadgame") renderLoadGame();
   else if(state.screen === "tutorial") renderTutorial();
   else if(state.screen === "settings") renderSettings();
+  else if(state.screen === "stats") renderStats();
   else if(state.screen === "create") renderCreateGame();
   else if(state.screen === "game") renderGame();
   else if(state.screen === "end") renderEnd();
   else if(state.screen === "timeline") renderTimelineOnly();
 
+  if(state.screen === "end") maybeRecordGameEnd();
   updateDocumentTitle();
   updateQuickMenu();
 }
@@ -4125,6 +4251,7 @@ async function resumeGame(){
   if(!state.settings.mode) state.settings.mode = "solo";
   if(!state.settings.difficulty) state.settings.difficulty = "normal";
     state.pendingSpend = null;
+    state.turnDeadline = null;
     state.saveSlotDialogOpen = false;
     state.confirmDeleteSlot = null;
     state.playersDrawerOpen = false;
@@ -4142,9 +4269,11 @@ const CUSTOM_THEME_KEY = "chronohit_custom_theme";
 let currentTheme = "og";
 
 // Lichtbrechung per SVG-Filter funktioniert im Backdrop nur in Chromium-Browsern
+let refractionSupported = false;
 (function detectRefraction(){
   const ua = navigator.userAgent || "";
   if(/(Chrome|Chromium|Edg|OPR)\//.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua)){
+    refractionSupported = true;
     document.documentElement.classList.add("glass-refract");
   }
 })();
@@ -4307,7 +4436,7 @@ function currentDesign(){
 function syncDesign(){
   const d = currentDesign();
   document.documentElement.setAttribute("data-design", d);
-  if(d === "norisk") startCursorGlow(); else stopCursorGlow();
+  if(d === "norisk" && !prefs.reduceMotion) startCursorGlow(); else stopCursorGlow();
 }
 function applyTheme(theme){
   currentTheme = theme;
@@ -4343,6 +4472,7 @@ function setCustomDesign(value){
   if(!DESIGN_OPTIONS.some(o => o.key === value)) return;
   customTheme.design = value;
   syncDesign();
+  sfx("theme");
   applyCustomTheme();
   saveCustomTheme();
 }
@@ -4385,9 +4515,488 @@ function confirmResetCustomTheme(){
 }
 document.addEventListener("keydown", e => { if(e.key === "Escape") cancelResetCustomTheme(); });
 
+/* ============ ZEITLIMIT PRO ZUG ============
+   Läuft ab dem Start des Songs (Schallplatte) bis zum Aufdecken. Bei geöffneten Dialogen
+   (Verlassen, Speichern, Token-Rückfrage) pausiert die Zeit. Nach dem Laden eines
+   Spielstands startet der laufende Zug mit der vollen Zeit neu. */
+let turnLastTick = Date.now();
+let turnLastSec = null;
+function turnLimitMs(){
+  const t = state && state.settings ? state.settings.turnLimit : 0;
+  return t > 0 ? t * 1000 : 0;
+}
+function turnTimerActive(){
+  return state.screen === "game" && turnLimitMs() > 0 && !!state.current &&
+    (state.phase === "placing" || state.phase === "revealed_pending");
+}
+function turnDialogOpen(){
+  return !!(state.showExitDialog || state.saveSlotDialogOpen || state.confirmOverwriteSave ||
+            state.confirmDeleteSlot || state.pendingSpend);
+}
+function turnTimerHtml(){
+  const total = turnLimitMs();
+  if(!total) return ``;
+  const left = state.turnDeadline ? Math.max(0, state.turnDeadline - Date.now()) : total;
+  return `
+    <div class="turn-timer ${left <= 5000 ? 'low' : ''}" id="turn-timer" role="timer" aria-label="Verbleibende Zeit für diesen Zug">
+      <div class="bar"><div class="fill" id="turn-timer-fill" style="width:${Math.min(100, left / total * 100)}%"></div></div>
+      <span class="time" id="turn-timer-text">${Math.ceil(left / 1000)} s</span>
+    </div>`;
+}
+function updateTurnTimerUi(left){
+  const fill = document.getElementById("turn-timer-fill");
+  const txt = document.getElementById("turn-timer-text");
+  const box = document.getElementById("turn-timer");
+  if(!fill || !txt || !box) return;
+  const total = turnLimitMs();
+  fill.style.width = Math.max(0, Math.min(100, left / total * 100)) + "%";
+  txt.textContent = Math.max(0, Math.ceil(left / 1000)) + " s";
+  box.classList.toggle("low", left <= 5000);
+}
+function turnTick(){
+  const now = Date.now();
+  const dt = now - turnLastTick;
+  turnLastTick = now;
+  if(!turnTimerActive()) return;
+  if(!state.turnDeadline){
+    state.turnDeadline = now + turnLimitMs();
+    turnLastSec = Math.round(turnLimitMs() / 1000);
+  }
+  if(turnDialogOpen()) state.turnDeadline += dt;
+  const left = state.turnDeadline - now;
+  updateTurnTimerUi(left);
+  // Ticken: ein Tick bei 15 s und 10 s, ab 5 s jede Sekunde (die Startsekunde selbst tickt nicht)
+  const sec = Math.ceil(left / 1000);
+  if(sec !== turnLastSec){
+    turnLastSec = sec;
+    if(sec === 15 || sec === 10 || (sec <= 5 && sec >= 1)) sfx("tick", 0, sec);
+  }
+  if(left <= 0) timeoutTurn();
+}
+function timeoutTurn(){
+  if(!turnTimerActive()) return;
+  pauseSpotifyPlayback();
+  const song = state.current;
+  state.turnDeadline = null;
+  state.pendingSpend = null;
+  state.discard.push(song);
+  state.wrongCount += 1;
+  if(!state.wrongSongs) state.wrongSongs = [];
+  state.wrongSongs.push(song);
+  if(state.settings.mode === "coop"){
+    state.tokens = Math.max(0, state.tokens - 1);
+  }
+  statsAddTurn(false, true);
+  turnLastSec = null;
+  sfx("timeout");
+  state.lastResult = {
+    ok: false, song, positionOk: false, timedOut: true,
+    guessCheck: { said:{ t:"", a:"", y:"" }, titleOk:false, artistOk:false, yearOk:false, both:false },
+    difficulty: state.settings.difficulty, bonusAwarded: false
+  };
+  state.guessResult = null;
+  state.guess = { t:"", a:"", y:"" };
+  state.pendingGap = null;
+  state.phase = "feedback";
+  render(); saveState();
+}
+
+/* ============ STATISTIKEN ============
+   Liegen nur lokal in diesem Browser (localStorage). Karten werden live gezählt
+   (auch aus abgebrochenen Runden), Spiele beim Erreichen des Endbildschirms. */
+const STATS_KEY = "chronohit_stats_v1";
+function freshStats(){
+  return {
+    since: null,
+    games: { solo:{ played:0, won:0 }, coop:{ played:0, won:0 }, multiplayer:{ played:0 } },
+    correct: 0, wrong: 0, timeouts: 0, curStreak: 0, bestStreak: 0
+  };
+}
+let stats = freshStats();
+function loadStats(){
+  try{
+    const raw = localStorage.getItem(STATS_KEY);
+    if(raw){
+      const p = JSON.parse(raw), f = freshStats();
+      stats = { ...f, ...p, games: {
+        solo: { ...f.games.solo, ...((p.games || {}).solo || {}) },
+        coop: { ...f.games.coop, ...((p.games || {}).coop || {}) },
+        multiplayer: { ...f.games.multiplayer, ...((p.games || {}).multiplayer || {}) }
+      } };
+    }
+  }catch(e){}
+}
+function saveStats(){
+  try{ localStorage.setItem(STATS_KEY, JSON.stringify(stats)); }catch(e){}
+}
+function statsTouch(){ if(!stats.since) stats.since = Date.now(); }
+function statsAddTurn(ok, timedOut){
+  statsTouch();
+  if(ok) stats.correct += 1; else stats.wrong += 1;
+  if(timedOut) stats.timeouts += 1;
+  // Serien nur ohne Mehrspieler zählen, sonst vermischen sich die Spieler
+  if(!isMultiRound()){
+    if(ok){ stats.curStreak += 1; stats.bestStreak = Math.max(stats.bestStreak, stats.curStreak); }
+    else stats.curStreak = 0;
+  }
+  saveStats();
+}
+function maybeRecordGameEnd(){
+  if(state.statsRecorded) return;
+  state.statsRecorded = true;
+  statsTouch();
+  const mode = state.settings.mode === "coop" ? "coop"
+             : (state.settings.mode === "multiplayer" && isMultiRound()) ? "multiplayer" : "solo";
+  stats.games[mode].played += 1;
+  if(mode !== "multiplayer" && state.won) stats.games[mode].won += 1;
+  sfx(mode === "multiplayer" || state.won ? "win" : "lose", 0.7);
+  saveStats();
+}
+function openStats(){ state.screen = "stats"; render(); }
+function pct(a, b){ return b > 0 ? Math.round(a / b * 100) + " %" : "–"; }
+function renderStats(){
+  const g = stats.games;
+  const decided = g.solo.played + g.coop.played;
+  const wins = g.solo.won + g.coop.won;
+  const total = decided + g.multiplayer.played;
+  const cards = stats.correct + stats.wrong;
+  const since = stats.since ? new Date(stats.since).toLocaleDateString("de-DE") : null;
+  const tile = (n, l) => `<div class="stat-tile"><div class="n">${n}</div><div class="l">${l}</div></div>`;
+  app.innerHTML = `
+    <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Statistiken</h1></div>
+    <div class="menu-card">
+      <h3>Überblick</h3>
+      <div class="stats-grid">
+        ${tile(total, "Spiele gespielt")}
+        ${tile(wins, "Siege")}
+        ${tile(pct(wins, decided), "Siegquote")}
+        ${tile(pct(stats.correct, cards), "Trefferquote")}
+        ${tile(stats.correct, "Richtige Karten")}
+        ${tile(stats.wrong, "Falsche Karten")}
+        ${tile(stats.timeouts, "Zeit abgelaufen")}
+        ${tile(stats.bestStreak, "Längste Serie")}
+      </div>
+    </div>
+    <div class="menu-card">
+      <h3>Nach Modus</h3>
+      <div class="stats-row"><span>Solo</span><b>${g.solo.played} gespielt · ${g.solo.won} gewonnen</b></div>
+      <div class="stats-row"><span>Koop</span><b>${g.coop.played} gespielt · ${g.coop.won} gewonnen</b></div>
+      <div class="stats-row"><span>Mehrspieler</span><b>${g.multiplayer.played} gespielt</b></div>
+      <div class="stats-note">
+        ${since ? `Erfasst seit ${since}. ` : `Noch keine Daten — sie erscheinen nach deiner ersten Karte. `}
+        Siegquote: nur Solo und Koop (Mehrspieler-Runden haben mehrere Spieler und zählen nur als gespielt).
+        Trefferquote: richtige Karten ÷ alle aufgedeckten Karten, ohne gekaufte Karten; ein abgelaufener Zug zählt als falsch.
+        Serie: richtige Karten in Folge (ohne Mehrspieler). Die Werte liegen nur in diesem Browser.
+      </div>
+    </div>
+    <div class="menu-actions">
+      <button class="btn-danger" onclick="requestResetStats()">Statistiken zurücksetzen</button>
+      <button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button>
+    </div>`;
+}
+function requestResetStats(){
+  if(document.getElementById("reset-stats-modal")) return;
+  const wrap = document.createElement("div");
+  wrap.id = "reset-stats-modal";
+  wrap.className = "modal-backdrop";
+  wrap.setAttribute("role", "dialog");
+  wrap.setAttribute("aria-modal", "true");
+  wrap.addEventListener("click", e => { if(e.target === wrap) cancelResetStats(); });
+  wrap.innerHTML = `
+    <div class="modal-box">
+      <h3>Statistiken zurücksetzen?</h3>
+      <p>Alle gespeicherten Werte (Spiele, Siege, Trefferquote, Serien) werden unwiderruflich gelöscht.</p>
+      <div class="modal-actions">
+        <button class="btn-danger" onclick="confirmResetStats()">Ja, zurücksetzen</button>
+        <button class="btn-ghost" onclick="cancelResetStats()">Abbrechen</button>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+}
+function cancelResetStats(){
+  const el = document.getElementById("reset-stats-modal");
+  if(el) el.remove();
+}
+function confirmResetStats(){
+  cancelResetStats();
+  stats = freshStats();
+  saveStats();
+  if(state.screen === "stats") render();
+}
+document.addEventListener("keydown", e => { if(e.key === "Escape") cancelResetStats(); });
+
+/* ============ SOUNDEFFEKTE ============
+   Alles wird live per Web Audio erzeugt (keine Dateien). Leise und kurz gehalten, damit der Song
+   (Spotify-Player) nicht übertönt wird. Je Stil ein eigenes Klang-Paket (Wellenform, Tonhöhe,
+   Ausklang). Audio startet erst nach einer Nutzer-Interaktion (Browser-Vorgabe). */
+const SFX_MASTER_MAX = 0.44; // Regler 100 %; Standard 50 % entspricht dem bisherigen Pegel
+function sfxMaster(){ return SFX_MASTER_MAX * Math.max(0, Math.min(1, prefs.soundVolume)); }
+const SFX_PACKS = {
+  standard: { wave:"sine",   pitch:1,    decay:1,   vol:1,    shimmer:false, clicky:true },
+  modern:   { wave:"square", pitch:1.25, decay:.7,  vol:.5,   shimmer:false },
+  glass:    { wave:"sine",   pitch:1.6,  decay:1.6, vol:.9,   shimmer:true  },
+  norisk:   { wave:"square", pitch:1,    decay:.8,  vol:.45,  shimmer:false }
+};
+let audioCtx = null;
+let sfxSpecificAt = 0;
+function sfxCtx(){
+  try{
+    if(!audioCtx){
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if(!AC) return null;
+      audioCtx = new AC();
+    }
+    if(audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  }catch(e){ return null; }
+}
+function sfxTone(ctx, pack, t, freq, dur, vol, o){
+  o = o || {};
+  const mul = o.fixed ? 1 : pack.pitch;
+  const d = dur * (o.abs ? 1 : pack.decay);
+  const v = Math.max(0.0002, vol * (o.abs ? 1 : pack.vol) * sfxMaster());
+  const voices = [{ f: freq * mul, to: o.slideTo ? o.slideTo * mul : null, v, wave: o.wave || pack.wave }];
+  if(pack.shimmer && !o.fixed) voices.push({ f: freq * mul * 2.01, to: null, v: v * 0.35, wave: "sine" });
+  voices.forEach(x => {
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = x.wave;
+    osc.frequency.setValueAtTime(x.f, t);
+    if(x.to) osc.frequency.exponentialRampToValueAtTime(x.to, t + d);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(x.v, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start(t); osc.stop(t + d + 0.03);
+  });
+}
+function sfxNoise(ctx, pack, t, dur, vol, f0, f1){
+  const n = Math.max(1, Math.floor(ctx.sampleRate * dur));
+  const buf = ctx.createBuffer(1, n, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for(let i = 0; i < n; i++) data[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource(); src.buffer = buf;
+  const flt = ctx.createBiquadFilter(); flt.type = "bandpass";
+  flt.frequency.setValueAtTime(f0, t);
+  flt.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  const g = ctx.createGain();
+  const v = Math.max(0.0002, vol * sfxMaster());
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(v, t + dur * 0.3);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(flt); flt.connect(g); g.connect(ctx.destination);
+  src.start(t); src.stop(t + dur + 0.02);
+}
+const SFX = {
+  click:   (c, p, t) => {
+    if(p.clicky){ // mechanisches Klicken: kurzer Rauschimpuls + knackiger Ton
+      sfxNoise(c, p, t, .03, .9, 3800, 1800);
+      sfxTone(c, p, t, 2000, .022, .35, { wave:"square", fixed:true, abs:true });
+    } else sfxTone(c, p, t, 880, .045, .5);
+  },
+  place:   (c, p, t) => {
+    sfxNoise(c, p, t, .06, .35, 900, 380);
+    sfxTone(c, p, t, 520, .09, .7, { slideTo:340 });
+  },
+  unplace: (c, p, t) => {
+    sfxNoise(c, p, t, .04, .25, 700, 1600);
+    sfxTone(c, p, t, 340, .08, .6, { slideTo:520 });
+  },
+  theme:   (c, p, t) => { sfxTone(c, p, t, 660, .09, .6); sfxTone(c, p, t + .08, 990, .14, .6); },
+  flip:    (c, p, t) => sfxNoise(c, p, t, .12, .5, 600, 2600),
+  correct: (c, p, t) => { sfxTone(c, p, t, 660, .11, .8); sfxTone(c, p, t + .09, 880, .2, .8); },
+  wrong:   (c, p, t) => sfxTone(c, p, t, 300, .3, .8, { slideTo:150, fixed:true }),
+  timeout: (c, p, t) => { sfxTone(c, p, t, 392, .5, .9, { fixed:true }); sfxTone(c, p, t + .2, 294, .6, .9, { fixed:true }); },
+  tick:    (c, p, t, sec) => {
+    // Bewusst grell und eckig (Rechteckwelle, hohe Töne, unabhängig vom Stil), damit es sich von der Musik abhebt
+    const o = { wave:"square", fixed:true, abs:true };
+    sfxNoise(c, p, t, .03, .9, 4200, 2200);
+    if(sec > 5){                       // 15 s und 10 s: doppeltes "Tik-Tik"
+      sfxTone(c, p, t, 1500, .05, .9, o);
+      sfxTone(c, p, t + .09, 1500, .05, .9, o);
+    } else {                           // ab 5 s: jede Sekunde ein Alarm-Piep, steigend
+      const f = 1400 + (5 - sec) * 180;
+      sfxTone(c, p, t, f, .11, 1, o);
+      if(sec <= 2) sfxTone(c, p, t + .13, f, .11, 1, o);
+    }
+  },
+  token:   (c, p, t) => { sfxTone(c, p, t, 1175, .3, .7); sfxTone(c, p, t + .08, 1568, .38, .7); },
+  spend:   (c, p, t) => { [1319, 1568, 1760].forEach((f, i) => sfxTone(c, p, t + i * .05, f, .09, .6)); },
+  streak:  (c, p, t) => { [523, 659, 784, 1047].forEach((f, i) => sfxTone(c, p, t + i * .08, f, .12, .7)); },
+  win:     (c, p, t) => { [523, 659, 784].forEach((f, i) => sfxTone(c, p, t + i * .12, f, .14, .8)); sfxTone(c, p, t + .36, 1047, .55, .9); },
+  lose:    (c, p, t) => { sfxTone(c, p, t, 392, .26, .8, { fixed:true }); sfxTone(c, p, t + .26, 349, .26, .8, { fixed:true }); sfxTone(c, p, t + .52, 294, .6, .8, { fixed:true, slideTo:262 }); },
+  turn:    (c, p, t) => sfxTone(c, p, t, 523, .32, .7)
+};
+const SOUND_GROUPS = [
+  { key:"klicks",     label:"Menü-Klicks",           hint:"Klicks bei Buttons, Schaltern und beim Wechsel von Theme/Stil", sample:"click" },
+  { key:"platzieren", label:"Karte platzieren",      hint:"Beim Setzen der Karte und bei „Position ändern“", sample:"place" },
+  { key:"ergebnis",   label:"Aufdecken & Ergebnis",  hint:"Whoosh, richtig, falsch und „Zeit abgelaufen“", sample:"correct" },
+  { key:"timer",      label:"Timer-Ticken",          hint:"Ticks bei 15 s und 10 s, ab 5 s jede Sekunde", sample:"tick", sampleArg:3 },
+  { key:"tokens",     label:"Tokens & Serien",       hint:"Bonus-Token, Token ausgeben, Serien-Fanfare", sample:"token" },
+  { key:"spielende",  label:"Spielende & Zugwechsel", hint:"Sieg/Niederlage und Gong beim Zugwechsel (Mehrspieler)", sample:"turn" }
+];
+const SFX_GROUP = {
+  click:"klicks", theme:"klicks", place:"platzieren", unplace:"platzieren",
+  flip:"ergebnis", correct:"ergebnis", wrong:"ergebnis", timeout:"ergebnis", tick:"timer",
+  token:"tokens", spend:"tokens", streak:"tokens", win:"spielende", lose:"spielende", turn:"spielende"
+};
+function defaultSoundGroups(){
+  const g = {}; SOUND_GROUPS.forEach(x => { g[x.key] = true; }); return g;
+}
+function sfx(name, delay, arg, force){
+  if(!prefs.sound || prefs.soundVolume <= 0) return;
+  const fn = SFX[name];
+  if(!fn) return;
+  const grp = SFX_GROUP[name];
+  if(!force && grp && prefs.soundGroups && prefs.soundGroups[grp] === false) return;
+  const ctx = sfxCtx();
+  if(!ctx) return;
+  if(name !== "click" || force) sfxSpecificAt = Date.now();
+  const pack = SFX_PACKS[currentDesign()] || SFX_PACKS.standard;
+  try{ fn(ctx, pack, ctx.currentTime + 0.01 + (delay || 0), arg); }catch(e){}
+}
+// Menü-Klick: erst nach dem eigentlichen Handler prüfen, ob schon ein spezieller Sound lief
+document.addEventListener("click", e => {
+  const el = e.target && e.target.closest ? e.target.closest("button, .theme-swatch, .save-slot, .chip, .switch, .suggest-opt, .todo-fab") : null;
+  if(!el || el.disabled) return;
+  setTimeout(() => { if(Date.now() - sfxSpecificAt > 120) sfx("click"); }, 0);
+}, true);
+
+/* ============ DARSTELLUNG & BARRIEREFREIHEIT ============ */
+const PREFS_KEY = "chronohit_prefs";
+const PREF_DEFAULTS = { reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, sound: true, soundVolume: 0.5, soundGroups: null };
+let prefs = { ...PREF_DEFAULTS, reduceMotion: false, soundGroups: defaultSoundGroups() };
+function loadPrefs(){
+  let saved = {};
+  try{ const raw = localStorage.getItem(PREFS_KEY); if(raw) saved = JSON.parse(raw) || {}; }catch(e){}
+  prefs = { ...PREF_DEFAULTS, ...saved };
+  // Ohne eigene Wahl folgt "Animationen reduzieren" der Systemeinstellung
+  if(typeof prefs.reduceMotion !== "boolean"){
+    prefs.reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }
+  prefs.soundGroups = { ...defaultSoundGroups(), ...((saved && saved.soundGroups) || {}) };
+  const sv = parseFloat(prefs.soundVolume);
+  prefs.soundVolume = isFinite(sv) ? Math.min(1, Math.max(0, sv)) : 0.5;
+  const fs = parseFloat(prefs.fontScale);
+  prefs.fontScale = isFinite(fs) ? Math.min(1.3, Math.max(0.85, fs)) : 1;
+}
+function savePrefs(){
+  try{ localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); }catch(e){}
+}
+function applyPrefs(){
+  const root = document.documentElement;
+  root.classList.toggle("reduce-motion", !!prefs.reduceMotion);
+  // Liquid Glass: Lichtbrechung nur ohne "Animationen reduzieren" (dann bleibt Blur + Glanz)
+  root.classList.toggle("glass-refract", refractionSupported && !prefs.reduceMotion);
+  root.classList.toggle("high-contrast", !!prefs.highContrast);
+  root.classList.toggle("cb-safe", !!prefs.colorSafe);
+  root.style.setProperty("--font-scale", String(prefs.fontScale));
+  syncDesign();
+}
+function togglePref(key){
+  prefs[key] = !prefs[key];
+  savePrefs(); applyPrefs();
+  if(state.screen === "settings") render();
+  else if(quickMenuOpen) renderQuickMenuContent();
+}
+function prefSwitchHtml(key){
+  return `<div class="switch ${prefs[key] ? 'on' : ''}" role="switch" aria-checked="${!!prefs[key]}" tabindex="0"
+      onclick="togglePref('${key}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePref('${key}');}"><div class="knob"></div></div>`;
+}
+function setFontScale(percent){
+  prefs.fontScale = Math.min(1.3, Math.max(0.85, parseInt(percent, 10) / 100));
+  savePrefs(); applyPrefs();
+  const el = document.getElementById("fs-val");
+  if(el) el.textContent = Math.round(prefs.fontScale * 100) + " %";
+}
+let soundGroupsOpen = false;
+function soundVolumeHtml(){
+  const pct = Math.round(prefs.soundVolume * 100);
+  return `<div style="display:flex; align-items:center; gap:10px;">
+    <input class="sv-range" type="range" min="0" max="100" step="5" value="${pct}"
+      oninput="setSoundVolume(this.value)" onchange="previewSoundVolume()" aria-label="Lautstärke der Soundeffekte" style="width:130px;">
+    <span class="sv-val" style="min-width:48px; text-align:right;">${pct} %</span>
+  </div>`;
+}
+function setSoundVolume(v){
+  prefs.soundVolume = Math.min(1, Math.max(0, parseInt(v, 10) / 100));
+  savePrefs();
+  const pct = Math.round(prefs.soundVolume * 100);
+  document.querySelectorAll(".sv-val").forEach(el => { el.textContent = pct + " %"; });
+  document.querySelectorAll(".sv-range").forEach(el => { if(el.value !== String(pct)) el.value = pct; });
+}
+function previewSoundVolume(){ sfx("click", 0, undefined, true); }
+function toggleSoundGroup(key){
+  prefs.soundGroups[key] = !prefs.soundGroups[key];
+  savePrefs();
+  if(state.screen === "settings") render();
+  if(prefs.soundGroups[key]){
+    const g = SOUND_GROUPS.find(x => x.key === key);
+    if(g) sfx(g.sample, 0, g.sampleArg, true);
+  }
+}
+function soundGroupSwitchHtml(key){
+  const on = prefs.soundGroups[key] !== false;
+  return `<div class="switch ${on ? 'on' : ''}" role="switch" aria-checked="${on}" tabindex="0"
+      onclick="toggleSoundGroup('${key}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSoundGroup('${key}');}"><div class="knob"></div></div>`;
+}
+function renderSoundCard(){
+  const rows = SOUND_GROUPS.map(g => `
+    <div class="setting-row">
+      <div><div class="label">${g.label}</div><div class="hint">${g.hint}</div></div>
+      ${soundGroupSwitchHtml(g.key)}
+    </div>`).join('');
+  return `
+    <div class="menu-card">
+      <h3>Sound</h3>
+      <div class="settings-grid">
+        <div class="setting-row">
+          <div><div class="label">Soundeffekte</div><div class="hint">Hauptschalter für alle Effekte. Der Klang passt sich dem Stil an (Standard, Modern, Liquid Glass, NRC).</div></div>
+          ${prefSwitchHtml('sound')}
+        </div>
+        <div class="setting-row">
+          <div><div class="label">Lautstärke</div><div class="hint">Gilt für alle Soundeffekte gemeinsam, nicht für die Musik.</div></div>
+          ${soundVolumeHtml()}
+        </div>
+        <details class="info" ${soundGroupsOpen ? 'open' : ''} ontoggle="soundGroupsOpen = this.open">
+          <summary>Soundgruppen einzeln schalten</summary>
+          <div class="settings-grid" style="margin-top:12px;">${rows}</div>
+        </details>
+      </div>
+    </div>`;
+}
+function renderAccessibilityCard(){
+  const sw = prefSwitchHtml;
+  const row = (label, hint, control) => `
+    <div class="setting-row">
+      <div><div class="label">${label}</div><div class="hint">${hint}</div></div>
+      ${control}
+    </div>`;
+  return `
+    <div class="menu-card">
+      <h3>Darstellung &amp; Barrierefreiheit</h3>
+      <div class="settings-grid">
+        <div class="setting-row">
+          <div><div class="label">Schriftgröße</div><div class="hint">Skaliert die Schrift im ganzen Spiel (85–130 %).</div></div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input type="range" min="85" max="130" step="5" value="${Math.round(prefs.fontScale * 100)}"
+              oninput="setFontScale(this.value)" aria-label="Schriftgröße" style="width:130px;">
+            <span id="fs-val" style="min-width:48px; text-align:right;">${Math.round(prefs.fontScale * 100)} %</span>
+          </div>
+        </div>
+        ${row('Animationen reduzieren', 'Schaltet Übergänge, drehende Schallplatte und Cursor-Leuchtkreis ab. Ohne eigene Wahl folgt es deiner Systemeinstellung.', sw('reduceMotion'))}
+        ${row('Hoher Kontrast', 'Kräftigere Rahmen, stärkerer Text und deckende Flächen.', sw('highContrast'))}
+        ${row('Farbenblind-freundlich', 'Blau/Orange statt Grün/Rot für richtig/falsch, dazu zusätzliche Symbole (✓ / ✕).', sw('colorSafe'))}
+      </div>
+    </div>`;
+}
+
 /* ============ INIT ============ */
 (async function init(){
+  loadPrefs();
+  loadStats();
   loadTheme();
+  applyPrefs();
+  setInterval(turnTick, 250);
   slotsCache = await loadAllSlots();
   const saved = await loadSave();
   if(saved){
