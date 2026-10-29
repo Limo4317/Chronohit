@@ -71,6 +71,85 @@
     font-size:15px;
   }
 
+  /* ---- splash ---- */
+  .splash-wrap{
+    min-height:70vh; width:100%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:36px;
+  }
+  .splash-title{
+    font-family:'Fraunces',serif; font-weight:700; font-size:44px;
+    color:var(--accent); letter-spacing:.03em; text-align:center;
+  }
+  .splash-play{
+    width:130px; height:130px; border-radius:50%;
+    background:var(--panel-2);
+    border:3px solid var(--accent);
+    color:var(--accent);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 14px 36px rgba(0,0,0,.45);
+    transition:transform .15s ease;
+    padding:0;
+  }
+  .splash-play:hover{ transform:scale(1.06); }
+
+  /* ---- loading ---- */
+  .loading-box{ display:flex; flex-direction:column; align-items:center; gap:16px; width:260px; }
+  .loading-label{ font-family:'Fraunces',serif; font-size:20px; color:var(--accent); }
+  .loading-frame{
+    width:100%; height:16px; border:2px solid var(--accent); border-radius:5px;
+    overflow:hidden; background:var(--panel-2); padding:2px;
+  }
+  .loading-fill{
+    height:100%; width:0%; background:var(--accent); border-radius:2px;
+    animation: loadingFill 1.2s ease-in-out forwards;
+  }
+  @keyframes loadingFill{ from{width:0%} to{width:100%} }
+
+  /* ---- to-do fab ---- */
+  .todo-fab{
+    position:fixed; right:18px; bottom:18px;
+    background:var(--panel); border:1px solid var(--line); color:var(--muted);
+    border-radius:999px; padding:10px 16px; font-size:13px; font-weight:600;
+    text-decoration:none; z-index:20;
+  }
+  .todo-fab:hover{ color:var(--accent); border-color:var(--accent); }
+
+  /* ---- wizard ---- */
+  .wizard-steps{ display:flex; justify-content:center; gap:8px; margin-top:12px; }
+  .wizard-dot{ width:8px; height:8px; border-radius:50%; background:var(--line); }
+  .wizard-dot.active{ background:var(--accent); width:20px; border-radius:999px; }
+  .wizard-dot.done{ background:var(--correct); }
+  .wizard-actions{ flex-direction:row !important; justify-content:space-between; }
+  .wizard-actions button{ width:auto; }
+  .wizard-slot{ cursor:pointer; }
+  .wizard-slot.selected{ border-color:var(--accent); }
+  .wizard-check{ color:var(--correct); font-family:'Fraunces',serif; font-size:18px; flex:none; }
+
+  /* ---- info-i ---- */
+  .label-with-info{ display:flex; align-items:center; gap:8px; }
+  .info-btn{
+    width:18px; height:18px; padding:0; border-radius:50%;
+    background:var(--panel-2); border:1px solid var(--line); color:var(--muted);
+    font-family:'Fraunces',serif; font-style:italic; font-size:12px; line-height:1;
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .info-btn:hover{ border-color:var(--accent); color:var(--accent); }
+  .info-desc{
+    background:var(--panel-2); border:1px dashed var(--line); border-radius:10px;
+    padding:10px 12px; font-size:13px; color:var(--muted); line-height:1.5;
+    margin-top:-8px;
+  }
+
+  /* ---- slot settings panel ---- */
+  .slot-settings-panel{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:10px;
+    padding:10px 14px; margin-top:-4px; font-size:13px;
+  }
+  .slot-settings-panel .row{ display:flex; justify-content:space-between; padding:3px 0; color:var(--muted); }
+  .slot-settings-panel .row b{ color:var(--text); font-weight:600; }
+  .icon-btn{ font-size:15px; padding:8px 10px; }
+
   /* ---- buttons ---- */
   button{
     font-family:'Space Grotesk', sans-serif;
@@ -99,6 +178,7 @@
     padding:26px;
     margin-bottom:16px;
   }
+  .menu-card h3{ font-size:18px; margin-bottom:14px; }
   .menu-actions{display:flex; flex-direction:column; gap:12px; align-items:stretch;}
   .menu-actions button{width:100%;}
 
@@ -157,8 +237,8 @@
     padding:18px 22px; margin-top:8px;
   }
   details.info summary{cursor:pointer; font-weight:600; color:var(--accent); font-size:14px;}
-  details.info .body{margin-top:12px; color:var(--muted); font-size:14px; line-height:1.6;}
-  details.info .body p{margin:0 0 10px;}
+  details.info .body, .menu-card .body{margin-top:2px; color:var(--muted); font-size:14px; line-height:1.6;}
+  details.info .body p, .menu-card .body p{margin:0 0 10px;}
 
   .note{
     font-size:13px; color:var(--muted); border-top:1px dashed var(--line);
@@ -678,6 +758,11 @@ function loadSlot(n){
   state.pendingSpend = null;
   state.showExitDialog = false;
   state.saveSlotDialogOpen = false;
+  state.confirmOverwriteSave = false;
+  state.openSlotSettings = null;
+  state.infoOpen = null;
+  state.activeSlot = n;
+  state.activeSaveName = data.name || "";
   state.screen = "game";
   render();
 }
@@ -698,7 +783,7 @@ async function confirmDeleteSlotNow(){
 
 /* ============ STATE ============ */
 let state = {
-  screen: "menu",           // menu | game | win
+  screen: "splash",         // splash | menu | loadgame | create | tutorial | game | end | timeline
   settings: {
     tokens: false,
     // strictYear: false, // vorerst deaktiviert – siehe isPlacementCorrect() weiter unten
@@ -725,7 +810,13 @@ let state = {
   pendingSpend: null,        // {type:"skip"|"buy", amount} — wartet auf Bestätigung
   saveSlotDialogOpen: false,
   saveNameDraft: "",
-  confirmDeleteSlot: null
+  confirmDeleteSlot: null,
+  openSlotSettings: null,    // welcher Slot im Lade-Bildschirm seine Settings zeigt
+  infoOpen: null,            // welches Info-i gerade aufgeklappt ist
+  activeSlot: null,          // an welchen Slot die laufende Runde gebunden ist
+  activeSaveName: "",
+  confirmOverwriteSave: false,
+  wizard: null               // Zwischenstand während "Spiel erstellen"
 };
 
 /* ============ TITEL/INTERPRET-PRÜFUNG ============
@@ -835,8 +926,9 @@ function shuffle(arr){
   return a;
 }
 
-function filteredPool(){
-  return SONGS.filter(s => state.settings.genres[s.g]);
+function filteredPool(settings){
+  const s = settings || state.settings;
+  return SONGS.filter(song => s.genres[song.g]);
 }
 
 function spotifySearchUrl(song){
@@ -845,21 +937,22 @@ function spotifySearchUrl(song){
 }
 
 /* ============ GAME ACTIONS ============ */
-function newGame(){
+function newGame(customSettings){
   pauseSpotifyPlayback();
-  const pool = filteredPool();
+  const settings = customSettings || state.settings;
+  const pool = filteredPool(settings);
   let deck = shuffle(pool);
   const starter = deck.shift();
   state = {
     screen: "game",
-    settings: state.settings,
+    settings,
     deck, discard: [],
     timeline: [starter],
     current: null,
     phase: "draw",
     pendingGap: null,
     lastResult: null,
-    tokens: state.settings.tokens ? 2 : 0,
+    tokens: settings.tokens ? 2 : 0,
     correctCount: 0,
     wrongCount: 0,
     won: false,
@@ -871,7 +964,12 @@ function newGame(){
     pendingSpend: null,
     saveSlotDialogOpen: false,
     saveNameDraft: "",
-    confirmDeleteSlot: null
+    confirmDeleteSlot: null,
+    openSlotSettings: null,
+    infoOpen: null,
+    activeSlot: null,
+    activeSaveName: "",
+    confirmOverwriteSave: false
   };
   drawNext();
   saveState();
@@ -956,10 +1054,9 @@ function pauseSpotifyPlayback(){
 }
 
 function reshuffleIfNeeded(){
-  if(state.deck.length === 0 && state.discard.length > 0){
-    state.deck = shuffle(state.discard);
-    state.discard = [];
-  }
+  // Verworfene Karten bleiben dauerhaft draußen (wie im echten Hitster) —
+  // kein Nachmischen mehr, sonst wird der Stapel praktisch nie leer und
+  // die Niederlage (leerer Stapel) ist so gut wie unerreichbar.
 }
 
 function drawNext(){
@@ -1172,10 +1269,16 @@ function closeExitDialog(){
   state.showExitDialog = false;
   render();
 }
-function saveAndMenu(){
+async function saveAndMenu(){
   pauseSpotifyPlayback();
   state.showExitDialog = false;
   state.hasSave = true;
+  if(state.activeSlot){
+    const snapshot = JSON.parse(JSON.stringify(state));
+    snapshot.savedAt = Date.now();
+    snapshot.name = state.activeSaveName;
+    await writeSlot(state.activeSlot, snapshot);
+  }
   state.screen = "menu";
   saveState();
   render();
@@ -1189,7 +1292,7 @@ async function discardAndMenu(){
     settings: keepSettings,
     deck: [], discard: [], timeline: [],
     current: null, phase: "draw", pendingGap: null, lastResult: null,
-    tokens: 0, correctCount: 0, wrongCount: 0, won: false, hasSave: false, showExitDialog: false, bonusClaimed: false, pendingSpend: null, saveSlotDialogOpen: false, saveNameDraft: "", confirmDeleteSlot: null
+    tokens: 0, correctCount: 0, wrongCount: 0, won: false, hasSave: false, showExitDialog: false, bonusClaimed: false, pendingSpend: null, saveSlotDialogOpen: false, saveNameDraft: "", confirmDeleteSlot: null, openSlotSettings: null, infoOpen: null, activeSlot: null, activeSaveName: "", confirmOverwriteSave: false, wizard: null
   };
   render();
 }
@@ -1240,6 +1343,22 @@ function renderSaveSlotModal(){
     </div>`;
 }
 
+function renderOverwriteConfirmModal(){
+  const n = state.activeSlot;
+  const label = state.activeSaveName ? esc(state.activeSaveName) : `Slot ${n}`;
+  return `
+    <div class="modal-backdrop" onclick="if(event.target===this) cancelOverwriteSave()">
+      <div class="modal-box">
+        <h3>Speicherstand überschreiben?</h3>
+        <p>„${label}" wird mit dem aktuellen Spielstand überschrieben.</p>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="confirmOverwriteSaveNow()">Ja</button>
+          <button class="btn-ghost" onclick="cancelOverwriteSave()">Nein</button>
+        </div>
+      </div>
+    </div>`;
+}
+
 function renderDeleteSlotModal(){
   const n = state.confirmDeleteSlot;
   return `
@@ -1255,170 +1374,366 @@ function renderDeleteSlotModal(){
     </div>`;
 }
 
-function renderMenu(){
-  const s = state.settings;
-  const genreChip = (key,label) => `
-    <button class="chip ${s.genres[key] ? 'on':''}" onclick="toggleGenre('${key}')">${label}</button>`;
+/* ============ LABELS ============ */
+function modeLabel(m){ return m==='multiplayer' ? 'Mehrspieler' : m==='coop' ? 'Koop' : 'Solo'; }
+function difficultyLabel(d){ return d==='expert' ? 'Experte' : d==='pro' ? 'Profi' : 'Normal'; }
+function genreLabel(g){
+  const names = { de:'Deutsch', en:'Englisch', es:'Spanisch' };
+  const active = Object.keys(g||{}).filter(k => g[k]).map(k => names[k] || k);
+  return active.length ? active.join(', ') : '—';
+}
 
+/* ============ INFO-I HELPER ============ */
+function toggleInfo(key){
+  state.infoOpen = state.infoOpen === key ? null : key;
+  render();
+}
+function infoRow(key, label, desc, controlHtml){
+  return `
+    <div class="setting-row" style="align-items:flex-start;">
+      <div class="label-with-info">
+        <span class="label">${label}</span>
+        <button type="button" class="info-btn" onclick="toggleInfo('${key}')" aria-label="Info zu ${label}">i</button>
+      </div>
+      ${controlHtml}
+    </div>
+    ${state.infoOpen === key ? `<div class="info-desc">${desc}</div>` : ``}
+  `;
+}
+
+/* ============ SPLASH ============ */
+function goToMenu(){
+  state.screen = "loading";
+  render();
+  setTimeout(() => {
+    state.screen = "menu";
+    render();
+  }, 1200);
+}
+function renderSplash(){
+  app.innerHTML = `
+    <div class="splash-wrap">
+      <div class="splash-title">CHRONOHIT</div>
+      <button class="splash-play" onclick="goToMenu()" aria-label="Chronohit starten">
+        <svg width="32" height="32" viewBox="0 0 20 20"><polygon points="5,3 16,10 5,17" fill="currentColor"/></svg>
+      </button>
+    </div>
+  `;
+}
+function renderLoading(){
+  app.innerHTML = `
+    <div class="splash-wrap">
+      <div class="loading-box">
+        <div class="loading-label">Lädt...</div>
+        <div class="loading-frame"><div class="loading-fill"></div></div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============ HAUPTMENÜ ============ */
+function openLoadGame(){
+  state.openSlotSettings = null;
+  state.screen = "loadgame";
+  render();
+}
+function openTutorial(){
+  state.screen = "tutorial";
+  render();
+}
+
+function renderMenu(){
   app.innerHTML = `
     <div class="brand">
-      <div class="mark">MUSIK &middot; ZEITLEISTE</div>
       <h1>Chronohit</h1>
-      <p>Ordne Songs nach ihrem Erscheinungsjahr — inspiriert von Hitster, gespielt mit deinem eigenen Spotify.</p>
     </div>
-
     <div class="menu-card">
       <div class="menu-actions">
-        <button class="btn-primary" onclick="newGame()">Neues Spiel starten</button>
-        ${state.hasSave ? `<button class="btn-ghost" onclick="resumeGame()">Spiel fortsetzen</button>` : ``}
+        <button class="btn-primary" onclick="startCreateWizard()">Spiel starten</button>
+        <button class="btn-ghost" onclick="openLoadGame()">Spiel laden</button>
+        <button class="btn-ghost" onclick="openTutorial()">Tutorial</button>
       </div>
     </div>
+    <a class="todo-fab" href="https://docs.google.com/spreadsheets/d/1rqiXWYksaIVn-ia4HOzgkgCINeQeQMeZh_-NRV7wddk/edit?usp=sharing" target="_blank" rel="noopener">To-Do-Liste ↗</a>
+  `;
+}
 
+/* ============ SPIEL LADEN ============ */
+function toggleSlotSettings(n){
+  state.openSlotSettings = state.openSlotSettings === n ? null : n;
+  render();
+}
+function renderSlotSettingsPanel(slot){
+  const s = slot.settings || {};
+  return `
+    <div class="slot-settings-panel">
+      <div class="row"><span>Modus</span><b>${modeLabel(s.mode)}</b></div>
+      <div class="row"><span>Schwierigkeit</span><b>${difficultyLabel(s.difficulty)}</b></div>
+      <div class="row"><span>Chrono-Tokens</span><b>${s.tokens ? `Ja (max. ${s.maxTokens})` : 'Nein'}</b></div>
+      <div class="row"><span>Ziel</span><b>${s.target} Karten</b></div>
+      <div class="row"><span>Sprachen</span><b>${genreLabel(s.genres)}</b></div>
+    </div>`;
+}
+function renderLoadGame(){
+  const rows = [1,2,3,4].map(n => {
+    const slot = slotsCache[n-1];
+    return `
+      <div class="save-slot">
+        <div class="slot-info">
+          <div class="slot-title">${slot && slot.name ? esc(slot.name) : `Slot ${n}`}</div>
+          <div class="slot-meta">${slot ? `Slot ${n} · ${slot.correctCount}/${slot.settings.target} · ${formatSlotDate(slot.savedAt)}` : 'leer'}</div>
+        </div>
+        ${slot ? `
+          <div class="slot-actions">
+            <button class="btn-ghost btn-small icon-btn" onclick="toggleSlotSettings(${n})" aria-label="Einstellungen anzeigen">⚙</button>
+            <button class="btn-primary btn-small" onclick="loadSlot(${n})">Laden</button>
+            <button class="btn-danger btn-small" onclick="requestDeleteSlot(${n})">Löschen</button>
+          </div>` : ``}
+      </div>
+      ${slot && state.openSlotSettings === n ? renderSlotSettingsPanel(slot) : ``}
+    `;
+  }).join('');
+
+  app.innerHTML = `
+    <div class="brand"><h1 style="font-size:30px;">Spielstände</h1></div>
     <div class="menu-card">
-      <h3 style="margin-bottom:14px;font-size:18px;">Spielstände</h3>
-      <div class="save-slot-list">
-        ${[1,2,3,4].map(n => {
-          const slot = slotsCache[n-1];
-          return `
-            <div class="save-slot">
-              <div class="slot-info">
-                <div class="slot-title">${slot && slot.name ? esc(slot.name) : `Slot ${n}`}</div>
-                <div class="slot-meta">${slot ? `Slot ${n} · ${slot.correctCount}/${slot.settings.target} · ${formatSlotDate(slot.savedAt)}` : 'leer'}</div>
-              </div>
-              ${slot ? `
-                <div class="slot-actions">
-                  <button class="btn-primary btn-small" onclick="loadSlot(${n})">Laden</button>
-                  <button class="btn-danger btn-small" onclick="requestDeleteSlot(${n})">Löschen</button>
-                </div>` : ``}
-            </div>`;
-        }).join('')}
-      </div>
-      <div class="hint" style="margin-top:10px;">Während einer laufenden Runde kannst du oben rechts jederzeit in einen dieser 4 Slots speichern.</div>
+      <div class="save-slot-list">${rows}</div>
     </div>
+    <div class="menu-actions">
+      <button class="btn-ghost" onclick="goToMenu()">← Zurück zum Hauptmenü</button>
+    </div>
+    ${state.confirmDeleteSlot ? renderDeleteSlotModal() : ``}
+  `;
+}
 
+/* ============ TUTORIAL ============ */
+function renderTutorial(){
+  app.innerHTML = `
+    <div class="brand"><h1 style="font-size:30px;">Tutorial</h1></div>
     <div class="menu-card">
-      <h3 style="margin-bottom:18px;font-size:18px;">Einstellungen</h3>
-      <div class="settings-grid">
-
-        <div class="setting-row" style="align-items:flex-start;">
-          <div>
-            <div class="label">Spielmodus</div>
-            <div class="hint">Solo ist spielbar, Mehrspieler &amp; Koop sind geplant</div>
-          </div>
-          <select class="dropdown" onchange="setMode(this.value)">
-            <option value="solo" ${s.mode==='solo'?'selected':''}>Solo</option>
-            <option value="multiplayer" ${s.mode==='multiplayer'?'selected':''}>Mehrspieler</option>
-            <option value="coop" ${s.mode==='coop'?'selected':''}>Koop</option>
-          </select>
-        </div>
-        ${s.mode !== 'solo' ? plannedFeatureNotice() : ``}
-
-        <div class="setting-row" style="align-items:flex-start;">
-          <div>
-            <div class="label">Schwierigkeit</div>
-            <div class="hint">${
-              s.difficulty === 'expert' ? 'Titel, Interpret UND exaktes Jahr müssen stimmen'
-              : s.difficulty === 'pro' ? 'Titel und Interpret müssen für den Punkt stimmen'
-              : 'Nur die richtige Position auf der Zeitleiste zählt'
-            }</div>
-          </div>
-          <select class="dropdown" onchange="setDifficulty(this.value)">
-            <option value="normal" ${s.difficulty==='normal'?'selected':''}>Normal</option>
-            <option value="pro" ${s.difficulty==='pro'?'selected':''}>Pro</option>
-            <option value="expert" ${s.difficulty==='expert'?'selected':''}>Expert</option>
-          </select>
-        </div>
-
-        <div class="setting-row">
-          <div>
-            <div class="label">Chrono-Tokens</div>
-            <div class="hint">Karte überspringen, kaufen oder Bonus für Titel &amp; Interpret</div>
-          </div>
-          <div class="switch ${s.tokens?'on':''}" onclick="toggleSetting('tokens')"><div class="knob"></div></div>
-        </div>
-
-        ${s.tokens ? `
-        <div class="setting-row">
-          <div>
-            <div class="label">Maximale Chrono-Tokens</div>
-            <div class="hint">Wie viele Tokens du gleichzeitig horten kannst</div>
-          </div>
-          <div class="stepper">
-            <button onclick="stepMaxTokens(-1)">–</button>
-            <div class="val">${s.maxTokens}</div>
-            <button onclick="stepMaxTokens(1)">+</button>
-          </div>
-        </div>
-        ` : ``}
-
-        <!--
-        <div class="setting-row">
-          <div>
-            <div class="label">Exaktes Jahr bei Gleichstand</div>
-            <div class="hint">Strengere Prüfung, wenn zwei Karten dasselbe Jahr haben könnten</div>
-          </div>
-          <div class="switch ${s.strictYear?'on':''}" onclick="toggleSetting('strictYear')"><div class="knob"></div></div>
-        </div>
-        -->
-
-        <div class="setting-row">
-          <div>
-            <div class="label">Kartenanzahl bis Sieg</div>
-            <div class="hint">Klassisch: 10 richtig erratene Karten — die Startkarte zählt nicht mit</div>
-          </div>
-          <div class="stepper">
-            <button onclick="stepTarget(-1)">–</button>
-            <div class="val">${s.target}</div>
-            <button onclick="stepTarget(1)">+</button>
-          </div>
-        </div>
-
-        <div class="setting-row" style="align-items:flex-start;">
-          <div>
-            <div class="label">Sprachen im Kartenstapel</div>
-            <div class="hint">Bisher verfügbar — weitere Sprachen können ergänzt werden</div>
-          </div>
-          <div class="chip-row">
-            ${genreChip('de','Deutsch')}
-            ${genreChip('en','Englisch')}
-            ${genreChip('es','Spanisch')}
-          </div>
-        </div>
-      </div>
-
-      <div class="note">
-        <strong>Modus:</strong> Solo-Testmodus. Mehrspieler mit Kartendiebstahl (&bdquo;HITSTER!&ldquo;-Ruf), Pro- und Expert-Varianten sowie ein Kooperativ-Modus sind als Nächstes geplant.
-      </div>
-    </div>
-
-    <details class="info">
-      <summary>Wie funktioniert's?</summary>
       <div class="body">
         <p><strong>1. Abspielen:</strong> Du ziehst eine Karte und klickst auf die Schallplatte — der Song spielt unsichtbar im Hintergrund über Spotify, du siehst weder Titel noch Cover. Nochmal auf die Schallplatte klicken pausiert/setzt fort. Mit Spotify Premium läuft der ganze Song, sonst die 30-Sekunden-Vorschau. Falls die Steuerung mal blockiert wird (z. B. durch einen Adblocker), springt das Spiel automatisch auf einen sichtbaren, aber zugeschnittenen Player um.</p>
         <p style="font-size:13px;">Hinweis: Bei einem Song (Enrique Iglesias' "Bailando") lag nur ein Album- statt Track-Link vor — dort öffnet sich stattdessen eine Spotify-Suche in neuem Tab, wo der Titel sichtbar ist.</p>
         <p><strong>2. Platzieren:</strong> Ohne das Jahr zu kennen, legst du die Karte an die Stelle deiner Zeitleiste, die du für chronologisch richtig hältst.</p>
         <p><strong>3. Aufdecken:</strong> Die Karte wird umgedreht. Liegt sie richtig, bleibt sie liegen und zählt einen Punkt für deinen Sieg (die Startkarte zählt nicht). Liegt sie falsch, kommt sie auf den Ablagestapel.</p>
-        <p><strong>Schwierigkeit — ${s.difficulty === 'expert' ? 'Expert (aktiv)' : s.difficulty === 'pro' ? 'Pro (aktiv)' : 'Normal (aktiv)'}:</strong>
-          ${s.difficulty === 'expert'
-            ? 'Für den Punkt müssen Position, Titel, Interpret UND das exakte Erscheinungsjahr stimmen — vor dem Aufdecken trägst du alle drei ein.'
-            : s.difficulty === 'pro'
-            ? 'Für den Punkt müssen Position, Titel und Interpret stimmen — vor dem Aufdecken trägst du beides ein.'
-            : 'Nur die richtige Position auf der Zeitleiste zählt für den Punkt.'}
-        </p>
-        ${s.tokens ? `
-        <p><strong>Chrono-Tokens (aktiv):</strong> Du startest mit 2 Chrono-Tokens, maximal kannst du ${s.maxTokens} gleichzeitig besitzen.</p>
+        <p><strong>Schwierigkeit:</strong><br>
+          <strong>Normal</strong> — nur die Position zählt.<br>
+          <strong>Profi</strong> — Titel &amp; Interpret müssen vor dem Aufdecken zusätzlich stimmen.<br>
+          <strong>Experte</strong> — zusätzlich auch das exakte Erscheinungsjahr.</p>
+        <p><strong>Chrono-Tokens (falls aktiviert):</strong> Du startest mit 2, das Maximum ist einstellbar.</p>
         <p>&bull; <strong>Song unbekannt?</strong> Wirf für 1 Chrono-Token die aktuelle Karte ab und ziehe eine neue, ohne sie zu platzieren.</p>
         <p>&bull; <strong>Karte kaufen:</strong> Für 3 Chrono-Tokens wird die nächste gezogene Karte garantiert korrekt in deine Zeitleiste einsortiert — ganz ohne Rateversuch und ohne Risiko.</p>
-        <p>&bull; <strong>Bonus-Chrono-Token (nur im Normal-Modus):</strong> Bevor du aufdeckst, kannst du Titel und Interpret eintippen. Stimmt beides, gibt es einen weiteren Chrono-Token. Verglichen wird großzügig: Groß-/Kleinschreibung, Akzente, Umlaut-Schreibweisen und Tippfehler werden verziehen, Zusätze wie &bdquo;feat.&ldquo; oder Klammer-Untertitel sind optional.</p>
-        ${s.difficulty !== 'normal' ? `<p style="font-size:13px;">In Pro/Expert ist das Eintippen ohnehin Pflicht fürs Zählen der Karte, daher entfällt hier der separate Bonus-Token.</p>` : ``}
-        ` : `
-        <p>Aktiviere Chrono-Tokens im Menü, um Karten überspringen oder kaufen zu können.</p>
-        `}
+        <p>&bull; <strong>Bonus-Chrono-Token (nur im Normal-Modus):</strong> Bevor du aufdeckst, kannst du Titel und Interpret eintippen. Stimmt beides, gibt es einen weiteren Chrono-Token. Verglichen wird großzügig: Groß-/Kleinschreibung, Akzente, Umlaut-Schreibweisen und Tippfehler werden verziehen. In Profi/Experte ist das Eintippen ohnehin Pflicht, daher entfällt dort der separate Bonus-Token.</p>
+        <p><strong>Spielstände:</strong> Beim Erstellen eines Spiels wählst du einen von 4 Speicherplätzen und einen Namen. Über den 💾-Button im Spiel speicherst du jederzeit in genau diesen Slot.</p>
       </div>
-    </details>
-
-    ${state.confirmDeleteSlot ? renderDeleteSlotModal() : ``}
+    </div>
+    <div class="menu-actions">
+      <button class="btn-ghost" onclick="goToMenu()">← Zurück zum Hauptmenü</button>
+    </div>
   `;
+}
+
+/* ============ SPIEL ERSTELLEN (WIZARD) ============ */
+function startCreateWizard(){
+  let defaultSlot = 1;
+  for(let n=1; n<=4; n++){ if(!slotsCache[n-1]){ defaultSlot = n; break; } }
+  state.wizard = {
+    step: 1,
+    slot: defaultSlot,
+    name: "",
+    mode: "solo",
+    difficulty: "normal",
+    tokens: false,
+    maxTokens: 5,
+    target: 10,
+    genres: { de:true, en:true, es:true }
+  };
+  state.infoOpen = null;
+  state.screen = "create";
+  render();
+}
+function wizardNext(){
+  if(state.wizard.step < 4){ state.wizard.step++; state.infoOpen = null; render(); }
+}
+function wizardBack(){
+  if(state.wizard.step > 1){ state.wizard.step--; state.infoOpen = null; render(); }
+  else { state.wizard = null; state.screen = "menu"; render(); }
+}
+function wizardSetSlot(n){ state.wizard.slot = n; render(); }
+function wizardSetMode(v){ state.wizard.mode = v; render(); }
+function wizardSetDifficulty(v){ state.wizard.difficulty = v; render(); }
+function wizardToggleTokens(){ state.wizard.tokens = !state.wizard.tokens; render(); }
+function wizardStepMaxTokens(delta){
+  const m = state.wizard.maxTokens + delta;
+  if(m < 3 || m > 15) return;
+  state.wizard.maxTokens = m; render();
+}
+function wizardStepTarget(delta){
+  const t = state.wizard.target + delta;
+  if(t < 5 || t > 15) return;
+  state.wizard.target = t; render();
+}
+function wizardToggleGenre(key){
+  const g = state.wizard.genres;
+  const activeCount = Object.values(g).filter(Boolean).length;
+  if(g[key] && activeCount === 1) return;
+  g[key] = !g[key];
+  render();
+}
+
+function renderWizardStep1(){
+  const w = state.wizard;
+  const rows = [1,2,3,4].map(n => {
+    const slot = slotsCache[n-1];
+    const selected = w.slot === n;
+    return `
+      <div class="save-slot wizard-slot ${selected?'selected':''}" onclick="wizardSetSlot(${n})">
+        <div class="slot-info">
+          <div class="slot-title">${slot && slot.name ? esc(slot.name) : `Slot ${n}`}</div>
+          <div class="slot-meta">${slot ? `belegt · ${formatSlotDate(slot.savedAt)}` : 'leer'}</div>
+        </div>
+        ${selected ? `<span class="wizard-check">✓</span>` : ``}
+      </div>`;
+  }).join('');
+  return `
+    <div class="menu-card">
+      <h3>1. Speicherplatz &amp; Name</h3>
+      <div class="save-slot-list">${rows}</div>
+      ${slotsCache[w.slot-1] ? `<div class="planned-notice" style="border-color:var(--wrong);margin-top:12px;">Dieser Slot ist belegt und wird beim Erstellen überschrieben.</div>` : ``}
+      <input class="guess-input" style="margin-top:14px;" type="text" maxlength="40" autocomplete="off"
+        placeholder="Name für den Spielstand (optional)"
+        value="${esc(w.name)}" oninput="state.wizard.name=this.value">
+    </div>`;
+}
+function renderWizardStep2(){
+  const w = state.wizard;
+  return `
+    <div class="menu-card">
+      <h3>2. Modus &amp; Schwierigkeit</h3>
+      <div class="settings-grid">
+        ${infoRow('w-mode', 'Spielmodus',
+          'Solo ist spielbar. Mehrspieler und Koop sind für die Zukunft geplant.',
+          `<select class="dropdown" onchange="wizardSetMode(this.value)">
+            <option value="solo" ${w.mode==='solo'?'selected':''}>Solo</option>
+            <option value="multiplayer" ${w.mode==='multiplayer'?'selected':''}>Mehrspieler</option>
+            <option value="coop" ${w.mode==='coop'?'selected':''}>Koop</option>
+          </select>`)}
+        ${w.mode !== 'solo' ? plannedFeatureNotice() : ``}
+        ${infoRow('w-difficulty', 'Schwierigkeit',
+          'Normal: Nur die Position auf der Zeitleiste zählt. Profi: Titel &amp; Interpret müssen zusätzlich stimmen. Experte: zusätzlich auch das exakte Erscheinungsjahr.',
+          `<select class="dropdown" onchange="wizardSetDifficulty(this.value)">
+            <option value="normal" ${w.difficulty==='normal'?'selected':''}>Normal</option>
+            <option value="pro" ${w.difficulty==='pro'?'selected':''}>Profi</option>
+            <option value="expert" ${w.difficulty==='expert'?'selected':''}>Experte</option>
+          </select>`)}
+      </div>
+    </div>`;
+}
+function renderWizardStep3(){
+  const w = state.wizard;
+  return `
+    <div class="menu-card">
+      <h3>3. Weitere Einstellungen</h3>
+      <div class="settings-grid">
+        ${infoRow('w-tokens', 'Chrono-Tokens',
+          'Erlaubt, Karten mit Tokens zu überspringen oder garantiert richtig zu kaufen.',
+          `<div class="switch ${w.tokens?'on':''}" onclick="wizardToggleTokens()"><div class="knob"></div></div>`)}
+        ${w.tokens ? infoRow('w-maxtokens', 'Maximale Chrono-Tokens',
+          'Wie viele Chrono-Tokens du gleichzeitig horten kannst (3–15).',
+          `<div class="stepper">
+            <button onclick="wizardStepMaxTokens(-1)">–</button>
+            <div class="val">${w.maxTokens}</div>
+            <button onclick="wizardStepMaxTokens(1)">+</button>
+          </div>`) : ``}
+        ${infoRow('w-target', 'Kartenanzahl bis Sieg',
+          'Wie viele Karten du richtig erraten musst, um zu gewinnen — die Startkarte zählt nicht mit.',
+          `<div class="stepper">
+            <button onclick="wizardStepTarget(-1)">–</button>
+            <div class="val">${w.target}</div>
+            <button onclick="wizardStepTarget(1)">+</button>
+          </div>`)}
+      </div>
+    </div>`;
+}
+function renderWizardStep4(){
+  const w = state.wizard;
+  const genreChip = (key,label) => `<button class="chip ${w.genres[key] ? 'on':''}" onclick="wizardToggleGenre('${key}')">${label}</button>`;
+  return `
+    <div class="menu-card">
+      <h3>4. Songauswahl</h3>
+      <div class="settings-grid">
+        ${infoRow('w-genres', 'Sprachen im Kartenstapel',
+          'Aktuell verfügbare Sprachen im Kartenstapel — weitere Sprachen kommen später dazu.',
+          `<div class="chip-row">${genreChip('de','Deutsch')}${genreChip('en','Englisch')}${genreChip('es','Spanisch')}</div>`)}
+      </div>
+    </div>`;
+}
+function renderCreateGame(){
+  const w = state.wizard;
+  const stepContent =
+    w.step === 1 ? renderWizardStep1() :
+    w.step === 2 ? renderWizardStep2() :
+    w.step === 3 ? renderWizardStep3() :
+    renderWizardStep4();
+  app.innerHTML = `
+    <div class="brand">
+      <h1 style="font-size:30px;">Spiel erstellen</h1>
+      <div class="wizard-steps">${[1,2,3,4].map(n=>`<span class="wizard-dot ${w.step===n?'active':''} ${w.step>n?'done':''}"></span>`).join('')}</div>
+    </div>
+    ${stepContent}
+    <div class="menu-actions wizard-actions">
+      <button class="btn-ghost" onclick="wizardBack()">${w.step===1?'Abbrechen':'← Zurück'}</button>
+      ${w.step < 4
+        ? `<button class="btn-primary" onclick="wizardNext()">Weiter</button>`
+        : `<button class="btn-primary" onclick="createGameFromWizard()">Spiel erstellen</button>`}
+    </div>
+  `;
+}
+async function createGameFromWizard(){
+  const w = state.wizard;
+  const settings = {
+    tokens: w.tokens,
+    target: w.target,
+    maxTokens: w.maxTokens,
+    mode: w.mode,
+    difficulty: w.difficulty,
+    genres: { ...w.genres }
+  };
+  const slotNum = w.slot;
+  const saveName = (w.name || "").trim();
+  state.wizard = null;
+  newGame(settings);
+  state.activeSlot = slotNum;
+  state.activeSaveName = saveName;
+  const snapshot = JSON.parse(JSON.stringify(state));
+  snapshot.savedAt = Date.now();
+  snapshot.name = saveName;
+  await writeSlot(slotNum, snapshot);
+  render();
+}
+
+/* ============ SPEICHERN (IM SPIEL) ============ */
+function requestOverwriteSave(){
+  state.confirmOverwriteSave = true;
+  render();
+}
+function cancelOverwriteSave(){
+  state.confirmOverwriteSave = false;
+  render();
+}
+async function confirmOverwriteSaveNow(){
+  const n = state.activeSlot;
+  state.confirmOverwriteSave = false;
+  if(n){
+    const snapshot = JSON.parse(JSON.stringify(state));
+    snapshot.savedAt = Date.now();
+    snapshot.name = state.activeSaveName;
+    await writeSlot(n, snapshot);
+  } else {
+    // Fallback für Spielstände ohne gebundenen Slot (z.B. sehr alte Spielstände)
+    state.saveSlotDialogOpen = true;
+  }
+  render();
 }
 
 function renderTag(song, timeline, idxInTimeline){
@@ -1615,7 +1930,7 @@ function renderGame(){
       <div class="stat">Richtig <b>${state.correctCount} / ${s.target}</b></div>
       <div class="stat">Stapel <b>${state.deck.length}</b></div>
       ${s.tokens ? `<div class="stat">Chrono <div class="token-dots">${tokenDots}</div></div>` : ``}
-      <button class="btn-ghost btn-small" onclick="openSaveSlotDialog()">💾 Speichern</button>
+      <button class="btn-ghost btn-small" onclick="requestOverwriteSave()">💾 Speichern</button>
       <button class="btn-ghost btn-small" onclick="openExitDialog()">Zurück zum Menü</button>
     </div>
 
@@ -1655,6 +1970,7 @@ function renderGame(){
     ` : ``}
 
     ${state.saveSlotDialogOpen ? renderSaveSlotModal() : ``}
+    ${state.confirmOverwriteSave ? renderOverwriteConfirmModal() : ``}
     ${state.confirmDeleteSlot ? renderDeleteSlotModal() : ``}
   `;
 
@@ -1729,7 +2045,12 @@ function renderTimelineOnly(){
 }
 
 function render(){
-  if(state.screen === "menu") renderMenu();
+  if(state.screen === "splash") renderSplash();
+  else if(state.screen === "loading") renderLoading();
+  else if(state.screen === "menu") renderMenu();
+  else if(state.screen === "loadgame") renderLoadGame();
+  else if(state.screen === "tutorial") renderTutorial();
+  else if(state.screen === "create") renderCreateGame();
   else if(state.screen === "game") renderGame();
   else if(state.screen === "end") renderEnd();
   else if(state.screen === "timeline") renderTimelineOnly();
