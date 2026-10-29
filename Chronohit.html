@@ -140,7 +140,7 @@
   :root[data-design="glass"] .skip-notice,
   :root[data-design="glass"] .guess-box,
   :root[data-design="glass"] .guess-result{
-    background-color:var(--panel);
+    background-color:color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent);
     background-image:linear-gradient(135deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,.07) 30%, rgba(255,255,255,.02) 58%, rgba(255,255,255,.12) 100%);
     border:1px solid rgba(255,255,255,.26);
     box-shadow:
@@ -177,7 +177,7 @@
   :root[data-design="glass"] .btn-ghost,
   :root[data-design="glass"] .stepper button,
   :root[data-design="glass"] .player-reload{
-    background-color:var(--panel-2);
+    background-color:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent);
     background-image:linear-gradient(160deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,.04) 45%, rgba(255,255,255,.10) 100%);
     border:1px solid rgba(255,255,255,.28);
     box-shadow:
@@ -257,7 +257,7 @@
     letter-spacing:.14em; text-transform:uppercase; color:var(--muted); line-height:1;
     margin-bottom:18px;
   }
-  :root[data-design="norisk"] .menu-card{ background:var(--panel); border:1px solid var(--line); }
+  :root[data-design="norisk"] .menu-card{ background:color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent); border:1px solid var(--line); }
   :root[data-design="norisk"] .modal-box{
     background:#0a0a0a; border:1px solid rgba(255,255,255,.10); box-shadow:0 24px 60px rgba(0,0,0,.65);
   }
@@ -403,7 +403,7 @@
   }
   .splash-play{
     width:130px; height:130px; border-radius:50%;
-    background:var(--panel-2);
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent);
     border:3px solid var(--accent);
     color:var(--accent);
     display:flex; align-items:center; justify-content:center;
@@ -424,7 +424,7 @@
   .loading-label{ font-family:var(--heading-font); font-size:calc(20px * var(--font-scale)); color:var(--accent); }
   .loading-frame{
     width:100%; height:16px; border:2px solid var(--accent); border-radius:5px;
-    overflow:hidden; background:var(--panel-2); padding:2px;
+    overflow:hidden; background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); padding:2px;
   }
   .loading-fill{
     height:100%; width:0%; background:var(--accent); border-radius:2px;
@@ -438,7 +438,7 @@
     display:flex; flex-direction:column; gap:10px; align-items:flex-end;
   }
   .todo-fab{
-    background:var(--panel); border:1px solid var(--line); color:var(--muted);
+    background:color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent); border:1px solid var(--line); color:var(--muted);
     border-radius:var(--btn-radius); padding:10px 16px; font-size:calc(13px * var(--font-scale)); font-weight:600;
     text-decoration:none; display:inline-block;
   }
@@ -457,7 +457,7 @@
   .theme-list{ display:flex; flex-direction:column; gap:10px; }
   .theme-swatch{
     display:flex; align-items:center; gap:14px; cursor:pointer;
-    background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); border:1px solid var(--line); border-radius:12px;
     padding:12px 14px;
     backdrop-filter:blur(var(--panel-blur)) saturate(150%);
     -webkit-backdrop-filter:blur(var(--panel-blur)) saturate(150%);
@@ -499,7 +499,7 @@
   }
   .skip-notice{
     display:flex; flex-direction:column; align-items:center; gap:2px; text-align:center;
-    background:var(--panel-2); border:1px dashed var(--line); border-radius:12px;
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); border:1px dashed var(--line); border-radius:12px;
     padding:8px 14px; font-size:calc(13px * var(--font-scale)); max-width:340px;
   }
   .skip-notice .skip-label{ color:var(--muted); font-size:calc(11px * var(--font-scale)); letter-spacing:.04em; text-transform:uppercase; }
@@ -517,7 +517,7 @@
   .player-row .guess-input{ flex:1; min-width:0; }
   .player-num{
     width:24px; height:24px; border-radius:50%; flex:none; font-size:calc(12px * var(--font-scale));
-    background:var(--panel-2); border:1px solid var(--line); color:var(--muted);
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); border:1px solid var(--line); color:var(--muted);
     display:flex; align-items:center; justify-content:center;
   }
   .turn-banner{
@@ -529,7 +529,7 @@
   .drawer-handle{
     position:fixed; right:0; top:50%; transform:translateY(-50%); z-index:30;
     writing-mode:vertical-rl; padding:16px 8px; border-radius:12px 0 0 12px;
-    background:var(--panel); color:var(--muted); border:1px solid var(--line); border-right:none;
+    background:color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent); color:var(--muted); border:1px solid var(--line); border-right:none;
     font-size:calc(12px * var(--font-scale)); letter-spacing:.14em; text-transform:uppercase;
     backdrop-filter:blur(var(--panel-blur)); -webkit-backdrop-filter:blur(var(--panel-blur));
   }
@@ -552,13 +552,13 @@
     display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;
     font-family:var(--heading-font); font-size:calc(20px * var(--font-scale));
   }
-  .pp{ border:1px solid var(--line); border-radius:12px; background:var(--panel-2); margin-bottom:8px; overflow:hidden; }
+  .pp{ border:1px solid var(--line); border-radius:12px; background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); margin-bottom:8px; overflow:hidden; }
   .pp.current{ border-color:var(--accent); }
   .pp-head{ display:flex; align-items:center; gap:8px; padding:10px 12px; cursor:pointer; }
   .pp.current .pp-head{ cursor:default; }
   .pp-order{
     width:22px; height:22px; border-radius:50%; flex:none; font-size:calc(12px * var(--font-scale));
-    background:var(--panel); color:var(--muted); display:flex; align-items:center; justify-content:center;
+    background:color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent); color:var(--muted); display:flex; align-items:center; justify-content:center;
   }
   .pp-name{ flex:1; min-width:0; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .pp-now{
@@ -581,7 +581,7 @@
   .rank-list{ display:flex; flex-direction:column; gap:8px; margin:18px 0 6px; text-align:left; }
   .rank-row{
     display:flex; align-items:center; gap:10px; padding:10px 14px;
-    background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); border:1px solid var(--line); border-radius:12px;
   }
   .rank-row.winner{ border-color:var(--correct); }
   .rank-pos{ font-family:var(--heading-font); font-size:calc(18px * var(--font-scale)); color:var(--muted); min-width:22px; }
@@ -595,7 +595,7 @@
   .suggest-list{ display:flex; flex-direction:column; gap:10px; }
   .suggest-opt{
     display:flex; align-items:center; gap:14px; text-decoration:none; color:var(--text);
-    background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:12px 14px;
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); border:1px solid var(--line); border-radius:12px; padding:12px 14px;
   }
   .suggest-opt:hover{ border-color:var(--accent); }
   .suggest-icon{ display:flex; flex:none; }
@@ -622,7 +622,7 @@
   .chip.on .chip-n{ opacity:.75; }
   .pool-info{
     margin-top:20px; padding:10px 14px; border-radius:12px; font-size:calc(13px * var(--font-scale)); text-align:center;
-    background:var(--panel-2); border:1px solid var(--line); color:var(--muted);
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); border:1px solid var(--line); color:var(--muted);
   }
   .pool-info b{ color:var(--text); }
   .pool-info.bad{ border-color:var(--wrong); }
@@ -631,7 +631,7 @@
   .qm-button{
     position:fixed; top:14px; left:14px; z-index:29; width:46px; height:46px; padding:0;
     border-radius:50%; display:none; align-items:center; justify-content:center;
-    background:var(--panel); border:1px solid var(--line); color:var(--text);
+    background:color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent); border:1px solid var(--line); color:var(--text);
     box-shadow:0 6px 18px rgba(0,0,0,.28);
     backdrop-filter:blur(var(--panel-blur)); -webkit-backdrop-filter:blur(var(--panel-blur));
   }
@@ -690,20 +690,20 @@
   .label-with-info{ display:flex; align-items:center; gap:8px; }
   .info-btn{
     width:18px; height:18px; padding:0; border-radius:50%;
-    background:var(--panel-2); border:1px solid var(--line); color:var(--muted);
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); border:1px solid var(--line); color:var(--muted);
     font-family:var(--heading-font); font-style:italic; font-size:calc(12px * var(--font-scale)); line-height:1;
     display:flex; align-items:center; justify-content:center; flex:none;
   }
   .info-btn:hover{ border-color:var(--accent); color:var(--accent); }
   .info-desc{
-    background:var(--panel-2); border:1px dashed var(--line); border-radius:10px;
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); border:1px dashed var(--line); border-radius:10px;
     padding:10px 12px; font-size:calc(13px * var(--font-scale)); color:var(--muted); line-height:1.5;
     margin-top:-8px;
   }
 
   /* ---- slot settings panel ---- */
   .slot-settings-panel{
-    background:var(--panel-2); border:1px solid var(--line); border-radius:10px;
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); border:1px solid var(--line); border-radius:10px;
     padding:10px 14px; margin-top:-4px; font-size:calc(13px * var(--font-scale));
   }
   .slot-settings-panel .row{ display:flex; justify-content:space-between; padding:3px 0; color:var(--muted); }
@@ -732,7 +732,7 @@
 
   /* ---- menu ---- */
   .menu-card{
-    background:var(--panel);
+    background:color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent);
     border:1px solid var(--line);
     border-radius:var(--radius);
     padding:26px;
@@ -756,7 +756,7 @@
 
   .switch{
     position:relative; width:46px; height:26px; border-radius:var(--btn-radius);
-    background:var(--panel-2); border:1px solid var(--line); flex:none;
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); border:1px solid var(--line); flex:none;
   }
   .switch.on{background:var(--accent); border-color:var(--accent);}
   .switch .knob{
@@ -773,14 +773,14 @@
   .chip.on{ color:var(--accent-ink); background:var(--accent); border-color:var(--accent); }
 
   .dropdown{
-    background:var(--panel-2); color:var(--text); border:1px solid var(--line);
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); color:var(--text); border:1px solid var(--line);
     border-radius:var(--btn-radius); padding:9px 14px; font-family:'Space Grotesk',sans-serif;
     font-size:calc(14px * var(--font-scale)); font-weight:600; cursor:pointer; flex:none;
   }
   .dropdown:hover{ border-color:var(--accent); }
 
   .planned-notice{
-    background:var(--panel-2); border:1px dashed var(--line); border-radius:12px;
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); border:1px dashed var(--line); border-radius:12px;
     padding:12px 14px; font-size:calc(13px * var(--font-scale)); color:var(--muted); line-height:1.5;
     margin-top:-8px;
   }
@@ -789,13 +789,13 @@
   .stepper{display:flex; align-items:center; gap:14px;}
   .stepper button{
     width:32px; height:32px; padding:0; border-radius:50%;
-    background:var(--panel-2); color:var(--text); border:1px solid var(--line);
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); color:var(--text); border:1px solid var(--line);
     font-size:calc(16px * var(--font-scale)); line-height:1;
   }
   .stepper .val{ font-family:var(--heading-font); font-size:calc(20px * var(--font-scale)); min-width:28px; text-align:center; }
 
   details.info{
-    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    background:color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent); border:1px solid var(--line); border-radius:var(--radius);
     padding:18px 22px; margin-top:8px;
   }
   details.info summary{cursor:pointer; font-weight:600; color:var(--accent); font-size:calc(14px * var(--font-scale));}
@@ -814,7 +814,7 @@
     margin-bottom:18px; gap:12px; flex-wrap:wrap;
   }
   .stat{
-    background:var(--panel); border:1px solid var(--line); border-radius:999px;
+    background:color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent); border:1px solid var(--line); border-radius:999px;
     padding:8px 16px; font-size:calc(13px * var(--font-scale)); color:var(--muted); display:flex; gap:8px; align-items:center;
   }
   .stat b{color:var(--text); font-family:var(--heading-font); font-size:calc(15px * var(--font-scale));}
@@ -838,7 +838,7 @@
     position:absolute; right:-8px; bottom:-8px; z-index:2;
     width:34px; height:34px; padding:0; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
-    background:var(--panel); color:var(--muted); border:1px solid var(--line);
+    background:color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent); color:var(--muted); border:1px solid var(--line);
     box-shadow:0 4px 12px rgba(0,0,0,.3);
   }
   .player-reload:hover{ color:var(--accent); border-color:var(--accent); }
@@ -861,7 +861,7 @@
   .vinyl.spin{animation:spin 5s linear infinite;}
   @keyframes spin{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
 
-  .preview-bar{ width:150px; height:4px; border-radius:999px; background:var(--panel-2); overflow:hidden; }
+  .preview-bar{ width:150px; height:4px; border-radius:999px; background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); overflow:hidden; }
   .preview-bar .fill{ height:100%; width:0%; background:var(--accent); }
   .preview-bar.running .fill{ animation: fillbar 30s linear forwards; }
   @keyframes fillbar{ from{width:0%} to{width:100%} }
@@ -872,7 +872,7 @@
   .embed-crop{
     width:300px; height:64px; margin:2px auto 0;
     overflow:hidden; border-radius:10px; position:relative;
-    background:var(--panel-2); border:1px solid var(--line);
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); border:1px solid var(--line);
     opacity:0; animation: embedFadeIn .35s ease .45s forwards;
   }
   .embed-crop iframe{
@@ -900,15 +900,15 @@
     overflow-y:hidden;
     overscroll-behavior-x:contain;
     scrollbar-width:thin;
-    scrollbar-color:var(--accent) var(--panel);
+    scrollbar-color:var(--accent) color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent);
   }
   .timeline-wrap::-webkit-scrollbar{ height:10px; }
   .timeline-wrap::-webkit-scrollbar-track{
-    background:var(--panel); border-radius:999px; margin:0 20px;
+    background:color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent); border-radius:999px; margin:0 20px;
   }
   .timeline-wrap::-webkit-scrollbar-thumb{
     background:var(--accent); border-radius:999px;
-    border:2px solid var(--panel);
+    border:2px solid color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent);
   }
   .timeline-wrap::-webkit-scrollbar-thumb:hover{ background:#f4bb62; }
   .timeline{
@@ -942,7 +942,7 @@
   .card .title{font-size:calc(12px * var(--font-scale) * var(--card-scale, 1)); font-weight:600; line-height:1.3; margin-top:6px;}
   .card .artist{font-size:calc(11px * var(--font-scale) * var(--card-scale, 1)); color:#5c5645; margin-top:2px;}
   .card.pending{
-    background:var(--panel-2); border:1px dashed var(--accent);
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); border:1px dashed var(--accent);
     align-items:center; justify-content:center;
   }
   .card.pending .q{font-family:var(--heading-font); font-size:calc(28px * var(--font-scale)); color:var(--muted);}
@@ -959,7 +959,7 @@
   .reveal-actions{display:flex; justify-content:center; gap:10px; margin-top:8px;}
 
   .token-panel{
-    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    background:color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent); border:1px solid var(--line); border-radius:var(--radius);
     padding:16px 18px; margin-top:10px; display:flex; flex-direction:column; gap:12px;
   }
   .token-panel .row{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;}
@@ -979,7 +979,7 @@
 
   /* ---- Titel/Interpret raten ---- */
   .guess-box{
-    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    background:color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent); border:1px solid var(--line); border-radius:var(--radius);
     padding:14px 16px; margin-top:6px; width:100%; max-width:320px;
     display:flex; flex-direction:column; gap:9px;
   }
@@ -998,7 +998,7 @@
   .guess-hint{font-size:calc(11px * var(--font-scale)); color:var(--muted); line-height:1.45;}
 
   .guess-result{
-    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    background:color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent); border:1px solid var(--line); border-radius:var(--radius);
     padding:12px 16px; margin-top:6px; width:100%; max-width:320px;
     display:flex; flex-direction:column; gap:6px; font-size:calc(13px * var(--font-scale));
   }
@@ -1037,7 +1037,7 @@
     display:flex; align-items:center; justify-content:center; padding:20px; z-index:50;
   }
   .modal-box{
-    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    background:color-mix(in srgb, var(--panel) var(--panel-a, 100%), transparent); border:1px solid var(--line); border-radius:var(--radius);
     padding:26px; max-width:360px; width:100%;
     backdrop-filter:blur(var(--panel-blur)) saturate(150%);
     -webkit-backdrop-filter:blur(var(--panel-blur)) saturate(150%);
@@ -1050,7 +1050,7 @@
   .save-slot-list{display:flex; flex-direction:column; gap:10px;}
   .save-slot{
     display:flex; justify-content:space-between; align-items:center; gap:12px;
-    background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+    background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); border:1px solid var(--line); border-radius:12px;
     padding:12px 14px;
     backdrop-filter:blur(var(--panel-blur)) saturate(150%);
     -webkit-backdrop-filter:blur(var(--panel-blur)) saturate(150%);
@@ -1074,7 +1074,7 @@
 
   /* ---- Zeitlimit pro Zug ---- */
   .turn-timer{ width:min(300px, 80vw); display:flex; align-items:center; gap:10px; font-size:calc(13px * var(--font-scale)); color:var(--muted); }
-  .turn-timer .bar{ flex:1; height:6px; border-radius:999px; background:var(--panel-2); overflow:hidden; }
+  .turn-timer .bar{ flex:1; height:6px; border-radius:999px; background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); overflow:hidden; }
   .turn-timer .fill{ height:100%; width:100%; background:var(--accent); transition:width .25s linear; }
   .turn-timer .time{ font-family:var(--heading-font); min-width:3.4ch; text-align:right; color:var(--text); }
   .turn-timer.low .fill{ background:var(--wrong); }
@@ -1082,7 +1082,7 @@
 
   /* ---- Statistiken ---- */
   .stats-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-  .stat-tile{ background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius); padding:12px 14px; text-align:center; }
+  .stat-tile{ background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); border:1px solid var(--line); border-radius:var(--radius); padding:12px 14px; text-align:center; }
   .stat-tile .n{ font-family:var(--heading-font); font-size:calc(26px * var(--font-scale)); color:var(--accent); }
   .stat-tile .l{ font-size:calc(12px * var(--font-scale)); color:var(--muted); margin-top:2px; }
   .stats-row{ display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:calc(14px * var(--font-scale)); }
@@ -1280,13 +1280,77 @@
   :root[data-design="synthwave"] .btn-primary{ box-shadow:0 0 14px rgba(255,43,214,.55); }
   :root[data-design="synthwave"] .menu-card, :root[data-design="synthwave"] .card{ box-shadow:0 0 18px rgba(255,43,214,.18); }
   :root[data-design="synthwave"] h1, :root[data-design="synthwave"] h2{ text-shadow:0 0 12px rgba(255,43,214,.7); }
+  :root[data-theme="notizbuch"]{
+    --bg:#f6f1e1; --bg-2:#efe8d2; --bg-highlight:#fbf7ea; --panel:#fffdf3; --panel-2:#f3ecd6;
+    --text:#23305a; --muted:#6b7390; --accent:#c8372d; --accent-ink:#ffffff;
+    --correct:#2f7d4f; --wrong:#c8372d; --line:#9fb0d8; --card-face:#fffef6; --ink:#23305a;
+    --heading-font:'Caveat','Patrick Hand',cursive; --body-font:'Patrick Hand','Comic Neue',cursive; --radius:6px;
+    --body-bg-image: linear-gradient(90deg, transparent 54px, rgba(200,55,45,.5) 54px 56px, transparent 56px), repeating-linear-gradient(to bottom, transparent 0 31px, rgba(80,120,200,.3) 31px 32px);
+  }
+  :root[data-design="notizbuch"] body{ background-attachment:local; font-size:1.06em; }
+  :root[data-design="notizbuch"] :is(.card,.menu-card,.modal-box,.btn-primary,.btn-ghost,.stat,.guess-box,.theme-swatch){
+    border:2px solid var(--ink); border-radius:255px 14px 225px 14px / 14px 225px 14px 255px; box-shadow:2px 3px 0 rgba(35,48,90,.28);
+  }
+  :root[data-design="notizbuch"] :is(h1,h2,h3,.mark){ text-decoration:underline wavy rgba(200,55,45,.55); text-underline-offset:6px; text-decoration-thickness:1.5px; }
+  :root[data-design="notizbuch"] .menu-card{ background-image:repeating-linear-gradient(to bottom, transparent 0 27px, rgba(80,120,200,.18) 27px 28px); }
+  :root[data-theme="gameboy"]{
+    --bg:#9bbc0f; --bg-2:#8bac0f; --bg-highlight:#9bbc0f; --panel:#8bac0f; --panel-2:#9bbc0f;
+    --text:#0f380f; --muted:#306230; --accent:#0f380f; --accent-ink:#9bbc0f;
+    --correct:#0f380f; --wrong:#306230; --line:#306230; --card-face:#9bbc0f; --ink:#0f380f;
+    --heading-font:'Press Start 2P',monospace; --body-font:'Press Start 2P',monospace; --radius:0px;
+    --body-bg-image: repeating-linear-gradient(0deg, rgba(15,56,15,.07) 0 2px, transparent 2px 4px);
+  }
+  :root[data-design="gameboy"] body{ font-size:12px; line-height:1.7; image-rendering:pixelated; }
+  :root[data-design="gameboy"] *{ border-radius:0 !important; text-shadow:none !important; }
+  :root[data-design="gameboy"] :is(.card,.menu-card,.modal-box,.btn-primary,.btn-ghost,.stat,.guess-box,.theme-swatch,.event-notice){ border:3px solid var(--ink); box-shadow:4px 4px 0 var(--ink); }
+  .theme-swatch[data-theme-preview="gameboy"] .theme-dots span:nth-child(1){ background:#0f380f; }
+  .theme-swatch[data-theme-preview="gameboy"] .theme-dots span:nth-child(2){ background:#306230; }
+  .theme-swatch[data-theme-preview="gameboy"] .theme-dots span:nth-child(3){ background:#8bac0f; }
+  :root[data-theme="ostern"]{ --bg:#fbf7e6; --bg-2:#f3edd0; --bg-highlight:#fffdf2; --panel:#eaf4d7; --panel-2:#dff0c6; --text:#2f3a22; --muted:#6f7d56; --accent:#8e5bd1; --accent-ink:#ffffff; --correct:#2f8a4f; --wrong:#d0463a; --line:#c9dcaa; --card-face:#fffef7; --ink:#2f3a22; --body-bg-image: radial-gradient(700px 400px at 90% 0%, rgba(142,91,209,.14), transparent 60%), radial-gradient(600px 400px at 0% 100%, rgba(255,214,90,.25), transparent 60%); }
+  :root[data-theme="valentin"]{ --bg:#2a0d1c; --bg-2:#1d0712; --bg-highlight:#3d1429; --panel:#3a1226; --panel-2:#4a1832; --text:#ffe8ef; --muted:#d79ab0; --accent:#ff5c8a; --accent-ink:#2a0d1c; --correct:#8fe0a8; --wrong:#ff8a7a; --line:#6b2845; --card-face:#fff0f4; --ink:#3a1226; --body-bg-image: radial-gradient(700px 420px at 85% 0%, rgba(255,92,138,.2), transparent 60%); }
+  :root[data-theme="silvester"]{ --bg:#0a0c1f; --bg-2:#05061a; --bg-highlight:#171a3a; --panel:#131632; --panel-2:#1c2045; --text:#f4f1ff; --muted:#9aa0d0; --accent:#ffd24a; --accent-ink:#14122a; --correct:#5ee6a8; --wrong:#ff6b7d; --line:#2d3270; --card-face:#f4f1ff; --ink:#14122a; --body-bg-image: radial-gradient(600px 380px at 20% 0%, rgba(255,210,74,.14), transparent 60%), radial-gradient(600px 380px at 85% 10%, rgba(120,90,255,.2), transparent 60%); }
+  .theme-swatch[data-theme-preview="notizbuch"] .theme-dots span:nth-child(1){ background:#f6f1e1; }
+  .theme-swatch[data-theme-preview="notizbuch"] .theme-dots span:nth-child(2){ background:#fffdf3; }
+  .theme-swatch[data-theme-preview="notizbuch"] .theme-dots span:nth-child(3){ background:#c8372d; }
+  .theme-swatch[data-theme-preview="ostern"] .theme-dots span:nth-child(1){ background:#fbf7e6; }
+  .theme-swatch[data-theme-preview="ostern"] .theme-dots span:nth-child(2){ background:#eaf4d7; }
+  .theme-swatch[data-theme-preview="ostern"] .theme-dots span:nth-child(3){ background:#8e5bd1; }
+  .theme-swatch[data-theme-preview="valentin"] .theme-dots span:nth-child(1){ background:#2a0d1c; }
+  .theme-swatch[data-theme-preview="valentin"] .theme-dots span:nth-child(2){ background:#3a1226; }
+  .theme-swatch[data-theme-preview="valentin"] .theme-dots span:nth-child(3){ background:#ff5c8a; }
+  .theme-swatch[data-theme-preview="silvester"] .theme-dots span:nth-child(1){ background:#0a0c1f; }
+  .theme-swatch[data-theme-preview="silvester"] .theme-dots span:nth-child(2){ background:#131632; }
+  .theme-swatch[data-theme-preview="silvester"] .theme-dots span:nth-child(3){ background:#ffd24a; }
+  /* Retro-Terminal: laufende Scanline (entfällt bei „Animationen reduzieren“) */
+  :root[data-design="terminal"] body::before{
+    content:""; position:fixed; left:0; right:0; top:0; height:18vh; pointer-events:none; z-index:9991;
+    background:linear-gradient(to bottom, transparent, rgba(125,255,155,.06) 40%, rgba(125,255,155,.17) 50%, rgba(125,255,155,.06) 60%, transparent);
+    animation:crtRoll 7s linear infinite;
+  }
+  @keyframes crtRoll{ 0%{ transform:translateY(-22vh); } 100%{ transform:translateY(105vh); } }
+  html.reduce-motion[data-design="terminal"] body::before{ display:none; animation:none; }
+  /* Deko-Ebene der Themes (Kürbisse, Tannen, Geschenke, Ostereier …) */
+  :root:is([data-theme="halloween"],[data-theme="weihnachten"],[data-theme="fruehling"],[data-theme="sommer"],[data-theme="herbst"],[data-theme="winter"],[data-theme="ostern"],[data-theme="valentin"],[data-theme="silvester"]){ --panel-a:66%; }
+  #theme-deco{ position:fixed; inset:0; pointer-events:none; z-index:-1; overflow:hidden; }
+  #theme-deco span{ position:absolute; line-height:1; user-select:none; }
+  #theme-deco .fl{ top:-12vh; animation:decoFall linear infinite; opacity:.85; }
+  #theme-deco .up{ bottom:-12vh; animation:decoUp linear infinite; opacity:.8; }
+  #theme-deco .gr{ bottom:-.12em; transform-origin:50% 100%; animation:decoSway ease-in-out infinite alternate; filter:drop-shadow(0 3px 8px rgba(0,0,0,.4)); }
+  #theme-deco .dr{ left:0; top:0; opacity:.9; will-change:transform; }
+  #theme-deco .st{ opacity:.9; filter:drop-shadow(0 0 22px rgba(255,200,90,.55)); }
+  @keyframes decoFall{ to{ transform:translateY(118vh) rotate(300deg); } }
+  @keyframes decoUp{ to{ transform:translateY(-118vh) rotate(25deg); } }
+  @keyframes decoSway{ from{ transform:rotate(-3deg); } to{ transform:rotate(3deg); } }
+  @keyframes decoDrift{ 0%{ transform:translate(0,0); } 50%{ transform:translate(65vw,-4vh); } 100%{ transform:translate(125vw,3vh); } }
+  html.reduce-motion #theme-deco span{ animation:none !important; }
+  .event-notice{ background:var(--accent); color:var(--accent-ink); font-weight:700; padding:8px 12px; border-radius:10px; margin-bottom:10px; text-align:center; }
   .fab-btn{ width:44px; height:44px; border-radius:50%; border:1px solid var(--line); background:var(--bg-2); color:var(--text); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(0,0,0,.35); }
   #pause-fab{ position:fixed; left:12px; bottom:12px; z-index:9500; }
   #react-bar{ position:fixed; left:12px; bottom:12px; z-index:9500; display:flex; align-items:center; gap:6px; }
   #react-bar .react-row{ display:none; gap:2px; padding:4px 8px; border-radius:999px; background:var(--bg-2); border:1px solid var(--line); flex-wrap:wrap; }
   #react-bar.open .react-row{ display:flex; }
   #react-bar .react-row button{ background:none; border:none; font-size:22px; cursor:pointer; padding:4px; border-radius:8px; }
-  #react-bar .react-row button:hover{ background:var(--panel-2); }
+  #react-bar .react-row button:hover{ background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); }
   #react-float{ position:fixed; inset:0; pointer-events:none; z-index:9600; overflow:hidden; }
   .react-pop{ position:absolute; bottom:70px; display:flex; flex-direction:column; align-items:center; animation:reactRise 2.7s ease-out forwards; }
   .react-pop .re{ font-size:38px; }
@@ -1302,7 +1366,7 @@
   .chron-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px; }
   .chron-head h3{ margin:0; }
   .chron-list{ overflow:auto; display:flex; flex-direction:column; gap:8px; }
-  .chron-row{ border-left:4px solid var(--line); padding:6px 10px; background:var(--panel-2); border-radius:6px; }
+  .chron-row{ border-left:4px solid var(--line); padding:6px 10px; background:color-mix(in srgb, var(--panel-2) var(--panel-a, 100%), transparent); border-radius:6px; }
   .chron-row.ok{ border-left-color:var(--correct); } .chron-row.wrong, .chron-row.timeout{ border-left-color:var(--wrong); } .chron-row.skip, .chron-row.buy{ border-left-color:var(--accent); }
   .chron-n{ font-size:calc(12px * var(--font-scale)); color:var(--muted); }
   .chron-k{ font-size:calc(13px * var(--font-scale)); }
@@ -2215,6 +2279,7 @@ function loadSlot(n){
   if(!state.settings.difficulty) state.settings.difficulty = "normal";
   state.pendingSpend = null;
   state.turnDeadline = null; state.chDeadline = null;
+  if(state.settings.variant === "blitz" && state.blitzEnd) state.blitzEnd = Date.now() + Math.max(1000, state.blitzLeft || 1000);
   state.showExitDialog = false;
   state.saveSlotDialogOpen = false;
   state.confirmOverwriteSave = false;
@@ -2706,6 +2771,7 @@ function drawNext(){
 
 function playCurrent(){
   if(!state.current) return;
+  if(state.settings.variant === "blitz" && !state.blitzEnd) state.blitzEnd = Date.now() + (state.settings.blitzSec || 60) * 1000;
   state.phase = "placing";
   state.turnDeadline = turnLimitMs() > 0 ? Date.now() + turnLimitMs() : null;
   turnLastTick = Date.now();
@@ -3027,8 +3093,34 @@ function evaluateGuess(song){
   state.guess = { t:"", a:"", y:"" };
 }
 
+/* Zufallsereignisse beim Spielerwechsel: Doppelrunde oder Kartentausch */
+function insByYear(tl, c){ let i = tl.findIndex(x => x.y > c.y); if(i < 0) i = tl.length; tl.splice(i, 0, c); }
+function eventCardSwap(){
+  syncActiveToPlayer();
+  const me = state.currentPlayer, P = state.players, own = P[me].timeline.map((c, i) => c.__starter ? -1 : i).filter(i => i >= 0);
+  const cand = P.map((p, i) => i).filter(i => i !== me && P[i].timeline.some(c => !c.__starter));
+  if(!own.length || !cand.length) return false;
+  const o = cand[Math.random() * cand.length | 0], oth = P[o].timeline.map((c, i) => c.__starter ? -1 : i).filter(i => i >= 0);
+  const a = P[me].timeline.splice(own[Math.random() * own.length | 0], 1)[0], b = P[o].timeline.splice(oth[Math.random() * oth.length | 0], 1)[0];
+  insByYear(P[me].timeline, b); insByYear(P[o].timeline, a);
+  loadActiveFromPlayer();
+  state.eventInfo = { text: `🔀 Kartentausch! ${P[me].name} und ${P[o].name} tauschen je eine Karte: „${a.t}“ (${a.y}) ⇄ „${b.t}“ (${b.y}).` };
+  return true;
+}
+function rollEvent(){
+  if(Math.random() >= .22) return;
+  if(Math.random() < .5 && eventCardSwap()){ toast(state.eventInfo.text); return; }
+  state.doubleTurn = true;
+  state.eventInfo = { text: "🔁 Doppelrunde! " + state.players[state.currentPlayer].name + " spielt diese Runde zwei Karten." };
+  toast(state.eventInfo.text);
+}
 function nextTurn(){
-  if(isMulti() && state.players.length > 1){ advancePlayer(); sfx("turn"); }
+  { const L = state.settings.lives; if(L && state.wrongCount >= L){ pauseSpotifyPlayback(); state.won = false; state.screen = "end"; render(); saveState(); return; } }
+  state.eventInfo = null;
+  if(isMulti() && state.players.length > 1){
+    if(state.doubleTurn){ state.doubleTurn = false; state.eventInfo = { text: "🔁 Doppelrunde – " + state.players[state.currentPlayer].name + " spielt die zweite Karte." }; sfx("turn"); }
+    else { advancePlayer(); sfx("turn"); if(state.settings.events) rollEvent(); }
+  }
   else if(state.online && state.net){ state.net.turn = ((state.net.turn || 0) + 1) % state.net.seats.length; sfx("turn"); }
   drawNext();
   render(); saveState();
@@ -3295,7 +3387,7 @@ function openTutorial(){
   state.screen = "tutorial";
   render();
 }
-function openSettings(){
+function openSettings(){ state.settingsSub = null;
   state.screen = "settings";
   render();
 }
@@ -3307,14 +3399,19 @@ const THEME_INFO = [
   { key:"modern", label:"Modern", desc:"Konsolen-Look mit Türkis-Akzent, schärferen Kanten, Monospace-Schrift und leicht angeglasten Flächen." },
   { key:"glass", label:"Liquid Glass", desc:"Echtes Glas-Material: Lichtkanten, Glanzreflex, Milchglas-Blur — in Chrome/Edge zusätzlich mit Lichtbrechung." },
   { key:"norisk", label:"NRC", desc:"Reines Schwarz, Minecraft-Schrift, blauer Akzent und ein leuchtender Kreis, der dem Cursor folgt — angelehnt an die NRC-Website." },
-  { key:"terminal", label:"Retro-Terminal", desc:"Grüne Phosphor-Schrift auf Schwarz mit Scanlines, Vignette und leichtem Flackern (Flackern entfällt bei „Animationen reduzieren“)." },
+  { key:"terminal", label:"Retro-Terminal", desc:"Grüne Phosphor-Schrift auf Schwarz mit Scanlines, Vignette, Flackern und einer langsam herunterlaufenden Scanline (Animationen entfallen bei „Animationen reduzieren“)." },
   { key:"synthwave", label:"Synthwave", desc:"Neon-Horizont mit gestreifter Sonne und Gitter, Pink-Türkis-Akzente und Orbitron-Überschriften." },
-  { key:"halloween", label:"Halloween", desc:"Dunkles Violett mit Kürbis-Orange und gruseliger Überschrift. Automatisch vom 24.10. bis 1.11.", season:true },
-  { key:"weihnachten", label:"Weihnachten", desc:"Tannengrün mit Gold und leichtem Schneefall im Hintergrund. Automatisch vom 1.12. bis 26.12.", season:true },
+  { key:"halloween", label:"Halloween", desc:"Dunkles Violett mit Kürbissen am Boden, Vollmond, fliegenden Fledermäusen und Geistern. Automatisch vom 24.10. bis 1.11.", season:true },
+  { key:"weihnachten", label:"Weihnachten", desc:"Tannengrün mit Gold, Tannenbäumen, Geschenken, Schneemann und Schneefall. Automatisch vom 1.12. bis 26.12.", season:true },
   { key:"fruehling", label:"Frühling", desc:"Helles Frischgrün mit Blütenrosa. Automatisch im März, April und Mai.", season:true },
   { key:"sommer", label:"Sommer", desc:"Sonniges Sandgelb mit Meerblau. Automatisch im Juni, Juli und August.", season:true },
   { key:"herbst", label:"Herbst", desc:"Warmes Braun mit Laubfarben. Automatisch im September, Oktober und November.", season:true },
   { key:"winter", label:"Winter", desc:"Eisiges Hellblau mit Schnee-Punkten. Automatisch im Dezember, Januar und Februar.", season:true },
+  { key:"gameboy", label:"Gameboy", desc:"Genau vier Grüntöne wie auf dem Original-LCD, Pixelschrift, harte Schatten und feine Rasterlinien." },
+  { key:"notizbuch", label:"Notizbuch", desc:"Skizzenstil: Karopapier-Linien mit rotem Rand, Handschrift und leicht schiefen, gezeichneten Rahmen." },
+  { key:"ostern", label:"Ostern", desc:"Pastellfarben mit Tulpen, Küken und Ostereiern. Automatisch von Palmsonntag bis Ostermontag.", season:true },
+  { key:"valentin", label:"Valentinstag", desc:"Dunkles Rosé mit aufsteigenden Herzen. Automatisch vom 12. bis 14.2.", season:true },
+  { key:"silvester", label:"Silvester", desc:"Nachtblau mit Gold. Echtes Feuerwerk (Raketen und Funkenringe) und Konfetti. Automatisch vom 27.12. bis 2.1.", season:true },
   { key:"custom", label:"Benutzerdefiniert", desc:"Eigene Farben, Transparenz, Stil (Standard, Modern, Glass, NRC) und Schriftart frei wählen." }
 ];
 
@@ -3331,7 +3428,28 @@ function selectTheme(key){
   themeAnimTimer = setTimeout(() => root.classList.remove("theme-animating"), 1000);
 }
 
+function themeSwatchHtml(t){
+  return `
+    <div class="theme-swatch ${currentTheme===t.key ? 'selected':''}" onclick="selectTheme('${t.key}')" data-theme-preview="${t.key}">
+      <div class="theme-dots"><span></span><span></span><span></span></div>
+      <div class="theme-info">
+        <div class="theme-label">${t.label}${currentTheme===t.key ? ' <span class="wizard-check">✓</span>' : ''}</div>
+        <div class="theme-desc">${t.desc}</div>
+      </div>
+    </div>`;
+}
+const THEME_SEASONS = ["fruehling", "sommer", "herbst", "winter"];
+const THEME_HOLIDAYS = ["valentin", "ostern", "halloween", "weihnachten", "silvester"];   // in Reihenfolge des Jahres
+function themeGroupsHtml(){
+  const by = k => THEME_INFO.find(x => x.key === k);
+  const grp = (title, keys) => `<details class="theme-group" style="margin-top:10px;" ${keys.includes(currentTheme) ? "open" : ""}><summary style="cursor:pointer;font-weight:700;padding:8px 0;">${title}</summary><div class="theme-list">${keys.map(by).filter(Boolean).map(themeSwatchHtml).join("")}</div></details>`;
+  const rest = THEME_INFO.filter(t => ![...THEME_SEASONS, ...THEME_HOLIDAYS, "custom"].includes(t.key));
+  const custom = by("custom");
+  return `<div class="theme-list">${rest.map(themeSwatchHtml).join("")}</div>${grp("🌱 Jahreszeiten", THEME_SEASONS)}${grp("🎉 Feiertage", THEME_HOLIDAYS)}${custom ? `<div class="theme-list" style="margin-top:10px;">${themeSwatchHtml(custom)}</div>` : ""}`;
+}
+const SETTINGS_SUBS = [["language","🌐 Sprache"],["themes","🎨 Themes"],["display","👁️ Darstellung & Barrierefreiheit"],["save","💾 Speichern"],["play","🎮 Spielen"],["sound","🔊 Sound"]];
 function renderSettings(){
+  const sub = state.settingsSub || null;
   const swatches = THEME_INFO.map(t => `
     <div class="theme-swatch ${currentTheme===t.key ? 'selected':''}" onclick="selectTheme('${t.key}')" data-theme-preview="${t.key}">
       <div class="theme-dots"><span></span><span></span><span></span></div>
@@ -3342,38 +3460,39 @@ function renderSettings(){
     </div>`).join('');
 
   app.innerHTML = `
-    <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Einstellungen</h1></div>
+    <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">${sub ? SETTINGS_SUBS.find(x => x[0] === sub)[1] : "Einstellungen"}</h1></div>
 
-    <div class="menu-card">
+    ${!sub ? `<div class="menu-card"><div class="menu-actions">${SETTINGS_SUBS.map(x => `<button class="btn-ghost" onclick="state.settingsSub='${x[0]}'; render(); window.scrollTo(0, 0)">${x[1]}</button>`).join("")}</div></div>` : ``}
+    ${sub === 'language' ? `<div class="menu-card">
       <h3>Sprache</h3>
       ${plannedFeatureNotice()}
-    </div>
+    </div>` : ``}
 
-    <div class="menu-card">
+    ${sub === 'themes' ? `<div class="menu-card">
       <h3>Themes</h3>
-      <div class="theme-list">${swatches}</div>
+      ${themeGroupsHtml()}
       <div class="setting-row" style="margin-top:12px;">
-        <div><div class="label">Jahreszeiten-Themes nach Datum</div><div class="hint">Wechselt beim Start der Seite automatisch zum passenden Theme (dein gewähltes bleibt gespeichert, „Benutzerdefiniert“ wird nie ersetzt). „Nur Feiertage“: Halloween 24.10.–1.11., Weihnachten 1.–26.12. „Feiertage &amp; Jahreszeiten“: sonst Frühling (Mär–Mai), Sommer (Jun–Aug), Herbst (Sep–Nov), Winter (Dez–Feb).</div></div>
+        <div><div class="label">Jahreszeiten-Themes nach Datum</div><div class="hint">Wechselt beim Start der Seite automatisch zum passenden Theme (dein gewähltes bleibt gespeichert, „Benutzerdefiniert“ wird nie ersetzt). „Nur Feiertage“: Valentinstag 12.–14.2., Ostern (Palmsonntag–Ostermontag), Halloween 24.10.–1.11., Weihnachten 1.–26.12., Silvester 27.12.–2.1. „Feiertage &amp; Jahreszeiten“: sonst Frühling (Mär–Mai), Sommer (Jun–Aug), Herbst (Sep–Nov), Winter (Dez–Feb).</div></div>
         <select class="dropdown" onchange="setSeasonal(this.value)" aria-label="Jahreszeiten-Themes">
           <option value="off" ${prefs.seasonal === 'off' ? 'selected' : ''}>Aus</option>
           <option value="events" ${prefs.seasonal === 'events' ? 'selected' : ''}>Nur Feiertage</option>
           <option value="all" ${prefs.seasonal === 'all' ? 'selected' : ''}>Feiertage &amp; Jahreszeiten</option>
         </select>
       </div>
-    </div>
+    </div>` : ``}
 
-    ${currentTheme === 'custom' ? renderCustomThemePanel() : ``}
+    ${sub === 'themes' && currentTheme === 'custom' ? renderCustomThemePanel() : ``}
 
-    ${renderAccessibilityCard()}
+    ${sub === 'display' ? renderAccessibilityCard() : ``}
 
-    ${renderSaveCard()}
+    ${sub === 'save' ? renderSaveCard() : ``}
 
-    ${renderPlayCard()}
+    ${sub === 'play' ? renderPlayCard() : ``}
 
-    ${renderSoundCard()}
+    ${sub === 'sound' ? renderSoundCard() : ``}
 
     <div class="menu-actions">
-      <button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button>
+      ${sub ? `<button class="btn-ghost" onclick="state.settingsSub=null; render(); window.scrollTo(0, 0)">← Zurück zu den Einstellungen</button>` : `<button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button>`}
     </div>
   `;
 }
@@ -3426,7 +3545,7 @@ function renderCustomThemePanel(){
 /* ============ SEITENMENÜ (links oben, außer auf Start/Laden/Hauptmenü/Einstellungen) ============ */
 let quickMenuOpen = false;
 function quickMenuVisible(){
-  return !["splash", "loading", "menu", "settings", "stats", "online", "join", "lobby", "resume"].includes(state.screen);
+  return !["splash", "loading", "menu", "settings", "playlist", "stats", "online", "join", "lobby", "resume"].includes(state.screen);
 }
 function renderQuickMenuContent(){
   const el = document.getElementById("qm-content");
@@ -3494,6 +3613,7 @@ function renderMenu(){
         <button class="btn-ghost" onclick="openSettings()">Einstellungen</button>
         <button class="btn-ghost" onclick="openStats()">Statistiken</button>
         <button class="btn-ghost" onclick="openRecap()">Jahresrückblick</button>
+        <button class="btn-ghost" onclick="openPlaylist()">Playlist</button>
         <button class="btn-ghost" onclick="openTutorial()">Tutorial</button>
       </div>
     </div>
@@ -3514,7 +3634,7 @@ function renderSlotSettingsPanel(slot){
   const s = slot.settings || {};
   return `
     <div class="slot-settings-panel">
-      <div class="row"><span>Modus</span><b>${modeLabel(s.mode)}</b></div>
+      <div class="row"><span>Modus</span><b>${modeLabel(s.mode)}${s.variant ? " · " + variantLabel(s.variant) : ""}</b></div>
       ${s.mode === 'multiplayer' && Array.isArray(slot.players) ? `<div class="row"><span>Spieler</span><b>${slot.players.map(p => esc(p.name)).join(', ')}</b></div>` : ``}
       <div class="row"><span>Schwierigkeit</span><b>${difficultyLabel(s.difficulty)}</b></div>
       <div class="row"><span>Chrono-Tokens</span><b>${s.tokens ? `Ja (max. ${s.maxTokens})` : 'Nein'}</b></div>
@@ -3560,6 +3680,79 @@ function renderLoadGame(){
   `;
 }
 
+/* Esc: immer eine Ebene zurück */
+document.addEventListener("keydown", e => {
+  if(e.key !== "Escape" || e.defaultPrevented || quickMenuOpen) return;
+  if(document.querySelector('[role="dialog"], .modal-backdrop, .modal-overlay')) return;
+  const sc = state.screen;
+  if(sc === "playlist"){ if(PL.open){ PL.open = false; plFilterRender(); } else plLeave(); }
+  else if(state.wizard && sc !== "game" && sc !== "end" && typeof wizardBack === "function") wizardBack();
+  else if(sc === "settings"){ if(state.settingsSub){ state.settingsSub = null; render(); } else backToMenuInstant(); }
+  else if(["stats", "recap", "tutorial", "loadgame", "online"].includes(sc)){ state.screen = "menu"; render(); }
+  else if(sc === "join"){ state.screen = "online"; render(); }
+});
+/* ============ PLAYLIST ============ */
+const PL = { q:"", sort:"t", dir:1, f:{ genres:[], styles:[], decades:[], themes:[] }, open:false, playing:null, tm:0 };
+function openPlaylist(){ state.screen = "playlist"; PL.open = false; render(); window.scrollTo(0, 0); }
+function plLeave(){ plStop(true); state.screen = "menu"; render(); }
+function plActiveCount(){ return Object.values(PL.f).reduce((n, a) => n + a.length, 0); }
+function plRows(){
+  const q = PL.q.trim().toLowerCase(), k = PL.sort;
+  const list = SONGS.filter(x => Object.keys(PL.f).every(key => !PL.f[key].length || stageKeysOf(x, key).some(v => PL.f[key].includes(v)))
+    && (!q || (x.t + " " + x.a + " " + x.y).toLowerCase().includes(q)));
+  list.sort((a, b) => (k === "y" ? a.y - b.y : String(a[k]).localeCompare(String(b[k]), "de")) * PL.dir || a.t.localeCompare(b.t, "de"));
+  return list;
+}
+function plLabels(x){
+  const lab = (items, keys) => keys.map(v => (items.find(i => i.key === v) || { label:v }).label);
+  return [...lab(LIB.styles, x.s || []), ...lab(LIB.themes, songThemes(x).filter(v => v !== "other"))].join(", ");
+}
+function plListHtml(){
+  const l = plRows(), td = "padding:4px 6px;";
+  return `<p style="margin:6px 0;">${l.length} von ${SONGS.length} Liedern</p><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:calc(14px * var(--font-scale));">
+    <tr style="text-align:left;"><th></th><th>Titel</th><th>Interpret</th><th>Jahr</th><th>Sprache</th><th>Genre / Kategorie</th></tr>
+    ${l.map(x => `<tr style="border-top:1px solid var(--line);"><td style="${td}"><button class="btn-ghost btn-small" onclick="plPlay('${x.id}')" aria-label="30 Sekunden abspielen">${PL.playing === x.id ? "⏸" : "▶"}</button></td><td style="${td}">${esc(x.t)}</td><td style="${td}">${esc(x.a)}</td><td style="${td}">${x.y}</td><td style="${td}">${esc((LIB.langs.find(i => i.key === x.g) || { label:x.g }).label)}</td><td style="${td}">${esc(plLabels(x))}</td></tr>`).join("")}
+  </table></div>`;
+}
+function plUpdate(){ const el = document.getElementById("pl-list"); if(el) el.innerHTML = plListHtml(); const b = document.getElementById("pl-fbtn"); if(b) b.textContent = "⚙ Filter" + (plActiveCount() ? " (" + plActiveCount() + ")" : ""); }
+function plToggle(key, v){ const a = PL.f[key], i = a.indexOf(v); if(i < 0) a.push(v); else a.splice(i, 1); plFilterRender(); plUpdate(); }
+function plReset(){ Object.keys(PL.f).forEach(k => PL.f[k] = []); plFilterRender(); plUpdate(); }
+function plFilterRender(){
+  let el = document.getElementById("pl-filter");
+  if(!PL.open){ if(el) el.remove(); return; }
+  if(!el){ el = document.createElement("div"); el.id = "pl-filter"; el.setAttribute("role", "dialog"); el.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;"; el.onclick = e => { if(e.target === el){ PL.open = false; plFilterRender(); } }; document.body.appendChild(el); }
+  const grp = (key, title, items) => `<div style="margin-bottom:12px;"><div class="label" style="margin-bottom:6px;">${title}</div><div style="display:flex;flex-wrap:wrap;gap:6px;">${items.map(it => `<button class="chip ${PL.f[key].includes(it.key) ? "on" : ""}" onclick="plToggle('${key}','${it.key}')">${it.label}<span class="chip-n">${it.count}</span></button>`).join("")}</div></div>`;
+  el.innerHTML = `<div class="menu-card" style="max-width:600px;width:100%;max-height:85vh;overflow:auto;"><h3>Filter</h3><p style="margin:0 0 10px;">Ohne Auswahl wird nichts gefiltert. Innerhalb einer Gruppe reicht ein Treffer.</p>
+    ${grp("genres", "Sprache", LIB.langs)}${grp("styles", "Genre", LIB.styles)}${grp("decades", "Jahrzehnt", LIB.decades)}${grp("themes", "Kategorien", LIB.themes)}
+    <div class="menu-actions"><button class="btn-ghost" onclick="plReset()">Zurücksetzen</button><button class="btn-primary" onclick="PL.open=false; plFilterRender()">Fertig (${plRows().length} Lieder)</button></div></div>`;
+}
+function plStop(silent){ clearTimeout(PL.tm); const was = PL.playing; PL.playing = null; if(was){ try{ pauseSpotifyPlayback(); }catch(e){} } if(!silent) plUpdate(); }
+function plPlay(id){
+  if(PL.playing === id){ plStop(); return; }
+  const song = SONGS.find(x => x.id === id); if(!song) return;
+  clearTimeout(PL.tm); PL.playing = id;
+  if(useFallbackEmbed) window.open("https://open.spotify.com/track/" + song.id, "_blank", "noopener");
+  else requestSpotifyPlay(song);
+  PL.tm = setTimeout(() => plStop(), 30000);
+  plUpdate();
+}
+function renderPlaylist(){
+  app.innerHTML = `
+    <div style="position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;background:var(--bg);">
+      <h1 style="font-size:calc(26px * var(--font-scale));margin:0;">Playlist</h1>
+      <button class="btn-ghost" onclick="plLeave()">Ins Hauptmenü</button>
+    </div>
+    <div class="menu-card"><div class="body">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <input type="search" placeholder="Suchen (Titel, Interpret, Jahr)" value="${esc(PL.q)}" oninput="PL.q=this.value; plUpdate()" style="flex:1 1 200px;padding:8px;">
+        <button class="btn-ghost btn-small" id="pl-fbtn" onclick="PL.open=true; plFilterRender()">⚙ Filter${plActiveCount() ? " (" + plActiveCount() + ")" : ""}</button>
+        <select class="dropdown" onchange="PL.sort=this.value; plUpdate()"><option value="t" ${PL.sort === "t" ? "selected" : ""}>Sortieren: Titel</option><option value="a" ${PL.sort === "a" ? "selected" : ""}>Sortieren: Interpret</option><option value="y" ${PL.sort === "y" ? "selected" : ""}>Sortieren: Jahr</option></select>
+        <button class="btn-ghost btn-small" onclick="PL.dir=-PL.dir; this.textContent=PL.dir>0?'↑ Aufsteigend':'↓ Absteigend'; plUpdate()">${PL.dir > 0 ? "↑ Aufsteigend" : "↓ Absteigend"}</button>
+      </div>
+      <div id="pl-list">${plListHtml()}</div>
+    </div></div>`;
+}
+
 /* ============ TUTORIAL ============ */
 function renderTutorial(){
   app.innerHTML = `
@@ -3603,7 +3796,7 @@ function startCreateWizard(online){
     err: "",
     mode: "solo",
     difficulty: "normal",
-    tokens: false,
+    tokens: true,
     maxTokens: 5,
     startTokens: 2,
     coopTokens: 5,
@@ -3634,7 +3827,9 @@ function wizardStepKeys(){
   if(state.wizard.online) keys.push("online");
   keys.push("mode");
   if(state.wizard.mode === "multiplayer" && !state.wizard.online) keys.push("players");
-  keys.push("settings", "songs");
+  const w = state.wizard;
+  if(!(w.mode === "solo" && w.variant === "blitz" && !w.online)) keys.push("settings");   // Blitz: alles Nötige steht schon beim Modus
+  keys.push("songs");
   return keys;
 }
 function wizardNext(){
@@ -3702,7 +3897,8 @@ function wizardMovePlayer(i, dir){
     render();
   });
 }
-function wizardSetMode(v){ state.wizard.mode = v; render(); }
+function wizardSetMode(v){ state.wizard.mode = v; if(v !== "solo") state.wizard.variant = "classic"; render(); }
+function wizardSetVariant(v){ state.wizard.variant = v; if(v === "blitz"){ state.wizard.difficulty = "normal"; state.wizard.tokens = false; state.wizard.timer = false; } render(); }
 function wizardSetDifficulty(v){ state.wizard.difficulty = v; render(); }
 function wizardToggleTokens(){ state.wizard.tokens = !state.wizard.tokens; render(); }
 function wizardToggleChallenge(){ state.wizard.challenge = !state.wizard.challenge; render(); }
@@ -3877,7 +4073,13 @@ function renderWizardStep2(){
             <option value="multiplayer" ${w.mode==='multiplayer'?'selected':''}>Mehrspieler</option>
             <option value="coop" ${w.mode==='coop'?'selected':''}>Koop</option>
           </select>`)}
-        ${infoRow('w-difficulty', 'Schwierigkeit',
+        ${w.mode === 'solo' && !w.online ? infoRow('w-variant', 'Spielvariante',
+          '<strong>Klassisch</strong>: bis zum Ziel.<br><strong>Endlos</strong>: ohne Ziel, 3 Fehler beenden die Runde, es zählt der Highscore.<br><strong>Blitz</strong>: x Sekunden, so viele richtige Karten wie möglich; nur Position/Jahr, kein Titel/Interpret, keine Tokens, automatisches Aufdecken und Weiter.<br><strong>Sudden Death</strong>: ein Fehler und du bist raus.',
+          `<select class="dropdown" onchange="wizardSetVariant(this.value)">
+            ${Object.entries(VARIANTS).map(([k, v]) => `<option value="${k}" ${(w.variant || 'classic') === k ? 'selected' : ''}>${v}</option>`).join('')}
+          </select>`) + (w.variant === 'blitz' ? infoRow('w-blitz', 'Blitz-Dauer', 'Gesamtzeit der Runde. Sie startet, sobald die erste Karte abgespielt wird.',
+          `<select class="dropdown" onchange="state.wizard.blitzSec=+this.value">${[30, 60, 90, 120, 180].map(x => `<option value="${x}" ${(w.blitzSec || 60) === x ? 'selected' : ''}>${x} Sekunden</option>`).join('')}</select>`) : '') : ''}
+        ${(w.mode === 'solo' && w.variant === 'blitz') ? '' : infoRow('w-difficulty', 'Schwierigkeit',
           '<strong>Normal</strong>: Nur die Position auf der Zeitleiste zählt.<br><strong>Profi</strong>: Titel &amp; Interpret müssen zusätzlich stimmen.<br><strong>Experte</strong>: zusätzlich auch das exakte Erscheinungsjahr.',
           `<select class="dropdown" onchange="wizardSetDifficulty(this.value)">
             <option value="normal" ${w.difficulty==='normal'?'selected':''}>Normal</option>
@@ -3929,13 +4131,16 @@ function renderWizardStep3(n){
           'Wie der „Chronohit!“-Ruf abläuft: Entweder beendet der aktive Spieler (online auch der Host) das Fenster selbst per Klick, oder es schließt automatisch nach 5 bzw. 10 Sekunden, bzw. (nur mit Zeitlimit) mit der Restzeit des Zeitlimits, mindestens aber 5 Sekunden. Ruft jemand, bleiben dem Rufer zum Wählen der Lücke mindestens 5 Sekunden (bei 5/10 Sekunden startet das Fenster neu). Läuft es ohne gewählte Lücke ab, wird der Ruf zurückgenommen (Token kommt zurück).',
           `<select class="dropdown" onchange="wizardSetChallengeMode(this.value)">${CH_MODES.filter(x => x[0] !== 'limit' || w.timer).map(x => `<option value="${x[0]}" ${wizardChallengeMode(w) === x[0] ? 'selected' : ''}>${x[1]}</option>`).join('')}</select>`) : ``}
         `}
-        ${infoRow('w-target', 'Kartenanzahl bis Sieg',
+        ${(w.mode === 'solo' && w.variant === 'endless') ? '' : infoRow('w-target', 'Kartenanzahl bis Sieg',
           'Wie viele Karten du richtig erraten musst, um zu gewinnen — die Startkarte zählt nicht mit.',
           `<div class="stepper">
             <button onclick="wizardStepTarget(-1)">–</button>
             <div class="val">${w.target}</div>
             <button onclick="wizardStepTarget(1)">+</button>
           </div>`)}
+        ${w.mode === 'multiplayer' ? infoRow('w-events', 'Zufallsereignisse',
+          'Beim Spielerwechsel passiert mit etwa 22 % Wahrscheinlichkeit etwas: <strong>Doppelrunde</strong> (der Spieler ist zweimal hintereinander dran) oder <strong>Kartentausch</strong> (zwei Spieler tauschen je eine zufällige Karte, ohne Startkarte).',
+          `<div class="switch ${w.events === true ? 'on':''}" onclick="state.wizard.events = !state.wizard.events; render()"><div class="knob"></div></div>`) : ''}
         ${infoRow('w-timer', 'Zeitlimit pro Zug',
           'Pro Zug bleibt nur begrenzte Zeit, die Karte zu platzieren (und in Profi/Experte oder für den Bonus Titel/Interpret zu raten). Die Zeit läuft ab dem Start des Songs. Läuft sie ab, gilt der Zug als verloren: Die Karte wird verworfen und zählt als falsch — im Koop-Modus kostet das einen Token.',
           `<div class="switch ${w.timer?'on':''}" onclick="wizardToggleTimer()"><div class="knob"></div></div>`)}
@@ -4086,6 +4291,13 @@ async function createGameFromWizard(){
     challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false, challengeMode: wizardChallengeMode(w), yearTol: w.difficulty === "expert" ? Math.max(0, Math.min(5, w.yearTol | 0)) : 0,
     ...songFilterFromWizard(w)
   };
+  if(w.mode === "multiplayer") settings.events = w.events === true;
+  if(w.mode === "solo" && w.variant && w.variant !== "classic"){
+    settings.variant = w.variant;
+    if(w.variant === "endless"){ settings.lives = 3; settings.target = 9999; }
+    if(w.variant === "sudden"){ settings.lives = 1; }
+    if(w.variant === "blitz"){ settings.tokens = false; settings.difficulty = "normal"; settings.turnLimit = 0; settings.yearTol = 0; settings.blitzSec = w.blitzSec || 60; settings.target = 9999; }
+  }
   const slotNum = w.slot;
   const saveName = (w.name || "").trim();
   let playerNames = null;
@@ -4305,6 +4517,7 @@ function renderGame(){
     const vinylOnClick = state.phase === "draw" ? "playCurrent()" : "toggleSpotifyPlayback()";
     drawZoneHtml = `
       <div class="draw-zone">
+        ${state.eventInfo ? `<div class="event-notice">${esc(state.eventInfo.text)}</div>` : ``}
         ${state.skippedInfo ? `
           <div class="skip-notice">
             <span class="skip-label">Übersprungen — das war:</span>
@@ -4379,8 +4592,9 @@ function renderGame(){
 
   app.innerHTML = `
     <div class="topbar">
-      <div class="stat">Richtig <b>${state.correctCount} / ${s.target}</b></div>
-      <div class="stat">Stapel <b>${deckSize()}</b></div>
+      <div class="stat">Richtig <b>${state.correctCount} / ${s.target >= 9999 ? '∞' : s.target}</b></div>
+      ${s.variant === 'blitz' ? `<div class="stat">Zeit <b id="blitz-t">${state.blitzEnd ? Math.max(0, Math.ceil((state.blitzEnd - Date.now()) / 1000)) : s.blitzSec} s</b></div>` : `<div class="stat">Stapel <b>${deckSize()}</b></div>`}
+      ${s.lives ? `<div class="stat">Fehler <b>${state.wrongCount} / ${s.lives}</b></div>` : ``}
       ${s.tokens ? `<div class="stat">Chrono <div class="token-dots">${tokenDots}</div></div>` : ``}
       ${online && NET.role === "host" ? `<button class="btn-ghost btn-small" onclick="netShowInvite()">🔑 Passwort</button>` : ``}
       ${online && NET.role === "guest" ? `` : `<button class="btn-ghost btn-small" onclick="requestOverwriteSave()">💾 Speichern</button>`}
@@ -4472,6 +4686,41 @@ function rankedPlayers(){
   return list;
 }
 
+const VARIANTS = { classic:"Klassisch", endless:"Endlos", blitz:"Blitz", sudden:"Sudden Death" };
+function variantLabel(v){ return VARIANTS[v] || v; }
+function hsRecord(){
+  const s = state.settings; if(state.hsDone || !s.variant) return; state.hsDone = true;
+  let all = {}; try{ all = JSON.parse(localStorage.getItem("chronohit_hs") || "{}"); }catch(e){}
+  const k = s.variant === "blitz" ? "blitz" + s.blitzSec : s.variant, old = all[k] || 0;
+  state.hsOld = old; state.hsNew = state.correctCount > old;
+  if(state.hsNew){ all[k] = state.correctCount; try{ localStorage.setItem("chronohit_hs", JSON.stringify(all)); }catch(e){} }
+}
+function endTitle(){
+  const v = state.settings.variant;
+  if(v === "blitz") return "Zeit ist um!";
+  if(v === "endless") return "Runde vorbei!";
+  if(v === "sudden" && !state.won) return "Raus!";
+  return state.won ? "Gewonnen!" : "Verloren!";
+}
+/* Blitz: Gesamtuhr, automatisch abspielen, aufdecken und weiter */
+let blitzKey = "", blitzLast = 0;
+function blitzTick(){
+  const s = state.settings; if(!s || s.variant !== "blitz" || state.screen !== "game") return;
+  const now = Date.now(), dt = blitzLast ? now - blitzLast : 0; blitzLast = now;
+  if(state.blitzEnd){
+    if(turnDialogOpen()) state.blitzEnd += dt;
+    const left = state.blitzEnd - now; state.blitzLeft = left;
+    const el = document.getElementById("blitz-t"); if(el) el.textContent = Math.max(0, Math.ceil(left / 1000)) + " s";
+    if(left <= 0){ pauseSpotifyPlayback(); state.screen = "end"; render(); saveState(); return; }
+  }
+  if(turnDialogOpen()) return;
+  const key = (state.turnNo || 0) + ":" + state.phase;
+  if(key === blitzKey) return;
+  if(state.phase === "revealed_pending" && state.pendingGap != null){ blitzKey = key; revealCard(); }
+  else if(state.phase === "feedback"){ blitzKey = key; setTimeout(() => { if(state.phase === "feedback" && state.screen === "game") nextTurn(); }, 800); }
+  else if(state.phase === "draw" && state.current && state.blitzEnd){ blitzKey = key; playCurrent(); }
+}
+setInterval(blitzTick, 200);
 function renderEnd(){
   const s = state.settings;
   if(isMultiRound()){
@@ -4503,18 +4752,20 @@ function renderEnd(){
     `;
     return;
   }
+  hsRecord();
   app.innerHTML = `
     <div class="brand">
       <div class="mark">RUNDE BEENDET</div>
     </div>
     <div class="menu-card win-card">
-      <div class="end-heading ${state.won ? 'won' : 'lost'}">${state.won ? 'Gewonnen!' : 'Verloren!'}</div>
+      <div class="end-heading ${state.won || s.variant === 'blitz' || s.variant === 'endless' ? 'won' : 'lost'}">${endTitle()}</div>
       <div class="num">${state.correctCount}</div>
       <p>richtig platzierte Karten auf deiner Zeitleiste</p>
+      ${s.variant ? `<p><b>${state.hsNew ? '🏆 Neuer Highscore!' : 'Highscore: ' + state.hsOld}</b> (${variantLabel(s.variant)}${s.variant === 'blitz' ? ', ' + s.blitzSec + ' s' : ''})</p>` : ``}
       <div class="win-stats">
         <div><div class="n">${state.wrongCount}</div><div class="l">Falsch platziert</div></div>
         ${s.tokens ? `<div><div class="n">${state.tokens}</div><div class="l">Chrono-Tokens übrig</div></div>` : ``}
-        <div><div class="n">${s.target}</div><div class="l">Ziel</div></div>
+        <div><div class="n">${s.target >= 9999 ? "∞" : s.target}</div><div class="l">Ziel</div></div>
       </div>
       <div class="menu-actions">
         <button class="btn-primary" onclick="showFinalTimeline()">Finale Zeitleiste ansehen</button>
@@ -4648,6 +4899,7 @@ function render(){
   else if(state.screen === "menu") renderMenu();
   else if(state.screen === "loadgame") renderLoadGame();
   else if(state.screen === "tutorial") renderTutorial();
+  else if(state.screen === "playlist") renderPlaylist();
   else if(state.screen === "settings") renderSettings();
   else if(state.screen === "stats") renderStats();
   else if(state.screen === "recap") renderRecap();
@@ -4929,19 +5181,20 @@ function currentDesign(){
   if(currentTheme === "custom"){
     return DESIGN_OPTIONS.some(o => o.key === customTheme.design) ? customTheme.design : "standard";
   }
-  return ["modern", "glass", "norisk", "terminal", "synthwave"].includes(currentTheme) ? currentTheme : "standard";
+  return ["modern", "glass", "norisk", "terminal", "synthwave", "notizbuch", "gameboy"].includes(currentTheme) ? currentTheme : "standard";
 }
 function syncDesign(){
   const d = currentDesign();
   document.documentElement.setAttribute("data-design", d);
   if(d === "norisk" && !prefs.reduceMotion) startCursorGlow(); else stopCursorGlow();
 }
-const THEME_GOOGLE = { terminal: ["VT323", "IBM+Plex+Mono:wght@400;600"], synthwave: ["Orbitron:wght@500;700"], halloween: ["Creepster"] };
+const THEME_GOOGLE = { terminal: ["VT323", "IBM+Plex+Mono:wght@400;600"], synthwave: ["Orbitron:wght@500;700"], halloween: ["Creepster"], notizbuch: ["Caveat:wght@500;700", "Patrick+Hand"], gameboy: ["Press+Start+2P"] };
 function applyTheme(theme, auto){
   currentTheme = theme;
   (THEME_GOOGLE[theme] || []).forEach(ensureGoogleFont);
   syncDesign();
   document.documentElement.setAttribute("data-theme", theme);
+  syncDeco();
   if(theme === "custom"){ applyCustomTheme(); }
   else { clearCustomOverrides(); }
   applyUserFont();
@@ -4953,8 +5206,95 @@ function loadTheme(){
 }
 /* Jahreszeiten-Themes: Feiertage (Halloween, Weihnachten) und optional die Jahreszeiten, nach Datum.
    Das gespeicherte Theme bleibt unverändert; „Benutzerdefiniert“ wird nie überschrieben. */
+function easterDate(y){
+  const a = y % 19, b = Math.floor(y / 100), c = y % 100, dd = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - dd - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(y, mo - 1, da);
+}
+const DECO = {
+  halloween:   { gr:["🎃","🎃","🪦","🎃","🕸️","🎃","🎃"], dr:["🦇","🦇","🦇","👻","🦇","🦇"], st:["🌕"] },
+  fruehling:   { gr:["🌷","🌸","🌼","🌱","🌷","🌻","🌼"], fl:["🌸","🌸","🌿","🌸"], dr:["🦋","🐝","🦋"] },
+  sommer:      { gr:["🌻","🌴","🍉","⛱️","🌻","🌴","🍦"], dr:["🦋","🐝"], st:["☀️"] },
+  herbst:      { gr:["🍄","🌰","🍁","🍄","🌾","🎃"], fl:["🍂","🍁","🍂","🍃"] },
+  winter:      { gr:["🌲","⛄","🌲","🧤","🌲","🏔️"], fl:["❄️","❄️","❄️","❄️"] },
+  weihnachten: { gr:["🎄","🎁","⛄","🎄","🎁","🎅","🎄","🎁"], fl:["❄️","❄️","❄️","⭐"] },
+  ostern:      { gr:["🌷","🐣","🥚","🌼","🐰","🥚","🌷","🐥"], dr:["🦋","🦋","🦋","🦋"] },
+  valentin:    { up:["💖","💗","💕","🌹","💘"] },
+  silvester:   { fl:["🎊","🎉","🥂","✨"], fw:true },
+  notizbuch:   { gr:["✏️","📎","📐"] }
+};
+let fwRaf = 0;
+function stopFw(){ if(fwRaf) cancelAnimationFrame(fwRaf); fwRaf = 0; }
+/* Feuerwerk: Raketen steigen auf, platzen in Funkenringe, die mit Schwerkraft verglühen (Canvas) */
+function startFw(el){
+  const c = document.createElement("canvas"); c.style.cssText = "position:absolute;inset:0;width:100%;height:100%"; el.appendChild(c);
+  const x = c.getContext("2d"); let W = 0, H = 0, rk = [], pt = [], next = 0;
+  const sz = () => { W = c.width = innerWidth; H = c.height = innerHeight; }; sz();
+  const cols = [[255,210,74],[255,90,130],[90,220,255],[170,120,255],[120,255,170],[255,150,60]];
+  const burst = (px, py) => {
+    const col = cols[Math.random() * cols.length | 0], n = 46 + (Math.random() * 30 | 0), ring = Math.random() < .35;
+    for(let i = 0; i < n; i++){ const a = Math.PI * 2 * i / n + Math.random() * .15, v = ring ? 2.4 + Math.random() * .4 : 1 + Math.random() * 3.2;
+      pt.push({ h:[], x:px, y:py, vx:Math.cos(a) * v, vy:Math.sin(a) * v, l:1, d:.008 + Math.random() * .01, c:col }); }
+  };
+  const loop = t => {
+    fwRaf = requestAnimationFrame(loop);
+    if(c.width !== innerWidth || c.height !== innerHeight) sz();
+    x.clearRect(0, 0, W, H); x.globalCompositeOperation = "lighter"; x.lineCap = "round";
+    if(t > next){ next = t + 700 + Math.random() * 1300; rk.push({ x:W * (.1 + Math.random() * .8), y:H, ty:H * (.07 + Math.random() * .3), vy:0 }); }
+    rk = rk.filter(r => { if(!r.vy) r.vy = -(H - r.ty) * .0105; r.y += r.vy; r.vy *= .99; x.fillStyle = "#ffe9b0"; x.fillRect(r.x, r.y, 2, 7); if(r.y <= r.ty || r.vy > -.8){ burst(r.x, r.y); return false; } return true; });
+    pt = pt.filter(q => { q.x += q.vx; q.y += q.vy; q.vy += .03; q.vx *= .985; q.vy *= .985; q.l -= q.d; if(q.l <= 0) return false;
+      q.h.push([q.x, q.y]); if(q.h.length > 6) q.h.shift();
+      x.strokeStyle = `rgba(${q.c[0]},${q.c[1]},${q.c[2]},${(q.l * .8).toFixed(2)})`; x.lineWidth = 1.8 * q.l + .5; x.beginPath(); x.moveTo(q.h[0][0], q.h[0][1]);
+      for(let i = 1; i < q.h.length; i++) x.lineTo(q.h[i][0], q.h[i][1]);
+      x.stroke(); return true; });
+  };
+  fwRaf = requestAnimationFrame(loop);
+}
+/* Flattern: Schmetterlinge/Fledermäuse fliegen zufällige Wege (Wegpunkte) und schlagen mit den Flügeln */
+function flutter(el){
+  if(document.documentElement.classList.contains("reduce-motion")) return;
+  const r = (a, b) => a + Math.random() * (b - a), T = Math.PI * 2;
+  el.querySelectorAll(".dr").forEach(sp => {
+    const ch = sp.textContent, bat = ch === "🦇", bee = ch === "🐝", ghost = ch === "👻";
+    const cx = r(15, 85), cy = r(18, 52), ax = r(10, 26), ay = r(5, 15), f1 = 1 + (Math.random() * 2 | 0), f2 = 1 + (Math.random() * 2 | 0), p1 = r(0, T), p2 = r(0, T), N = 90, kf = [];
+    for(let k = 0; k <= N; k++){
+      const u = k / N, ph = T * f1 * u + p1;
+      const x = cx + ax * Math.sin(ph), y = cy + ay * Math.sin(T * f2 * u + p2) + 1.2 * Math.sin(T * 9 * u);
+      kf.push({ transform:`translate(${x.toFixed(2)}vw,${y.toFixed(2)}vh) rotate(${(10 * Math.cos(ph)).toFixed(1)}deg)` });
+    }
+    sp.animate(kf, { duration:(bee ? r(16, 26) : bat ? r(26, 40) : ghost ? r(80, 120) : r(36, 54)) * 1000, iterations:Infinity, easing:"linear", delay:-r(0, 60) * 1000 });
+  });
+}
+function syncDeco(){
+  stopFw();
+  const cfg = DECO[currentTheme]; let el = document.getElementById("theme-deco");
+  if(!cfg || !document.body){ if(el) el.remove(); return; }
+  if(!el){ el = document.createElement("div"); el.id = "theme-deco"; document.body.appendChild(el); }
+  const r = (a, b) => a + Math.random() * (b - a); let h = "";
+  const W = innerWidth, k = Math.min(1, W / 1200);
+  const add = (cls, arr, n, fn) => { if(arr) for(let i = 0; i < n; i++) h += `<span class="${cls}" style="${fn(i)}">${arr[i % arr.length]}</span>`; };
+  if(cfg.gr){
+    const n = Math.max(3, Math.min(cfg.gr.length * 2, Math.floor(W / 100))), sp = W / n;
+    add("gr", cfg.gr, n, i => `left:${((i + .5) / n * 100 + r(-1, 1)).toFixed(1)}vw;font-size:${Math.max(28, Math.min(86, sp * .9) * r(.65, 1)).toFixed(0)}px;animation-duration:${r(3, 6).toFixed(1)}s;animation-delay:-${r(0, 5).toFixed(1)}s`);
+  }
+  add("fl", cfg.fl, cfg.fl ? Math.max(8, Math.round(24 * k)) : 0, () => `left:${r(0, 100).toFixed(0)}vw;font-size:${r(14, 28).toFixed(0)}px;animation-duration:${r(9, 19).toFixed(1)}s;animation-delay:-${r(0, 19).toFixed(1)}s`);
+  add("up", cfg.up, cfg.up ? Math.max(6, Math.round(16 * k)) : 0, () => `left:${r(0, 100).toFixed(0)}vw;font-size:${r(22, 40).toFixed(0)}px;animation-duration:${r(10, 20).toFixed(1)}s;animation-delay:-${r(0, 20).toFixed(1)}s`);
+  add("dr", cfg.dr, cfg.dr && !document.documentElement.classList.contains("reduce-motion") ? Math.max(2, Math.round(cfg.dr.length * Math.max(.5, k))) : 0, () => `font-size:${r(26, 42).toFixed(0)}px`);
+  add("st", cfg.st, cfg.st ? 1 : 0, () => `top:5vh;right:7vw;font-size:96px`);
+  el.innerHTML = h;
+  flutter(el);
+  if(cfg.fw && !document.documentElement.classList.contains("reduce-motion")) startFw(el);
+}
+document.addEventListener("DOMContentLoaded", syncDeco);
+let decoW = innerWidth, decoT = 0;
+addEventListener("resize", () => { clearTimeout(decoT); decoT = setTimeout(() => { if(Math.abs(innerWidth - decoW) > 60){ decoW = innerWidth; syncDeco(); } }, 300); });
 function seasonalEventTheme(d){
   const md = (d.getMonth() + 1) * 100 + d.getDate();
+  const eas = easterDate(d.getFullYear()), dd = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - eas) / 864e5);
+  if(dd >= -7 && dd <= 1) return "ostern";
+  if(md >= 212 && md <= 214) return "valentin";
+  if(md >= 1227 || md <= 102) return "silvester";
   if(md >= 1024 && md <= 1101) return "halloween";
   if(md >= 1201 && md <= 1226) return "weihnachten";
   return null;
@@ -5552,9 +5892,10 @@ function toast(msg){
   el.className = "autosave-toast"; el.textContent = msg;
   document.body.appendChild(el); setTimeout(() => el.remove(), 2600);
 }
+function netMyTurnGuard(){ return false; }
 async function netRematch(){
   if(NET.role !== "host" || !NET.started || !state.online || state.screen === "game") return;
-  NET.seats = NET.seats.filter(q => q.connected);
+  NET.seats = NET.seats.filter(q => q.connected); NET.rm = null;
   if(NET.seats.length < 2){ toast("Für ein Rematch werden mindestens 2 verbundene Spieler benötigt."); render(); return; }
   const settings = JSON.parse(JSON.stringify(state.settings)), names = NET.seats.map(q => q.name);
   const slot = state.activeSlot, room = state.activeSaveName;
@@ -5569,10 +5910,49 @@ async function netRematch(){
   if(slot){ try{ const snap = JSON.parse(JSON.stringify(state)); snap.savedAt = Date.now(); snap.name = room; snap.turnDeadline = null; snap.chDeadline = null; await writeSlot(slot, snap); }catch(e){} }
   render();
 }
+/* Rematch nur mit Zustimmung: der Host fragt an, jeder verbundene Mitspieler muss zustimmen */
+function netRematchAsk(){
+  if(NET.role !== "host" || !NET.started || !state.online || state.screen === "game") return;
+  NET.seats = NET.seats.filter(q => q.connected);
+  if(NET.seats.length < 2){ toast("Für ein Rematch werden mindestens 2 verbundene Spieler benötigt."); render(); return; }
+  NET.rm = { votes: {} };
+  NET.seats.slice(1).forEach(q => { NET.rm.votes[netKey(q.name)] = null; });
+  netBroadcast({ t: "rmreq" });
+  render();
+}
+function netRematchCancel(msg){
+  if(NET.role !== "host" || !NET.rm) return;
+  NET.rm = null; netBroadcast({ t: "rmend", msg: msg || "" });
+  if(msg) toast(msg);
+  render();
+}
+function netHostRmVote(entry, d){
+  if(!NET.rm || !(entry.key in NET.rm.votes)) return;
+  if(!d.ok){ const q = NET.seats.find(x => netKey(x.name) === entry.key); return netRematchCancel((q ? q.name : "Ein Mitspieler") + " hat das Rematch abgelehnt."); }
+  NET.rm.votes[entry.key] = true;
+  const open = NET.seats.slice(1).filter(q => q.connected && NET.rm.votes[netKey(q.name)] !== true);
+  if(open.length){ render(); return; }
+  NET.rm = null; netBroadcast({ t: "rmend", msg: "" });
+  netRematch();
+}
+function netRematchVote(ok){
+  if(NET.role !== "guest" || !NET.rmAsk) return;
+  NET.rmMine = ok ? "ja" : "nein"; netSendHost({ t: "rmvote", ok: !!ok });
+  if(!ok) NET.rmAsk = false;
+  render();
+}
 function endExtraHtml(){
   let h = `<button class="btn-ghost" onclick="openChronicle()">📜 Spielchronik</button>`;
-  if(state.online && NET.role === "host") h += `<button class="btn-primary" onclick="netRematch()">🔁 Rematch (gleicher Raum, neues Spiel)</button>`;
-  else if(state.online && NET.role === "guest") h += `<div class="stats-note" style="width:100%; text-align:center;">Der Host kann ein Rematch starten – dann geht es hier automatisch weiter.</div>`;
+  if(state.online && NET.role === "host"){
+    if(NET.rm){
+      const rows = NET.seats.slice(1).filter(q => NET.rm.votes[netKey(q.name)] !== undefined).map(q => `<div>${NET.rm.votes[netKey(q.name)] === true ? "✅" : "⏳"} ${esc(q.name)}</div>`).join("");
+      h += `<div class="stats-note" style="width:100%; text-align:center;"><b>Rematch angefragt</b> – alle müssen zustimmen:${rows}</div><button class="btn-ghost" onclick="netRematchCancel('Rematch abgebrochen.')">Anfrage abbrechen</button>`;
+    } else h += `<button class="btn-primary" onclick="netRematchAsk()">🔁 Rematch vorschlagen (alle müssen zustimmen)</button>`;
+  } else if(state.online && NET.role === "guest"){
+    if(NET.rmAsk && NET.rmMine === "ja") h += `<div class="stats-note" style="width:100%; text-align:center;">✅ Du hast zugestimmt – warte auf die anderen …</div>`;
+    else if(NET.rmAsk) h += `<div class="stats-note" style="width:100%; text-align:center;"><b>Der Host möchte ein Rematch.</b></div><button class="btn-primary" onclick="netRematchVote(true)">👍 Zustimmen</button><button class="btn-ghost" onclick="netRematchVote(false)">Ablehnen</button>`;
+    else h += `<div class="stats-note" style="width:100%; text-align:center;">Der Host kann ein Rematch vorschlagen – nach Zustimmung aller geht es hier automatisch weiter.</div>`;
+  }
   return h;
 }
 
@@ -5810,7 +6190,13 @@ const SFX_PACKS = {
   standard: { wave:"sine",   pitch:1,    decay:1,   vol:1,    shimmer:false, clicky:true },
   modern:   { wave:"square", pitch:1.25, decay:.7,  vol:.5,   shimmer:false },
   glass:    { wave:"sine",   pitch:1.6,  decay:1.6, vol:.9,   shimmer:true  },
-  norisk:   { wave:"square", pitch:1,    decay:.8,  vol:.45,  shimmer:false }
+  norisk:   { wave:"square", pitch:1,    decay:.8,  vol:.45,  shimmer:false },
+  weihnachten:{ wave:"sine",     pitch:1.9, decay:1.8, vol:.8,  shimmer:true, sparkle:true },
+  halloween:  { wave:"sawtooth", pitch:.6,  decay:1.8, vol:.5,  shimmer:false, eerie:true },
+  ostern:     { wave:"triangle", pitch:1.5, decay:1,   vol:.8,  shimmer:true },
+  valentin:   { wave:"sine",     pitch:1.25,decay:1.6, vol:.9,  shimmer:true },
+  silvester:  { wave:"triangle", pitch:1.4, decay:.9,  vol:.8,  shimmer:true, sparkle:true },
+  notizbuch:  { wave:"triangle", pitch:1.3, decay:.5,  vol:.3,  shimmer:false, paper:true }
 };
 let audioCtx = null;
 let sfxSpecificAt = 0;
@@ -5929,8 +6315,14 @@ function sfx(name, delay, arg, force){
   const ctx = sfxCtx();
   if(!ctx) return;
   if(name !== "click" || force) sfxSpecificAt = Date.now();
-  const pack = SFX_PACKS[currentDesign()] || SFX_PACKS.standard;
+  const pack = SFX_PACKS[currentTheme] || SFX_PACKS[currentDesign()] || SFX_PACKS.standard;
   try{ fn(ctx, pack, ctx.currentTime + 0.01 + (delay || 0), arg); }catch(e){}
+  try{
+    const t0 = ctx.currentTime + 0.01 + (delay || 0);
+    if(pack.paper){ const lg = /turn|reveal|win|lose|next|start/.test(name); sfxNoise(ctx, pack, t0, lg ? .42 : .13, lg ? .55 : .32, 4200, 1400); }
+    if(pack.eerie && name !== "click"){ sfxTone(ctx, pack, t0, 98, .7, .1, { fixed:true }); sfxTone(ctx, pack, t0 + .02, 103.8, .7, .08, { fixed:true }); }
+    if(pack.sparkle){ for(let i = 0; i < (name === "click" ? 1 : 3); i++) sfxTone(ctx, pack, t0 + i * .07, 2093 * (1 + i * .25), .35, .05, { fixed:true }); }
+  }catch(e){}
 }
 // Menü-Klick: erst nach dem eigentlichen Handler prüfen, ob schon ein spezieller Sound lief
 document.addEventListener("click", e => {
@@ -5971,6 +6363,7 @@ function savePrefs(){
 function applyPrefs(){
   const root = document.documentElement;
   root.classList.toggle("reduce-motion", !!prefs.reduceMotion);
+  if(window.__lastRM !== !!prefs.reduceMotion){ window.__lastRM = !!prefs.reduceMotion; if(typeof syncDeco === "function") try{ syncDeco(); }catch(e){} }
   // Liquid Glass: Lichtbrechung nur ohne "Animationen reduzieren" (dann bleibt Blur + Glanz)
   root.classList.toggle("glass-refract", refractionSupported && !prefs.reduceMotion);
   root.classList.toggle("high-contrast", !!prefs.highContrast);
@@ -6277,7 +6670,7 @@ function netBuildSnapshot(){
     settings: netPublicSettings(st.settings),
     timeline: st.timeline, current: cur, phase: st.phase, pendingGap: st.pendingGap, lastResult: st.lastResult,
     tokens: st.tokens, correctCount: st.correctCount, wrongCount: st.wrongCount, won: st.won, bonusClaimed: st.bonusClaimed,
-    guess: st.guess, guessResult: st.guessResult, skippedInfo: st.skippedInfo, wrongSongs: st.wrongSongs || [],
+    guess: st.guess, guessResult: st.guessResult, skippedInfo: st.skippedInfo, eventInfo: st.eventInfo || null, wrongSongs: st.wrongSongs || [],
     challenge: st.challenge ? { caller: st.challenge.caller, gap: st.challenge.gap } : null,
     players: st.players || [], currentPlayer: st.currentPlayer || 0, winners: st.winners || [], chronicle: (st.chronicle || []).slice(-300),
     turnNo: st.turnNo || 0, deckCount: st.deck.length,
@@ -6373,6 +6766,7 @@ function netCleanSnapshot(s){
     skippedInfo: s.skippedInfo && typeof s.skippedInfo === "object"
       ? { t: netCleanSong({ t: s.skippedInfo.t }).t, a: netCleanSong({ a: s.skippedInfo.a }).a, y: netInt(s.skippedInfo.y, 0, 0, 3000) } : null,
     challenge: s.challenge && typeof s.challenge === "object" ? { caller: s.challenge.caller == null ? null : netInt(s.challenge.caller, 0, 0, NET_MAX_PLAYERS), gap: s.challenge.gap == null ? null : netInt(s.challenge.gap, 0, 0, 500) } : null,
+    eventInfo: s.eventInfo && typeof s.eventInfo === "object" ? { text: String(s.eventInfo.text || "").slice(0, 200) } : null,
     wrongSongs: netCleanSongs(s.wrongSongs), players, currentPlayer: netInt(s.currentPlayer, 0, 0, NET_MAX_PLAYERS),
     winners: (Array.isArray(s.winners) ? s.winners : []).map(i => netInt(i, 0, 0, NET_MAX_PLAYERS)).slice(0, NET_MAX_PLAYERS),
     turnNo: netInt(s.turnNo, 0, 0, 1e6), deckCount: netInt(s.deckCount, 0, 0, 1e5), chronicle: netCleanChronicle(s.chronicle),
@@ -6571,6 +6965,7 @@ async function netHostHandle(entry, d){
     case "guess": netHostGuess(entry, d); break;
     case "ready": netHostReady(entry, d); break;
     case "react": netHostReact(entry, d); break;
+    case "rmvote": netHostRmVote(entry, d); break;
     case "bye": try{ entry.conn.close(); }catch(e){} break;
   }
 }
@@ -6877,6 +7272,8 @@ function netGuestConnect(first){
         }
         case "react": { if(NET_REACTS.includes(d.e)) showReaction(netCleanName(d.n) || "?", d.e); break; }
         case "state": netGuestApplyState(d); break;
+        case "rmreq": if(!NET.spec && !netMyTurnGuard()){ NET.rmAsk = true; NET.rmMine = ""; render(); } break;
+        case "rmend": NET.rmAsk = false; NET.rmMine = ""; if(d.msg) toast(String(d.msg).slice(0, 120)); render(); break;
         case "guess": {
           if(!state.online || netMyTurn()) break;
           state.guess = netCleanGuess(d.g); netApplyGuessDom(state.guess); break;
@@ -6975,6 +7372,7 @@ async function netHostFromWizard(){
     tokens: w.tokens, target: w.target, maxTokens: w.maxTokens, startTokens: w.startTokens, mode: w.mode, difficulty: w.difficulty,
     turnLimit: w.timer ? w.turnLimit : 0, challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false, challengeMode: wizardChallengeMode(w), yearTol: w.difficulty === "expert" ? Math.max(0, Math.min(5, w.yearTol | 0)) : 0, ...songFilterFromWizard(w)
   };
+  if(w.mode === "multiplayer") settings.events = w.events === true;
   const room = (w.name || "").trim(), hostName = netCleanName(w.hostName), pw = w.password;
   try{ localStorage.setItem("chronohit_netname", hostName); }catch(e){}
   const config = { settings, slot: w.slot, room };
