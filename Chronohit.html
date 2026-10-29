@@ -918,7 +918,7 @@
     margin:0 auto;   /* zentriert, solange nichts überläuft */
   }
   .gap{
-    flex:none; width:26px; display:flex; align-items:center; justify-content:center;
+    flex:none; width:var(--gap-w, 26px); display:flex; align-items:center; justify-content:center;
     cursor:pointer; position:relative;
   }
   .gap .dot{
@@ -928,18 +928,19 @@
   .gap.active .dot{ border-color:var(--accent); background:var(--accent); transform:scale(1.3); }
   .gap:not(.locked):hover .dot{ border-color:var(--accent); }
   .gap.locked{cursor:default;}
+  .gap.kb .dot{ border-color:var(--accent); box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent); transform:scale(1.4); }
 
   .card{
-    flex:none; width:118px; background:var(--card-face);
+    flex:none; width:var(--card-w, 118px); background:var(--card-face);
     border-radius:10px; color:var(--ink);
     display:flex; flex-direction:column; justify-content:space-between;
     padding:12px 10px; position:relative;
     box-shadow:0 6px 16px rgba(0,0,0,.28);
     border:1px solid rgba(0,0,0,.08);
   }
-  .card .year{font-family:var(--heading-font); font-size:calc(26px * var(--font-scale)); font-weight:700;}
-  .card .title{font-size:calc(12px * var(--font-scale)); font-weight:600; line-height:1.3; margin-top:6px;}
-  .card .artist{font-size:calc(11px * var(--font-scale)); color:#5c5645; margin-top:2px;}
+  .card .year{font-family:var(--heading-font); font-size:calc(26px * var(--font-scale) * var(--card-scale, 1)); font-weight:700;}
+  .card .title{font-size:calc(12px * var(--font-scale) * var(--card-scale, 1)); font-weight:600; line-height:1.3; margin-top:6px;}
+  .card .artist{font-size:calc(11px * var(--font-scale) * var(--card-scale, 1)); color:#5c5645; margin-top:2px;}
   .card.pending{
     background:var(--panel-2); border:1px dashed var(--accent);
     align-items:center; justify-content:center;
@@ -1172,6 +1173,146 @@
     select.dropdown{ color-scheme:normal; }
     select.dropdown option, select.dropdown optgroup{ background-color:var(--bg); color:var(--text); }
   }
+  :root[data-theme="terminal"]{
+    --bg:#030b05; --bg-2:#000000; --bg-highlight:#0b2514; --panel:#07160b; --panel-2:#0c2213;
+    --text:#7dff9b; --muted:#3fae5c; --accent:#7dff9b; --accent-ink:#021006;
+    --correct:#7dff9b; --wrong:#ff6b5e; --line:#1c5a2e; --card-face:#0a2012; --ink:#7dff9b;
+    --heading-font: 'VT323', 'IBM Plex Mono', monospace; --body-font: 'IBM Plex Mono', monospace; --radius: 3px; --body-bg-image: none;
+  }
+  .theme-swatch[data-theme-preview="terminal"] .theme-dots span:nth-child(1){ background:#030b05; }
+  .theme-swatch[data-theme-preview="terminal"] .theme-dots span:nth-child(2){ background:#07160b; }
+  .theme-swatch[data-theme-preview="terminal"] .theme-dots span:nth-child(3){ background:#7dff9b; }
+  :root[data-theme="synthwave"]{
+    --bg:#12062b; --bg-2:#0b0420; --bg-highlight:#2a0c55; --panel:rgba(30,10,64,0.80); --panel-2:rgba(48,16,96,0.80);
+    --text:#f6e9ff; --muted:#b79be0; --accent:#ff2bd6; --accent-ink:#12062b;
+    --correct:#2bffd0; --wrong:#ff4d6d; --line:rgba(255,43,214,0.45); --card-face:#1b0a40; --ink:#f6e9ff;
+    --heading-font: 'Orbitron', 'Space Grotesk', sans-serif; --body-font: 'Space Grotesk', sans-serif; --body-bg-image: linear-gradient(180deg, #0b0420 0%, #1d0a45 42%, #4a1070 66%, #ff2bd6 71.5%, #12062b 72.2%, #12062b 100%);
+  }
+  .theme-swatch[data-theme-preview="synthwave"] .theme-dots span:nth-child(1){ background:#12062b; }
+  .theme-swatch[data-theme-preview="synthwave"] .theme-dots span:nth-child(2){ background:rgba(30,10,64,0.80); }
+  .theme-swatch[data-theme-preview="synthwave"] .theme-dots span:nth-child(3){ background:#ff2bd6; }
+  :root[data-theme="halloween"]{
+    --bg:#120a1a; --bg-2:#0a0510; --bg-highlight:#24122f; --panel:#1d1028; --panel-2:#281638;
+    --text:#f3e6d4; --muted:#a58fb3; --accent:#ff7a1a; --accent-ink:#1a0d08;
+    --correct:#8fd16a; --wrong:#e0473a; --line:#3a2150; --card-face:#f2e2c4; --ink:#25161a;
+    --heading-font: 'Creepster', 'Fraunces', serif; --body-bg-image: radial-gradient(700px 400px at 85% 0%, rgba(255,122,26,0.14), transparent 60%), radial-gradient(600px 400px at 0% 100%, rgba(140,60,200,0.18), transparent 60%);
+  }
+  .theme-swatch[data-theme-preview="halloween"] .theme-dots span:nth-child(1){ background:#120a1a; }
+  .theme-swatch[data-theme-preview="halloween"] .theme-dots span:nth-child(2){ background:#1d1028; }
+  .theme-swatch[data-theme-preview="halloween"] .theme-dots span:nth-child(3){ background:#ff7a1a; }
+  :root[data-theme="weihnachten"]{
+    --bg:#0f1f17; --bg-2:#0a1610; --bg-highlight:#1a3326; --panel:#173024; --panel-2:#1f3f30;
+    --text:#f6efe2; --muted:#9fb8a8; --accent:#f1c24b; --accent-ink:#1b1a10;
+    --correct:#7fd28b; --wrong:#ff6b5e; --line:#2c5a43; --card-face:#f7efe0; --ink:#2a1a16;
+    --body-bg-image: radial-gradient(rgba(255,255,255,0.13) 1.5px, transparent 2px) 0 0 / 90px 90px, radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1.5px) 45px 45px / 90px 90px;
+  }
+  .theme-swatch[data-theme-preview="weihnachten"] .theme-dots span:nth-child(1){ background:#0f1f17; }
+  .theme-swatch[data-theme-preview="weihnachten"] .theme-dots span:nth-child(2){ background:#173024; }
+  .theme-swatch[data-theme-preview="weihnachten"] .theme-dots span:nth-child(3){ background:#f1c24b; }
+  :root[data-theme="fruehling"]{
+    --bg:#eef6e8; --bg-2:#e3efdb; --bg-highlight:#f7fbf2; --panel:#dcebd0; --panel-2:#d0e4c2;
+    --text:#1f2d1c; --muted:#5b7355; --accent:#d6427f; --accent-ink:#ffffff;
+    --correct:#2f8a4f; --wrong:#c8412f; --line:#b9d3a8; --card-face:#fffdf7; --ink:#26301f;
+    --body-bg-image: radial-gradient(700px 420px at 90% 0%, rgba(214,66,127,0.12), transparent 60%);
+  }
+  .theme-swatch[data-theme-preview="fruehling"] .theme-dots span:nth-child(1){ background:#eef6e8; }
+  .theme-swatch[data-theme-preview="fruehling"] .theme-dots span:nth-child(2){ background:#dcebd0; }
+  .theme-swatch[data-theme-preview="fruehling"] .theme-dots span:nth-child(3){ background:#d6427f; }
+  :root[data-theme="sommer"]{
+    --bg:#fdf3d8; --bg-2:#f8e8bd; --bg-highlight:#fffaf0; --panel:#f7e0a3; --panel-2:#f1d58a;
+    --text:#3a2a12; --muted:#8a6d3b; --accent:#0e8fc7; --accent-ink:#ffffff;
+    --correct:#2a9d6a; --wrong:#d63c2f; --line:#e2c37a; --card-face:#fffdf5; --ink:#2a2415;
+    --body-bg-image: radial-gradient(800px 420px at 85% -5%, rgba(255,170,40,0.25), transparent 60%);
+  }
+  .theme-swatch[data-theme-preview="sommer"] .theme-dots span:nth-child(1){ background:#fdf3d8; }
+  .theme-swatch[data-theme-preview="sommer"] .theme-dots span:nth-child(2){ background:#f7e0a3; }
+  .theme-swatch[data-theme-preview="sommer"] .theme-dots span:nth-child(3){ background:#0e8fc7; }
+  :root[data-theme="herbst"]{
+    --bg:#2a1b12; --bg-2:#1f130c; --bg-highlight:#3b271a; --panel:#3a261a; --panel-2:#47301f;
+    --text:#f3e3cc; --muted:#b79a7c; --accent:#d9822b; --accent-ink:#1f130c;
+    --correct:#9bbf5a; --wrong:#d4502f; --line:#5a4230; --card-face:#f0dcb8; --ink:#2b1d12;
+    --body-bg-image: radial-gradient(800px 420px at 10% 0%, rgba(217,130,43,0.14), transparent 60%);
+  }
+  .theme-swatch[data-theme-preview="herbst"] .theme-dots span:nth-child(1){ background:#2a1b12; }
+  .theme-swatch[data-theme-preview="herbst"] .theme-dots span:nth-child(2){ background:#3a261a; }
+  .theme-swatch[data-theme-preview="herbst"] .theme-dots span:nth-child(3){ background:#d9822b; }
+  :root[data-theme="winter"]{
+    --bg:#e8f1f8; --bg-2:#dbe8f2; --bg-highlight:#f4f9fd; --panel:#d3e3ef; --panel-2:#c6dbea;
+    --text:#14283a; --muted:#55718a; --accent:#2a7fd1; --accent-ink:#ffffff;
+    --correct:#2c8f6a; --wrong:#c9433a; --line:#aac6dc; --card-face:#ffffff; --ink:#14283a;
+    --body-bg-image: radial-gradient(rgba(255,255,255,0.9) 1.5px, transparent 2px) 0 0 / 80px 80px;
+  }
+  .theme-swatch[data-theme-preview="winter"] .theme-dots span:nth-child(1){ background:#e8f1f8; }
+  .theme-swatch[data-theme-preview="winter"] .theme-dots span:nth-child(2){ background:#d3e3ef; }
+  .theme-swatch[data-theme-preview="winter"] .theme-dots span:nth-child(3){ background:#2a7fd1; }
+  /* Retro-Terminal: Scanlines, Vignette, Phosphor-Glühen */
+  :root[data-design="terminal"] body{ text-shadow:0 0 4px rgba(125,255,155,.5); }
+  :root[data-design="terminal"] body::after{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:9990;
+    background:repeating-linear-gradient(to bottom, rgba(0,0,0,.30) 0, rgba(0,0,0,.30) 1px, transparent 1px, transparent 3px);
+    box-shadow:inset 0 0 140px rgba(0,0,0,.65);
+    animation:crtFlicker 5s steps(60) infinite;
+  }
+  @keyframes crtFlicker{ 0%,100%{opacity:1} 47%{opacity:.96} 50%{opacity:.9} 53%{opacity:.97} }
+  html.reduce-motion :root[data-design="terminal"] body::after, html.reduce-motion[data-design="terminal"] body::after{ animation:none; }
+  :root[data-design="terminal"] .card{ border:1px solid var(--line); box-shadow:0 0 10px rgba(125,255,155,.15); }
+  :root[data-design="terminal"] .card .artist{ color:var(--muted); }
+  :root[data-design="terminal"] .menu-card, :root[data-design="terminal"] .modal-box{ border:1px solid var(--line); box-shadow:0 0 14px rgba(125,255,155,.08); }
+  :root[data-design="terminal"] ::selection{ background:var(--accent); color:var(--accent-ink); text-shadow:none; }
+  /* Synthwave: Neon-Horizont mit Sonne und Gitter */
+  :root[data-design="synthwave"] body{ background-attachment:fixed; background-size:cover; }
+  :root[data-design="synthwave"] body::before{
+    content:""; position:fixed; left:-60%; right:-60%; bottom:0; height:30vh; pointer-events:none; z-index:-1;
+    background:linear-gradient(rgba(255,43,214,.65) 1px, transparent 1px) 0 0 / 100% 38px, linear-gradient(90deg, rgba(255,43,214,.65) 1px, transparent 1px) 0 0 / 56px 100%;
+    transform:perspective(260px) rotateX(58deg); transform-origin:center bottom;
+    -webkit-mask-image:linear-gradient(to top, #000 25%, transparent 96%); mask-image:linear-gradient(to top, #000 25%, transparent 96%);
+    animation:swGrid 1.6s linear infinite;
+  }
+  @keyframes swGrid{ to{ background-position:0 38px, 0 0; } }
+  html.reduce-motion[data-design="synthwave"] body::before{ animation:none; }
+  :root[data-design="synthwave"] body::after{
+    content:""; position:fixed; left:50%; bottom:calc(28vh - min(24vw, 190px)); width:min(48vw, 380px); aspect-ratio:1; transform:translateX(-50%);
+    border-radius:50%; pointer-events:none; z-index:-1; opacity:.9; clip-path:inset(0 0 50% 0);
+    background:linear-gradient(180deg, #ffe45e 0%, #ff7a59 45%, #ff2bd6 100%);
+    -webkit-mask-image:linear-gradient(180deg, #000 0 58%, transparent 58% 63%, #000 63% 73%, transparent 73% 79%, #000 79% 100%);
+    mask-image:linear-gradient(180deg, #000 0 58%, transparent 58% 63%, #000 63% 73%, transparent 73% 79%, #000 79% 100%);
+  }
+  :root[data-design="synthwave"] .btn-primary{ box-shadow:0 0 14px rgba(255,43,214,.55); }
+  :root[data-design="synthwave"] .menu-card, :root[data-design="synthwave"] .card{ box-shadow:0 0 18px rgba(255,43,214,.18); }
+  :root[data-design="synthwave"] h1, :root[data-design="synthwave"] h2{ text-shadow:0 0 12px rgba(255,43,214,.7); }
+  .fab-btn{ width:44px; height:44px; border-radius:50%; border:1px solid var(--line); background:var(--bg-2); color:var(--text); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(0,0,0,.35); }
+  #pause-fab{ position:fixed; left:12px; bottom:12px; z-index:9500; }
+  #react-bar{ position:fixed; left:12px; bottom:12px; z-index:9500; display:flex; align-items:center; gap:6px; }
+  #react-bar .react-row{ display:none; gap:2px; padding:4px 8px; border-radius:999px; background:var(--bg-2); border:1px solid var(--line); flex-wrap:wrap; }
+  #react-bar.open .react-row{ display:flex; }
+  #react-bar .react-row button{ background:none; border:none; font-size:22px; cursor:pointer; padding:4px; border-radius:8px; }
+  #react-bar .react-row button:hover{ background:var(--panel-2); }
+  #react-float{ position:fixed; inset:0; pointer-events:none; z-index:9600; overflow:hidden; }
+  .react-pop{ position:absolute; bottom:70px; display:flex; flex-direction:column; align-items:center; animation:reactRise 2.7s ease-out forwards; }
+  .react-pop .re{ font-size:38px; }
+  .react-pop .rn{ font-size:calc(12px * var(--font-scale)); padding:1px 8px; border-radius:999px; background:var(--bg-2); color:var(--text); border:1px solid var(--line); }
+  .react-pop.still{ animation:reactStill 1.8s ease-out forwards; }
+  @keyframes reactRise{ 0%{ transform:translateY(0) scale(.6); opacity:0 } 12%{ opacity:1; transform:translateY(-30px) scale(1.1) } 100%{ transform:translateY(-55vh) scale(1); opacity:0 } }
+  @keyframes reactStill{ 0%{ opacity:0 } 15%{ opacity:1 } 80%{ opacity:1 } 100%{ opacity:0 } }
+  #pause-overlay{ position:fixed; inset:0; z-index:9700; background:var(--bg); display:flex; align-items:center; justify-content:center; padding:20px; text-align:center; }
+  #pause-overlay .pause-box{ max-width:380px; display:flex; flex-direction:column; align-items:center; gap:12px; }
+  #pause-overlay .pause-ic{ font-size:64px; }
+  .chron-overlay{ position:fixed; inset:0; z-index:9650; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; padding:16px; }
+  .chron-box{ background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:12px; width:100%; max-width:560px; max-height:82vh; display:flex; flex-direction:column; padding:14px 16px; }
+  .chron-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px; }
+  .chron-head h3{ margin:0; }
+  .chron-list{ overflow:auto; display:flex; flex-direction:column; gap:8px; }
+  .chron-row{ border-left:4px solid var(--line); padding:6px 10px; background:var(--panel-2); border-radius:6px; }
+  .chron-row.ok{ border-left-color:var(--correct); } .chron-row.wrong, .chron-row.timeout{ border-left-color:var(--wrong); } .chron-row.skip, .chron-row.buy{ border-left-color:var(--accent); }
+  .chron-n{ font-size:calc(12px * var(--font-scale)); color:var(--muted); }
+  .chron-k{ font-size:calc(13px * var(--font-scale)); }
+  .mini-tl-wrap{ margin-top:6px; display:flex; flex-direction:column; gap:4px; }
+  .mini-tl-row{ display:flex; align-items:center; gap:8px; min-width:0; }
+  .mt-name{ font-size:calc(11px * var(--font-scale)); color:var(--muted); flex:none; max-width:70px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .mini-tl{ display:flex; align-items:center; flex-wrap:wrap; row-gap:3px; min-width:0; }
+  .mt-card{ font-size:calc(10px * var(--font-scale)); padding:1px 5px; border-radius:4px; background:var(--card-face); color:var(--ink); font-weight:600; }
+  .mt-link{ width:6px; height:2px; background:var(--accent); flex:none; }
+  .mt-more{ font-size:calc(10px * var(--font-scale)); color:var(--muted); margin-left:4px; }
 </style>
 </head>
 <body>
@@ -2608,6 +2749,7 @@ function doSkipWithToken(){
   state.tokens -= 1;
   sfx("spend");
   state.discard.push(skipped);
+  chronicleAdd({ n: state.turnNo || 0, p: chroName(), t: skipped.t, a: skipped.a, y: skipped.y, k: "skip", c: "" });
   drawNext();
   // Nach drawNext setzen (drawNext leert den Hinweis), damit er bei der neuen Karte erscheint
   state.skippedInfo = { t: skipped.t, a: skipped.a, y: skipped.y };
@@ -2624,6 +2766,7 @@ function doBuyWithTokens(){
   if(idx === -1) idx = state.timeline.length;
   state.timeline.splice(idx, 0, song);
   state.correctCount += 1;
+  chronicleAdd({ n: state.turnNo || 0, p: chroName(), t: song.t, a: song.a, y: song.y, k: "buy", c: "" });
   checkWin();
   if(state.screen === "game"){ drawNext(); }
   render(); saveState();
@@ -2674,7 +2817,7 @@ function computeGuessCheck(song){
   };
   const titleOk  = said.t ? fuzzyMatch(said.t, titleVariants(song.t))  : false;
   const artistOk = said.a ? fuzzyMatch(said.a, artistVariants(song.a)) : false;
-  const yearOk   = said.y !== "" ? (parseInt(said.y, 10) === song.y) : false;
+  const yearOk   = said.y !== "" ? (Math.abs(parseInt(said.y, 10) - song.y) <= Math.max(0, Math.min(5, (state.settings.yearTol | 0)))) : false;
   return { said, titleOk, artistOk, yearOk, both: titleOk && artistOk };
 }
 
@@ -2746,7 +2889,7 @@ function challengeZoneHtml(){
     } else if(eligible.includes(mySeat)){
       h += `<button class="btn-primary" onclick="callChallenge(${mySeat})">Chronohit! rufen (1 ${icon('token')})</button>`;
     } else if(mySeat !== netActiveSeat()){
-      h += `<div class="draw-caption">Du hast keinen Token für einen Einspruch.</div>`;
+      h += `<div class="draw-caption">${NET.spec ? 'Du schaust zu.' : 'Du hast keinen Token für einen Einspruch.'}</div>`;
     } else {
       h += `<div class="draw-caption">Die anderen können jetzt Einspruch erheben …</div>`;
     }
@@ -2827,6 +2970,7 @@ function doReveal(){
     statsTouch();
     if(!stats.ruf) stats.ruf = { won: 0, lost: 0 };
     if(chOk) stats.ruf.won += 1; else stats.ruf.lost += 1;
+    { const yr = yearStat().ruf; if(chOk) yr.won += 1; else yr.lost += 1; }
     saveStats();
   }
   state.challenge = null;
@@ -2853,6 +2997,8 @@ function doReveal(){
   }
   if(chResult && chResult.success) sfx("steal", sfxLate);
   state.lastResult = { ok, song, positionOk, guessCheck, difficulty: diff, bonusAwarded, autoRevealed: autoRevealFlag || !!state.autoRevealed, challenge: chResult, ts: Date.now() };
+  chronicleAdd({ n: state.turnNo || 0, p: chroName(), t: song.t, a: song.a, y: song.y, k: state.lastResult.ok ? "ok" : "wrong",
+    c: chResult && chResult.caller != null && state.players && state.players[chResult.caller] ? state.players[chResult.caller].name + (chResult.success ? " ⚡ Einspruch gewonnen" : " ⚡ Einspruch verloren") : "" });
   state.autoRevealed = false;
   state.guessResult = null;
   state.guess = { t:"", a:"", y:"" };
@@ -2976,6 +3122,7 @@ function renderSaveSlotModal(){
         <div class="slot-info">
           <div class="slot-title">${slot && slot.name ? esc(slot.name) : `Slot ${n}`}</div>
           <div class="slot-meta">${slot ? `Slot ${n} · ${slot.online ? 'Online · ' : ''}${slotProgress(slot)} · ${formatSlotDate(slot.savedAt)}` : 'leer'}</div>
+          ${slot ? miniTimelineHtml(slot) : ''}
         </div>
         <button class="btn-primary btn-small" onclick="saveToSlot(${n})">${slot ? 'Überschreiben' : 'Speichern'}</button>
       </div>`;
@@ -3160,6 +3307,14 @@ const THEME_INFO = [
   { key:"modern", label:"Modern", desc:"Konsolen-Look mit Türkis-Akzent, schärferen Kanten, Monospace-Schrift und leicht angeglasten Flächen." },
   { key:"glass", label:"Liquid Glass", desc:"Echtes Glas-Material: Lichtkanten, Glanzreflex, Milchglas-Blur — in Chrome/Edge zusätzlich mit Lichtbrechung." },
   { key:"norisk", label:"NRC", desc:"Reines Schwarz, Minecraft-Schrift, blauer Akzent und ein leuchtender Kreis, der dem Cursor folgt — angelehnt an die NRC-Website." },
+  { key:"terminal", label:"Retro-Terminal", desc:"Grüne Phosphor-Schrift auf Schwarz mit Scanlines, Vignette und leichtem Flackern (Flackern entfällt bei „Animationen reduzieren“)." },
+  { key:"synthwave", label:"Synthwave", desc:"Neon-Horizont mit gestreifter Sonne und Gitter, Pink-Türkis-Akzente und Orbitron-Überschriften." },
+  { key:"halloween", label:"Halloween", desc:"Dunkles Violett mit Kürbis-Orange und gruseliger Überschrift. Automatisch vom 24.10. bis 1.11.", season:true },
+  { key:"weihnachten", label:"Weihnachten", desc:"Tannengrün mit Gold und leichtem Schneefall im Hintergrund. Automatisch vom 1.12. bis 26.12.", season:true },
+  { key:"fruehling", label:"Frühling", desc:"Helles Frischgrün mit Blütenrosa. Automatisch im März, April und Mai.", season:true },
+  { key:"sommer", label:"Sommer", desc:"Sonniges Sandgelb mit Meerblau. Automatisch im Juni, Juli und August.", season:true },
+  { key:"herbst", label:"Herbst", desc:"Warmes Braun mit Laubfarben. Automatisch im September, Oktober und November.", season:true },
+  { key:"winter", label:"Winter", desc:"Eisiges Hellblau mit Schnee-Punkten. Automatisch im Dezember, Januar und Februar.", season:true },
   { key:"custom", label:"Benutzerdefiniert", desc:"Eigene Farben, Transparenz, Stil (Standard, Modern, Glass, NRC) und Schriftart frei wählen." }
 ];
 
@@ -3197,6 +3352,14 @@ function renderSettings(){
     <div class="menu-card">
       <h3>Themes</h3>
       <div class="theme-list">${swatches}</div>
+      <div class="setting-row" style="margin-top:12px;">
+        <div><div class="label">Jahreszeiten-Themes nach Datum</div><div class="hint">Wechselt beim Start der Seite automatisch zum passenden Theme (dein gewähltes bleibt gespeichert, „Benutzerdefiniert“ wird nie ersetzt). „Nur Feiertage“: Halloween 24.10.–1.11., Weihnachten 1.–26.12. „Feiertage &amp; Jahreszeiten“: sonst Frühling (Mär–Mai), Sommer (Jun–Aug), Herbst (Sep–Nov), Winter (Dez–Feb).</div></div>
+        <select class="dropdown" onchange="setSeasonal(this.value)" aria-label="Jahreszeiten-Themes">
+          <option value="off" ${prefs.seasonal === 'off' ? 'selected' : ''}>Aus</option>
+          <option value="events" ${prefs.seasonal === 'events' ? 'selected' : ''}>Nur Feiertage</option>
+          <option value="all" ${prefs.seasonal === 'all' ? 'selected' : ''}>Feiertage &amp; Jahreszeiten</option>
+        </select>
+      </div>
     </div>
 
     ${currentTheme === 'custom' ? renderCustomThemePanel() : ``}
@@ -3204,6 +3367,8 @@ function renderSettings(){
     ${renderAccessibilityCard()}
 
     ${renderSaveCard()}
+
+    ${renderPlayCard()}
 
     ${renderSoundCard()}
 
@@ -3287,6 +3452,8 @@ function renderQuickMenuContent(){
       </div>
     </div>
     ${autoSaveQmHtml()}
+    ${playQmHtml()}
+    ${chronicleQmHtml()}
     <div class="qm-section">
       <div class="qm-title">Sound</div>
       <div class="setting-row"><div class="label">Lautstärke</div>${soundVolumeHtml()}</div>
@@ -3326,6 +3493,7 @@ function renderMenu(){
         <button class="btn-ghost" onclick="openLoadGame()">Spiel laden</button>
         <button class="btn-ghost" onclick="openSettings()">Einstellungen</button>
         <button class="btn-ghost" onclick="openStats()">Statistiken</button>
+        <button class="btn-ghost" onclick="openRecap()">Jahresrückblick</button>
         <button class="btn-ghost" onclick="openTutorial()">Tutorial</button>
       </div>
     </div>
@@ -3367,6 +3535,7 @@ function renderLoadGame(){
         <div class="slot-info">
           <div class="slot-title">${slot && slot.name ? esc(slot.name) : `Slot ${n}`}</div>
           <div class="slot-meta">${slot ? `Slot ${n} · ${slot.online ? 'Online · ' : ''}${slotProgress(slot)} · ${formatSlotDate(slot.savedAt)}` : 'leer'}</div>
+          ${slot ? miniTimelineHtml(slot) : ''}
         </div>
         ${slot ? `
           <div class="slot-actions">
@@ -3404,7 +3573,7 @@ function renderTutorial(){
         <p><strong>Schwierigkeit:</strong><br>
           <strong>Normal</strong> — nur die Position zählt.<br>
           <strong>Profi</strong> — Titel &amp; Interpret müssen vor dem Aufdecken zusätzlich stimmen.<br>
-          <strong>Experte</strong> — zusätzlich auch das exakte Erscheinungsjahr.</p>
+          <strong>Experte</strong> — zusätzlich auch das Erscheinungsjahr (Toleranz bis ±5 Jahre einstellbar).</p>
         <p><strong>Koop-Modus:</strong> Ihr startet gemeinsam mit einer festen Anzahl Chrono-Tokens (1–10, einstellbar) und einer Startkarte. Jede falsch platzierte Karte kostet einen Token — Skip/Kaufen gibt es hier nicht, die Tokens sind eure gemeinsamen Leben. Erreicht ihr 0 Tokens, bevor die Zielkartenzahl erreicht ist, habt ihr verloren; schafft ihr die Zielkartenzahl vorher, habt ihr gewonnen.</p>
         <p><strong>Chrono-Tokens (falls aktiviert, außerhalb von Koop):</strong> Start- und Maximalwert sind einstellbar.</p>
         <p>&bull; <strong>Song unbekannt?</strong> Wirf für 1 Chrono-Token die aktuelle Karte ab und ziehe eine neue, ohne sie zu platzieren.</p>
@@ -3443,6 +3612,7 @@ function startCreateWizard(online){
     turnLimit: 30,
     challenge: true,
     challengeMode: "manual",
+    yearTol: 0,
     playerCount: 2,
     playerNames: ["", ""],
     playerIds: [0, 1],
@@ -3714,6 +3884,9 @@ function renderWizardStep2(){
             <option value="pro" ${w.difficulty==='pro'?'selected':''}>Profi</option>
             <option value="expert" ${w.difficulty==='expert'?'selected':''}>Experte</option>
           </select>`)}
+        ${w.difficulty === 'expert' ? infoRow('w-yeartol', 'Jahres-Toleranz',
+          'Wie weit das getippte Jahr im Experten-Modus danebenliegen darf. ±0 = exakt, bis ±5 Jahre.',
+          `<div style="display:flex; align-items:center; gap:10px;"><input type="range" min="0" max="5" step="1" value="${w.yearTol | 0}" oninput="state.wizard.yearTol=+this.value; this.nextElementSibling.textContent='±'+this.value" aria-label="Jahres-Toleranz"><b style="min-width:2.2em;">±${w.yearTol | 0}</b></div>`) : ``}
       </div>
     </div>`;
 }
@@ -3900,7 +4073,7 @@ async function createGameFromWizard(){
     mode: w.mode,
     difficulty: w.difficulty,
     turnLimit: w.timer ? w.turnLimit : 0,
-    challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false, challengeMode: wizardChallengeMode(w),
+    challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false, challengeMode: wizardChallengeMode(w), yearTol: w.difficulty === "expert" ? Math.max(0, Math.min(5, w.yearTol | 0)) : 0,
     ...songFilterFromWizard(w)
   } : {
     tokens: w.tokens,
@@ -3910,7 +4083,7 @@ async function createGameFromWizard(){
     mode: w.mode,
     difficulty: w.difficulty,
     turnLimit: w.timer ? w.turnLimit : 0,
-    challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false, challengeMode: wizardChallengeMode(w),
+    challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false, challengeMode: wizardChallengeMode(w), yearTol: w.difficulty === "expert" ? Math.max(0, Math.min(5, w.yearTol | 0)) : 0,
     ...songFilterFromWizard(w)
   };
   const slotNum = w.slot;
@@ -4043,6 +4216,7 @@ function renderGame(){
     return `<div class="card pending"><div class="q">?</div></div>`;
   }
 
+  kbSync();
   let timelineHtml = "";
   for(let i=0;i<=timeline.length;i++){
     const chPick = state.phase === "challenge" && state.challenge && state.challenge.caller != null && (!online || state.challenge.caller === netMySeat()) && netWaitingSeat() < 0;
@@ -4051,7 +4225,7 @@ function renderGame(){
     const chMark = (state.phase === "challenge" && state.challenge && state.challenge.gap === i) ||
       (state.phase === "feedback" && state.lastResult && state.lastResult.challenge && state.lastResult.challenge.gap === i);
 
-    timelineHtml += `<div class="gap ${clickable ? '' : 'locked'} ${showPendingHere?'active':''}"
+    timelineHtml += `<div class="gap ${clickable ? '' : 'locked'} ${showPendingHere?'active':''} ${clickable && kbGap === i ? 'kb' : ''}"
         ${clickable ? `onclick="${state.phase === 'challenge' ? 'chooseChallengeGap' : 'chooseGap'}(${i})"` : ``}>
         <div class="dot"></div>${chMark ? `<div class="ch-marker" title="Einspruch">⚡</div>` : ``}
       </div>`;
@@ -4190,7 +4364,7 @@ function renderGame(){
               oninput="state.guess.y=this.value; netGuessSend()" ${canAct ? '' : 'readonly'}>` : ``}
             <div class="guess-hint">${
               s.difficulty !== 'normal'
-                ? 'Tippfehler, Akzente und Groß-/Kleinschreibung sind egal. Position, Titel & Interpret' + (s.difficulty==='expert' ? ' & exaktes Jahr' : '') + ' müssen stimmen, sonst zählt die Karte nicht.'
+                ? 'Tippfehler, Akzente und Groß-/Kleinschreibung sind egal. Position, Titel & Interpret' + (s.difficulty==='expert' ? ' & Jahr' + (s.yearTol ? ' (±' + s.yearTol + ')' : ' (exakt)') : '') + ' müssen stimmen, sonst zählt die Karte nicht.'
                 : 'Tippfehler, Akzente und Groß-/Kleinschreibung sind egal — „enrike iglesias" zählt. Leer lassen = kein Rateversuch.'
             }</div>
           </div>` : ``}
@@ -4322,6 +4496,7 @@ function renderEnd(){
         <div class="rank-list">${rows}</div>
         <div class="menu-actions" style="margin-top:18px;">
           <button class="btn-primary" onclick="showFinalTimeline()">Finale Zeitleisten ansehen</button>
+          ${endExtraHtml()}
           <button class="btn-ghost" onclick="abandonGame()">Hauptmenü</button>
         </div>
       </div>
@@ -4343,6 +4518,7 @@ function renderEnd(){
       </div>
       <div class="menu-actions">
         <button class="btn-primary" onclick="showFinalTimeline()">Finale Zeitleiste ansehen</button>
+        ${endExtraHtml()}
         <button class="btn-ghost" onclick="abandonGame()">Hauptmenü</button>
       </div>
     </div>
@@ -4474,6 +4650,7 @@ function render(){
   else if(state.screen === "tutorial") renderTutorial();
   else if(state.screen === "settings") renderSettings();
   else if(state.screen === "stats") renderStats();
+  else if(state.screen === "recap") renderRecap();
   else if(state.screen === "online") renderOnlineHub();
   else if(state.screen === "join") renderJoin();
   else if(state.screen === "lobby") renderLobby();
@@ -4573,6 +4750,14 @@ const FONT_OPTIONS = [
   { key:"Space Mono",       family:"'Space Mono', monospace",      google:"Space+Mono:wght@400;700" },
   { key:"IBM Plex Mono",    family:"'IBM Plex Mono', monospace",   google:"IBM+Plex+Mono:wght@400;500;600;700" },
   { key:"Playfair Display", family:"'Playfair Display', serif",    google:"Playfair+Display:wght@500;600;700" },
+  { key:"Atkinson Hyperlegible", family:"'Atkinson Hyperlegible', sans-serif", google:"Atkinson+Hyperlegible:wght@400;700", read:true },
+  { key:"Lexend",           family:"'Lexend', sans-serif",         google:"Lexend:wght@400;500;600;700", read:true },
+  { key:"Nunito",           family:"'Nunito', sans-serif",         google:"Nunito:wght@400;600;700", read:true },
+  { key:"Comic Neue",       family:"'Comic Neue', 'Comic Sans MS', cursive", google:"Comic+Neue:wght@400;700", read:true },
+  { key:"Fira Sans",        family:"'Fira Sans', sans-serif",      google:"Fira+Sans:wght@400;500;600;700", read:true },
+  { key:"Merriweather",     family:"'Merriweather', serif",        google:"Merriweather:wght@400;700", read:true },
+  { key:"Orbitron",         family:"'Orbitron', sans-serif",       google:"Orbitron:wght@500;700" },
+  { key:"VT323",            family:"'VT323', monospace",           google:"VT323" },
   { key:"Minecraft",        family:"'NRCMinecraft', 'Pixelify Sans', monospace", google:null },
   { key:"System",           family:"system-ui, -apple-system, 'Segoe UI', sans-serif", google:null }
 ];
@@ -4580,7 +4765,9 @@ const DESIGN_OPTIONS = [
   { key:"standard", label:"Standard" },
   { key:"modern",   label:"Modern" },
   { key:"glass",    label:"Liquid Glass" },
-  { key:"norisk",   label:"NRC" }
+  { key:"norisk",   label:"NRC" },
+  { key:"terminal", label:"Retro-Terminal" },
+  { key:"synthwave", label:"Synthwave" }
 ];
 const CUSTOM_THEME_DEFAULTS = {
   bg: "#14151d", panel: "#21232f", accent: "#e8a33d", text: "#ece7db",
@@ -4619,6 +4806,28 @@ function relativeLuminance(hex){
   const h = hex.replace("#","");
   const r = parseInt(h.substring(0,2),16)/255, g = parseInt(h.substring(2,4),16)/255, b = parseInt(h.substring(4,6),16)/255;
   return 0.2126*r + 0.7152*g + 0.0722*b;
+}
+function userFontActive(){ return typeof prefs.fontFamily === "string" && prefs.fontFamily !== "theme" && FONT_OPTIONS.some(x => x.key === prefs.fontFamily); }
+function applyUserFont(){
+  const root = document.documentElement.style;
+  if(userFontActive()){
+    const f = FONT_OPTIONS.find(x => x.key === prefs.fontFamily);
+    ensureGoogleFont(f.google);
+    root.setProperty("--heading-font", f.family); root.setProperty("--body-font", f.family);
+    if(f.key === "Minecraft" || f.key === "VT323") root.setProperty("font-synthesis", "none"); else root.removeProperty("font-synthesis");
+  } else if(currentTheme === "custom") applyCustomTheme();
+  else { root.removeProperty("--heading-font"); root.removeProperty("--body-font"); }
+}
+function setUserFont(v){
+  if(v !== "theme" && !FONT_OPTIONS.some(x => x.key === v)) return;
+  prefs.fontFamily = v; savePrefs(); applyUserFont();
+}
+function fontSelectHtml(){
+  const opt = f => `<option value="${f.key}" ${prefs.fontFamily === f.key ? 'selected' : ''} style="font-family:${f.family.replace(/"/g, "'")}">${f.key}</option>`;
+  return `<select class="dropdown" onchange="setUserFont(this.value)" aria-label="Schriftart">
+    <option value="theme" ${prefs.fontFamily === 'theme' ? 'selected' : ''}>Wie im Theme</option>
+    <optgroup label="Lesefreundlich">${FONT_OPTIONS.filter(f => f.read).map(opt).join("")}</optgroup>
+    <optgroup label="Weitere">${FONT_OPTIONS.filter(f => !f.read).map(opt).join("")}</optgroup></select>`;
 }
 function ensureGoogleFont(query){
   if(!query) return;
@@ -4687,6 +4896,7 @@ function applyCustomTheme(){
   if(f.key === "Minecraft") root.setProperty("font-synthesis", "none");
   else root.removeProperty("font-synthesis");
   root.setProperty("--body-bg-image", bgImage);
+  if(userFontActive()) applyUserFont();
 }
 
 /* Cursor-Leuchtkreis: folgt der Maus mit weichem Nachziehen (Easing) */
@@ -4719,26 +4929,56 @@ function currentDesign(){
   if(currentTheme === "custom"){
     return DESIGN_OPTIONS.some(o => o.key === customTheme.design) ? customTheme.design : "standard";
   }
-  return ["modern", "glass", "norisk"].includes(currentTheme) ? currentTheme : "standard";
+  return ["modern", "glass", "norisk", "terminal", "synthwave"].includes(currentTheme) ? currentTheme : "standard";
 }
 function syncDesign(){
   const d = currentDesign();
   document.documentElement.setAttribute("data-design", d);
   if(d === "norisk" && !prefs.reduceMotion) startCursorGlow(); else stopCursorGlow();
 }
-function applyTheme(theme){
+const THEME_GOOGLE = { terminal: ["VT323", "IBM+Plex+Mono:wght@400;600"], synthwave: ["Orbitron:wght@500;700"], halloween: ["Creepster"] };
+function applyTheme(theme, auto){
   currentTheme = theme;
+  (THEME_GOOGLE[theme] || []).forEach(ensureGoogleFont);
   syncDesign();
   document.documentElement.setAttribute("data-theme", theme);
   if(theme === "custom"){ applyCustomTheme(); }
   else { clearCustomOverrides(); }
-  try{ localStorage.setItem(THEME_STORAGE_KEY, theme); }catch(e){ /* best effort */ }
+  applyUserFont();
+  if(!auto){ try{ localStorage.setItem(THEME_STORAGE_KEY, theme); }catch(e){ /* best effort */ } }
 }
 function loadTheme(){
   loadCustomTheme();
+  applySeasonOrSaved();
+}
+/* Jahreszeiten-Themes: Feiertage (Halloween, Weihnachten) und optional die Jahreszeiten, nach Datum.
+   Das gespeicherte Theme bleibt unverändert; „Benutzerdefiniert“ wird nie überschrieben. */
+function seasonalEventTheme(d){
+  const md = (d.getMonth() + 1) * 100 + d.getDate();
+  if(md >= 1024 && md <= 1101) return "halloween";
+  if(md >= 1201 && md <= 1226) return "weihnachten";
+  return null;
+}
+function seasonOfYearTheme(d){
+  const m = d.getMonth() + 1;
+  return m >= 3 && m <= 5 ? "fruehling" : m >= 6 && m <= 8 ? "sommer" : m >= 9 && m <= 11 ? "herbst" : "winter";
+}
+function effectiveSeasonTheme(){
+  if(prefs.seasonal === "off") return null;
+  const d = new Date();
+  return seasonalEventTheme(d) || (prefs.seasonal === "all" ? seasonOfYearTheme(d) : null);
+}
+function applySeasonOrSaved(){
   let saved = null;
   try{ saved = localStorage.getItem(THEME_STORAGE_KEY); }catch(e){}
-  applyTheme(saved && THEME_INFO.some(t => t.key === saved) ? saved : "og");
+  if(!(saved && THEME_INFO.some(t => t.key === saved))) saved = "og";
+  const sea = effectiveSeasonTheme();
+  if(sea && saved !== "custom") applyTheme(sea, true); else applyTheme(saved);
+}
+function setSeasonal(v){
+  if(!["off", "events", "all"].includes(v)) return;
+  prefs.seasonal = v; savePrefs();
+  applySeasonOrSaved(); render();
 }
 
 function setCustomColor(key, value){
@@ -4819,6 +5059,7 @@ function turnTimerActive(){
     (state.phase === "placing" || state.phase === "revealed_pending");
 }
 function turnDialogOpen(){
+  if(paused) return true;
   if(state.online) return netWaitingSeat() >= 0;
   return !!(state.showExitDialog || state.saveSlotDialogOpen || state.confirmOverwriteSave ||
             state.confirmDeleteSlot || state.pendingSpend);
@@ -4894,6 +5135,7 @@ function timeoutTurn(){
     guessCheck: { said:{ t:"", a:"", y:"" }, titleOk:false, artistOk:false, yearOk:false, both:false },
     difficulty: state.settings.difficulty, bonusAwarded: false
   };
+  chronicleAdd({ n: state.turnNo || 0, p: chroName(), t: song.t, a: song.a, y: song.y, k: "timeout", c: "" });
   state.guessResult = null;
   state.guess = { t:"", a:"", y:"" };
   state.pendingGap = null;
@@ -5025,6 +5267,7 @@ function netHostReady(entry, d){
 function lobbyExtraButtons(host, seats, info){
   if(info.resume) return ``;
   if(host) return seats.length >= 2 ? `<button class="btn-ghost" onclick="netRollOrder()">🎲 Reihenfolge würfeln</button>` : ``;
+  if(NET.spec) return `<div class="stats-note" style="width:100%; text-align:center;">👁 Du schaust zu.</div>`;
   if(NET.status !== "connected" || NET.started) return ``;
   const me = seats.find(x => netSameName(x.name, NET.myName));
   const on = !!(me && me.ready);
@@ -5089,6 +5332,324 @@ function confettiCheck(){
   if(good || r.bonusAwarded) confettiBurst(good && r.bonusAwarded ? "medium" : "small");
 }
 
+/* ============ ABLAUF & DARSTELLUNG: Auto-Weiter, Kartengröße, Dichte, Tastatur ============ */
+const SEL_CARD = [["s", "Klein"], ["m", "Normal"], ["l", "Groß"], ["xl", "Sehr groß"]];
+const SEL_DENS = [["tight", "Kompakt"], ["normal", "Normal"], ["wide", "Weit"]];
+const SEL_NEXT = [[0, "Aus"], [3, "3 s"], [5, "5 s"], [8, "8 s"], [10, "10 s"], [15, "15 s"], [20, "20 s"]];
+const PREF_CHOICES = { cardSize: ["s", "m", "l", "xl"], density: ["tight", "normal", "wide"], autoNextSec: [0, 3, 5, 8, 10, 15, 20] };
+function setPlayPref(key, v){
+  const list = PREF_CHOICES[key]; if(!list) return;
+  const val = typeof list[0] === "number" ? parseInt(v, 10) : v;
+  if(!list.includes(val)) return;
+  prefs[key] = val; savePrefs(); applyPrefs();
+}
+function prefSelect(key, opts){
+  return `<select class="dropdown" onchange="setPlayPref('${key}', this.value)">${opts.map(([v, l]) => `<option value="${v}" ${String(prefs[key]) === String(v) ? 'selected' : ''}>${l}</option>`).join("")}</select>`;
+}
+function renderPlayCard(){
+  return `
+    <div class="menu-card">
+      <h3>Ablauf &amp; Darstellung</h3>
+      <div class="settings-grid">
+        <div class="setting-row">
+          <div><div class="label">Automatisch weiter nach dem Ergebnis</div><div class="hint">Nach dieser Zeit geht es von selbst zur nächsten Karte bzw. zum nächsten Spieler. Online zählt die Einstellung dessen, der „Weiter“ drücken darf.</div></div>
+          ${prefSelect("autoNextSec", SEL_NEXT)}
+        </div>
+        <div class="setting-row">
+          <div><div class="label">Schriftart</div><div class="hint">Gilt für das ganze Spiel und überschreibt die Schrift des Themes. „Lesefreundlich“ enthält Schriften, die gezielt gut lesbar entworfen wurden (z. B. Atkinson Hyperlegible, Lexend). Die Schriften werden von Google Fonts geladen, ohne Internet greift eine Standardschrift.</div></div>
+          ${fontSelectHtml()}
+        </div>
+        <div class="setting-row">
+          <div><div class="label">Kartengröße</div><div class="hint">Größe der Karten auf der Zeitleiste.</div></div>
+          ${prefSelect("cardSize", SEL_CARD)}
+        </div>
+        <div class="setting-row">
+          <div><div class="label">Dichte der Zeitleiste</div><div class="hint">Abstand zwischen den Karten (die Punkte zum Platzieren).</div></div>
+          ${prefSelect("density", SEL_DENS)}
+        </div>
+        <div class="setting-row">
+          <div><div class="label">Tastatursteuerung (PC)</div><div class="hint">← → Lücke wählen · Enter/Leertaste bestätigen, aufdecken, weiter · Rücktaste Position ändern · S Überspringen · B Kaufen · P Pause (nur lokal) · Esc Menü. Nicht aktiv, während du in ein Textfeld tippst.</div></div>
+          <div class="switch ${prefs.keys ? 'on' : ''}" role="switch" tabindex="0" aria-checked="${!!prefs.keys}" aria-label="Tastatursteuerung"
+            onclick="togglePref('keys')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePref('keys');}"><div class="knob"></div></div>
+        </div>
+      </div>
+    </div>`;
+}
+function playQmHtml(){
+  return `
+    <div class="qm-section">
+      <div class="qm-title">Ablauf &amp; Anzeige</div>
+      <div class="setting-row"><div class="label">Auto-Weiter</div>${prefSelect("autoNextSec", SEL_NEXT)}</div>
+      <div class="setting-row"><div class="label">Kartengröße</div>${prefSelect("cardSize", SEL_CARD)}</div>
+      <div class="setting-row"><div class="label">Zeitleisten-Dichte</div>${prefSelect("density", SEL_DENS)}</div>
+    </div>`;
+}
+
+/* Auto-Weiter: zählt im Ergebnis-Bildschirm herunter und klickt dann „Weiter“ (nur wer den Button hat). */
+let anKey = "", anDeadline = 0, anLast = Date.now();
+function autoNextTick(){
+  const now = Date.now(), dt = now - anLast; anLast = now;
+  const btn = state.screen === "game" && state.phase === "feedback" ? document.querySelector('button[onclick="nextTurn()"]') : null;
+  if(!btn || !prefs.autoNextSec){ anKey = ""; return; }
+  const key = ((state.lastResult && state.lastResult.ts) || 0) + ":" + state.correctCount + ":" + state.wrongCount + ":" + (state.turnNo || 0);
+  if(key !== anKey){ anKey = key; anDeadline = now + prefs.autoNextSec * 1000; }
+  if(turnDialogOpen() || quickMenuOpen) anDeadline += dt;
+  const left = Math.max(0, Math.ceil((anDeadline - now) / 1000));
+  if(!btn.dataset.base) btn.dataset.base = btn.textContent;
+  btn.textContent = btn.dataset.base + " (" + left + ")";
+  if(anDeadline - now <= 0){ anDeadline = now + 1e9; btn.click(); }
+}
+
+/* Tastatursteuerung: nutzt die vorhandenen Buttons, damit alle Bedingungen (wer darf, welche Phase) gelten. */
+let kbGap = null, kbPhase = "";
+function kbSync(){ if(state.phase !== kbPhase){ kbPhase = state.phase; kbGap = null; } }
+function kbClick(sel){ const b = document.querySelector(sel); if(b){ b.click(); return true; } return false; }
+function kbMoveGap(dir){
+  const gs = [...document.querySelectorAll(".gap")];
+  const ok = gs.map((g, i) => g.classList.contains("locked") ? -1 : i).filter(i => i >= 0);
+  if(!ok.length) return false;
+  let pos = kbGap == null ? -1 : ok.indexOf(kbGap);
+  pos = pos < 0 ? Math.floor((ok.length - 1) / 2) : Math.max(0, Math.min(ok.length - 1, pos + dir));
+  kbGap = ok[pos];
+  gs.forEach((g, i) => g.classList.toggle("kb", i === kbGap));
+  gs[kbGap].scrollIntoView({ block: "nearest", inline: "center", behavior: prefs.reduceMotion ? "auto" : "smooth" });
+  return true;
+}
+function kbConfirm(){
+  const gs = [...document.querySelectorAll(".gap")];
+  if(kbGap != null && gs[kbGap] && !gs[kbGap].classList.contains("locked")){ gs[kbGap].click(); return true; }
+  return kbClick('button[onclick="revealCard()"]') || kbClick('button[onclick="nextTurn()"]') || kbClick('button[onclick*="resolveChallenge"]');
+}
+document.addEventListener("keydown", e => {
+  if(!prefs.keys || e.ctrlKey || e.metaKey || e.altKey || state.screen !== "game") return;
+  const t = e.target, tag = t && t.tagName;
+  if(tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (t && t.isContentEditable)) return;
+  if(tag === "BUTTON" && (e.key === "Enter" || e.key === " ")) return;   // normale Button-Bedienung nicht doppeln
+  const k = e.key; let used = false;
+  if(paused){ if(k === "Enter" || k === " " || k === "Escape" || k === "p" || k === "P"){ pauseToggle(); e.preventDefault(); } return; }
+  if((k === "p" || k === "P") && !state.online && !quickMenuOpen){ pauseToggle(); e.preventDefault(); return; }
+  if(document.querySelector('button[onclick="confirmSpend()"]')){
+    if(k === "Enter") used = kbClick('button[onclick="confirmSpend()"]');
+    else if(k === "Escape") used = kbClick('button[onclick="cancelSpend()"]');
+  } else if(quickMenuOpen || turnDialogOpen()) return;
+  else if(k === "ArrowLeft" || k === "a" || k === "A") used = kbMoveGap(-1);
+  else if(k === "ArrowRight" || k === "d" || k === "D") used = kbMoveGap(1) || kbClick('button[onclick="nextTurn()"]');
+  else if(k === "Enter" || k === " ") used = kbConfirm();
+  else if(k === "Backspace") used = kbClick('button[onclick="changePosition()"]');
+  else if(k === "s" || k === "S") used = kbClick('button[onclick="requestSkip()"]');
+  else if(k === "b" || k === "B") used = kbClick('button[onclick="requestBuy()"]');
+  if(used) e.preventDefault();
+});
+
+/* ============ JAHRESRÜCKBLICK ============
+   Wird ab dieser Version pro Kalenderjahr mitgezählt (ältere Gesamtwerte lassen sich keinem Jahr zuordnen). */
+let recapYear = null;
+const MONTHS_DE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+function openRecap(){ recapYear = String(new Date().getFullYear()); state.screen = "recap"; render(); }
+function setRecapYear(y){ recapYear = String(y); render(); }
+function renderRecap(){
+  const years = Object.keys(stats.years || {});
+  const cur = String(new Date().getFullYear());
+  if(!years.includes(cur)) years.push(cur);
+  years.sort((a, b) => b - a);
+  if(!recapYear || !years.includes(recapYear)) recapYear = cur;
+  const ys = (stats.years || {})[recapYear];
+  const tile = (n, l) => `<div class="stat-tile"><div class="n">${n}</div><div class="l">${l}</div></div>`;
+  const yearSel = `<select class="dropdown" onchange="setRecapYear(this.value)" aria-label="Jahr">${years.map(y => `<option value="${y}" ${y === recapYear ? 'selected' : ''}>${y}</option>`).join("")}</select>`;
+  let body = "";
+  const cards = ys ? ys.correct + ys.wrong : 0;
+  if(!ys || cards === 0){
+    body = `<div class="menu-card"><h3>Noch keine Daten für ${recapYear}</h3>
+      <div class="stats-note">Der Jahresrückblick zählt ab dieser Version mit: jede aufgedeckte Karte, jedes beendete Spiel und jeder Einspruch landet im jeweiligen Kalenderjahr. Ältere Gesamtwerte (Menü „Statistiken“) lassen sich keinem Jahr zuordnen. Spiel ein paar Karten, dann füllt sich diese Seite.</div></div>`;
+  } else {
+    const g = ys.games, decided = g.solo.played + g.coop.played, wins = g.solo.won + g.coop.won, total = decided + g.multiplayer.played;
+    const dayKeys = Object.keys(ys.days);
+    const perMonth = Array(12).fill(0);
+    dayKeys.forEach(k => { perMonth[parseInt(k.slice(5, 7), 10) - 1] += ys.days[k]; });
+    const maxM = Math.max(...perMonth), bestMonth = perMonth.indexOf(maxM);
+    let bestDay = dayKeys[0]; dayKeys.forEach(k => { if(ys.days[k] > ys.days[bestDay]) bestDay = k; });
+    const decs = Object.entries(ys.dec || {});
+    const favDec = decs.slice().sort((a, b) => b[1].n - a[1].n)[0];
+    const strongDec = decs.filter(d => d[1].n >= 5).sort((a, b) => b[1].ok / b[1].n - a[1].ok / a[1].n)[0];
+    const bars = perMonth.map((n, i) => `<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; min-width:0;">
+        <div style="height:90px; width:100%; display:flex; align-items:flex-end;"><div title="${MONTHS_DE[i]}: ${n} Karten" style="width:100%; height:${maxM ? Math.max(n ? 4 : 0, Math.round(n / maxM * 90)) : 0}px; background:var(--accent); border-radius:4px 4px 0 0;"></div></div>
+        <div style="font-size:calc(11px * var(--font-scale)); color:var(--muted);">${MONTHS_DE[i].slice(0, 3)}</div></div>`).join("");
+    body = `
+      <div class="menu-card"><h3>${recapYear} in Zahlen</h3>
+        <div class="stats-grid">
+          ${tile(total, "Spiele gespielt")}
+          ${tile(wins, "Siege (Solo &amp; Koop)")}
+          ${tile(cards, "Karten aufgedeckt")}
+          ${tile(pct(ys.correct, cards), "Trefferquote")}
+          ${tile(ys.bestStreak, "Längste Serie")}
+          ${tile(dayKeys.length, "Tage gespielt")}
+          ${tile(ys.ruf.won, "Einsprüche gewonnen")}
+          ${tile(ys.ruf.lost, "Einsprüche verloren")}
+          ${tile(ys.timeouts, "Zeit abgelaufen")}
+        </div></div>
+      <div class="menu-card"><h3>Highlights</h3>
+        <div class="stats-row"><span>Aktivster Monat</span><b>${MONTHS_DE[bestMonth]} (${maxM} Karten)</b></div>
+        <div class="stats-row"><span>Aktivster Tag</span><b>${new Date(bestDay + "T12:00:00").toLocaleDateString("de-DE")} (${ys.days[bestDay]} Karten)</b></div>
+        ${favDec ? `<div class="stats-row"><span>Meistgespieltes Jahrzehnt</span><b>${favDec[0]}er (${favDec[1].n} Karten, ${pct(favDec[1].ok, favDec[1].n)} richtig)</b></div>` : ``}
+        ${strongDec ? `<div class="stats-row"><span>Stärkstes Jahrzehnt (ab 5 Karten)</span><b>${strongDec[0]}er (${pct(strongDec[1].ok, strongDec[1].n)} richtig)</b></div>` : ``}
+      </div>
+      <div class="menu-card"><h3>Karten pro Monat</h3>
+        <div style="display:flex; gap:6px; align-items:flex-end;">${bars}</div>
+        <div class="stats-note">Trefferquote: richtige Karten ÷ alle aufgedeckten Karten; ein abgelaufener Zug zählt als falsch. Die Werte liegen nur in diesem Browser; „Statistiken zurücksetzen“ löscht auch den Jahresrückblick.</div>
+      </div>`;
+  }
+  app.innerHTML = `
+    <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Jahresrückblick</h1></div>
+    <div class="menu-card"><div class="setting-row"><div class="label">Jahr</div>${yearSel}</div></div>
+    ${body}
+    <div class="menu-actions">
+      <button class="btn-ghost" onclick="openStats()">Zu den Statistiken</button>
+      <button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button>
+    </div>`;
+}
+
+/* ============ EMOJI-REAKTIONEN (online) ============ */
+const NET_REACTS = ["👏", "😂", "😮", "🔥", "😢", "🎉", "👍", "🤔"];
+let lastReactSend = 0;
+function showReaction(name, e){
+  let box = document.getElementById("react-float");
+  if(!box){ box = document.createElement("div"); box.id = "react-float"; document.body.appendChild(box); }
+  const el = document.createElement("div");
+  el.className = "react-pop" + (prefs.reduceMotion ? " still" : "");
+  el.style.left = (8 + Math.random() * 60) + "%";
+  el.innerHTML = `<span class="re">${e}</span><span class="rn"></span>`;
+  el.querySelector(".rn").textContent = String(name || "").slice(0, 20);
+  box.appendChild(el);
+  setTimeout(() => el.remove(), 2800);
+}
+function netSendReaction(e){
+  if(!NET.role || !NET_REACTS.includes(e)) return;
+  const now = Date.now(); if(now - lastReactSend < 600) return; lastReactSend = now;
+  showReaction(NET.myName, e);
+  if(NET.role === "host") netBroadcast({ t: "react", n: NET.myName, e }); else netSendHost({ t: "react", e });
+}
+function netHostReact(entry, d){
+  if(!NET_REACTS.includes(d.e)) return;
+  const now = Date.now(); if(now - (entry.lastReact || 0) < 600) return; entry.lastReact = now;
+  const name = entry.spec ? (NET.specs.find(x => "~" + netKey(x) === entry.key) || "?")
+                          : ((NET.seats.find(q => netKey(q.name) === entry.key) || {}).name || "?");
+  netBroadcast({ t: "react", n: name, e: d.e }, entry.key);
+  showReaction(name, d.e);
+}
+function reactUiSync(){
+  const show = !!(state.online && NET.role && ["game", "end", "timeline"].includes(state.screen));
+  let el = document.getElementById("react-bar");
+  if(!show){ if(el) el.remove(); return; }
+  if(el) return;
+  el = document.createElement("div"); el.id = "react-bar";
+  el.innerHTML = `<button class="fab-btn" aria-label="Reaktionen" onclick="document.getElementById('react-bar').classList.toggle('open')">😀</button><div class="react-row">${NET_REACTS.map(x => `<button aria-label="Reaktion ${x}" onclick="netSendReaction('${x}')">${x}</button>`).join("")}</div>`;
+  document.body.appendChild(el);
+}
+
+/* ============ REMATCH (gleicher Raum, neues Spiel) ============ */
+function toast(msg){
+  const el = document.createElement("div");
+  el.className = "autosave-toast"; el.textContent = msg;
+  document.body.appendChild(el); setTimeout(() => el.remove(), 2600);
+}
+async function netRematch(){
+  if(NET.role !== "host" || !NET.started || !state.online || state.screen === "game") return;
+  NET.seats = NET.seats.filter(q => q.connected);
+  if(NET.seats.length < 2){ toast("Für ein Rematch werden mindestens 2 verbundene Spieler benötigt."); render(); return; }
+  const settings = JSON.parse(JSON.stringify(state.settings)), names = NET.seats.map(q => q.name);
+  const slot = state.activeSlot, room = state.activeSaveName;
+  if(settings.mode === "multiplayer"){ settings.playerCount = names.length; newGame(settings, names); } else newGame(settings);
+  state.online = true; state.net = { seats: NET.seats, turn: 0 }; state.turnNo = state.turnNo || 1;
+  const st = Math.floor(Math.random() * NET.seats.length);   // neuer Startspieler
+  if(st > 0){
+    if(isMulti()){ syncActiveToPlayer(); state.currentPlayer = st; loadActiveFromPlayer(); } else state.net.turn = st;
+  }
+  state.activeSlot = slot; state.activeSaveName = room;
+  NET.lastSig = ""; NET.playedTurn = -1; NET.orderStart = null;
+  if(slot){ try{ const snap = JSON.parse(JSON.stringify(state)); snap.savedAt = Date.now(); snap.name = room; snap.turnDeadline = null; snap.chDeadline = null; await writeSlot(slot, snap); }catch(e){} }
+  render();
+}
+function endExtraHtml(){
+  let h = `<button class="btn-ghost" onclick="openChronicle()">📜 Spielchronik</button>`;
+  if(state.online && NET.role === "host") h += `<button class="btn-primary" onclick="netRematch()">🔁 Rematch (gleicher Raum, neues Spiel)</button>`;
+  else if(state.online && NET.role === "guest") h += `<div class="stats-note" style="width:100%; text-align:center;">Der Host kann ein Rematch starten – dann geht es hier automatisch weiter.</div>`;
+  return h;
+}
+
+/* ============ SPIELCHRONIK ============ */
+function chronicleAdd(e){
+  if(!state.chronicle) state.chronicle = [];
+  state.chronicle.push(e);
+  if(state.chronicle.length > 300) state.chronicle.shift();
+}
+function chroName(){
+  if(isMulti() && state.players && state.players[state.currentPlayer]) return state.players[state.currentPlayer].name;
+  if(state.online && state.net){ const q = state.net.seats[netActiveSeat()]; return q ? q.name : ""; }
+  return "";
+}
+function closeChronicle(){ const el = document.getElementById("chron-overlay"); if(el) el.remove(); }
+function openChronicle(){
+  closeChronicle();
+  const K = { ok: "✓ richtig", wrong: "✕ falsch", timeout: "⏱ Zeit abgelaufen", skip: "⏭ übersprungen", buy: "🛒 gekauft" };
+  const list = (state.chronicle || []).slice().reverse();
+  const rows = list.length ? list.map(e => `
+    <div class="chron-row ${e.k}">
+      <div class="chron-n">${e.n ? 'Zug ' + e.n : ''}${e.p ? (e.n ? ' · ' : '') + esc(e.p) : ''}</div>
+      <div class="chron-song"><b>${esc(e.t)}</b> – ${esc(e.a)}${e.y ? ' (' + e.y + ')' : ''}</div>
+      <div class="chron-k">${K[e.k] || ''}${e.c ? ' · ' + esc(e.c) : ''}</div>
+    </div>`).join("") : `<div class="stats-note">Noch keine Züge. Die Chronik füllt sich, sobald eine Karte aufgedeckt, übersprungen oder gekauft wurde.</div>`;
+  const el = document.createElement("div");
+  el.id = "chron-overlay"; el.className = "chron-overlay";
+  el.onclick = ev => { if(ev.target === el) closeChronicle(); };
+  el.innerHTML = `<div class="chron-box" role="dialog" aria-label="Spielchronik">
+    <div class="chron-head"><h3>📜 Spielchronik (${list.length})</h3><button class="btn-ghost btn-small" onclick="closeChronicle()">Schließen</button></div>
+    <div class="chron-list">${rows}</div></div>`;
+  document.body.appendChild(el);
+}
+document.addEventListener("keydown", e => { if(e.key === "Escape") closeChronicle(); });
+function chronicleQmHtml(){
+  if(!["game", "end", "timeline"].includes(state.screen)) return ``;
+  return `<div class="qm-section"><div class="qm-title">Spiel</div><button class="btn-ghost" onclick="toggleQuickMenu(false); openChronicle()">📜 Spielchronik</button></div>`;
+}
+
+/* ============ SPIELSTAND-VORSCHAU (Mini-Zeitleiste) ============ */
+function miniTimelineHtml(slot){
+  const lists = [];
+  if(slot.settings && slot.settings.mode === "multiplayer" && Array.isArray(slot.players) && slot.players.length > 1)
+    slot.players.slice(0, 6).forEach(q => lists.push({ n: q.name || "", tl: q.timeline || [] }));
+  else lists.push({ n: "", tl: slot.timeline || [] });
+  const rows = lists.map(l => {
+    const ys = l.tl.map(c => c && c.y).filter(y => typeof y === "number");
+    if(!ys.length) return ``;
+    const shown = ys.slice(0, 14), more = ys.length - shown.length;
+    return `<div class="mini-tl-row">${l.n ? `<span class="mt-name">${esc(l.n)}</span>` : ``}<div class="mini-tl">${shown.map(y => `<span class="mt-card" title="${y}">${y}</span>`).join('<span class="mt-link"></span>')}${more > 0 ? `<span class="mt-more">+${more}</span>` : ``}</div></div>`;
+  }).join("");
+  return rows ? `<div class="mini-tl-wrap">${rows}</div>` : ``;
+}
+
+/* ============ PAUSE (nur lokal) ============ */
+let paused = false;
+function pauseToggle(){
+  if(state.online || state.screen !== "game") return;
+  paused = !paused;
+  if(paused) pauseSpotifyPlayback();
+  else if((state.phase === "placing" || state.phase === "revealed_pending") && state.current && state.current.id && !useFallbackEmbed) requestSpotifyPlay(state.current);
+  pauseUiSync();
+}
+function pauseUiSync(){
+  const can = !state.online && state.screen === "game";
+  if(!can && paused) paused = false;
+  let fab = document.getElementById("pause-fab"), ov = document.getElementById("pause-overlay");
+  if(!can){ if(fab) fab.remove(); if(ov) ov.remove(); return; }
+  if(!fab){ fab = document.createElement("button"); fab.id = "pause-fab"; fab.className = "fab-btn"; fab.setAttribute("aria-label", "Pause"); fab.title = "Pause (P)"; fab.textContent = "⏸"; fab.onclick = pauseToggle; document.body.appendChild(fab); }
+  fab.style.display = paused ? "none" : "";
+  if(paused && !ov){
+    ov = document.createElement("div"); ov.id = "pause-overlay";
+    ov.innerHTML = `<div class="pause-box"><div class="pause-ic">⏸</div><h2>Pause</h2><p>Das Zeitlimit steht still und die Karten sind verdeckt. Beim Fortsetzen startet der Song neu.</p><button class="btn-primary" onclick="pauseToggle()">▶ Weiter</button></div>`;
+    document.body.appendChild(ov);
+  } else if(!paused && ov) ov.remove();
+}
+
 /* ============ STATISTIKEN ============
    Liegen nur lokal in diesem Browser (localStorage). Karten werden live gezählt
    (auch aus abgebrochenen Runden), Spiele beim Erreichen des Endbildschirms. */
@@ -5098,7 +5659,8 @@ function freshStats(){
     since: null,
     games: { solo:{ played:0, won:0 }, coop:{ played:0, won:0 }, multiplayer:{ played:0 } },
     correct: 0, wrong: 0, timeouts: 0, curStreak: 0, bestStreak: 0,
-    ruf: { won: 0, lost: 0 }
+    ruf: { won: 0, lost: 0 },
+    years: {}
   };
 }
 let stats = freshStats();
@@ -5119,6 +5681,13 @@ function saveStats(){
   try{ localStorage.setItem(STATS_KEY, JSON.stringify(stats)); }catch(e){}
 }
 function statsTouch(){ if(!stats.since) stats.since = Date.now(); }
+function dateKey(d){ d = d || new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+function yearStat(y){
+  y = String(y || new Date().getFullYear());
+  if(!stats.years) stats.years = {};
+  if(!stats.years[y]) stats.years[y] = { correct: 0, wrong: 0, timeouts: 0, bestStreak: 0, games: { solo: { played: 0, won: 0 }, coop: { played: 0, won: 0 }, multiplayer: { played: 0 } }, ruf: { won: 0, lost: 0 }, days: {}, dec: {} };
+  return stats.years[y];
+}
 function statsAddTurn(ok, timedOut){
   statsTouch();
   if(ok) stats.correct += 1; else stats.wrong += 1;
@@ -5127,6 +5696,18 @@ function statsAddTurn(ok, timedOut){
   if(!isMultiRound()){
     if(ok){ stats.curStreak += 1; stats.bestStreak = Math.max(stats.bestStreak, stats.curStreak); }
     else stats.curStreak = 0;
+  }
+  { // Jahresrückblick: pro Jahr, Tag und Jahrzehnt der Karte
+    const ys = yearStat(), k = dateKey();
+    ys.days[k] = (ys.days[k] || 0) + 1;
+    if(ok) ys.correct += 1; else ys.wrong += 1;
+    if(timedOut) ys.timeouts += 1;
+    ys.bestStreak = Math.max(ys.bestStreak, stats.curStreak);
+    const sg = state.current;
+    if(sg && typeof sg.y === "number"){
+      const dk = String(Math.floor(sg.y / 10) * 10), dd = ys.dec[dk] || (ys.dec[dk] = { n: 0, ok: 0 });
+      dd.n += 1; if(ok) dd.ok += 1;
+    }
   }
   saveStats();
 }
@@ -5138,6 +5719,7 @@ function maybeRecordGameEnd(){
              : (state.settings.mode === "multiplayer" && isMultiRound()) ? "multiplayer" : "solo";
   stats.games[mode].played += 1;
   if(mode !== "multiplayer" && state.won) stats.games[mode].won += 1;
+  { const yg = yearStat().games[mode]; yg.played += 1; if(mode !== "multiplayer" && state.won) yg.won += 1; }
   sfx(mode === "multiplayer" || state.won ? "win" : "lose", 0.7);
   if(mode === "multiplayer" || state.won) confettiBurst("big");
   saveStats();
@@ -5174,6 +5756,7 @@ function renderStats(){
       <div class="stats-row"><span>Solo</span><b>${g.solo.played} gespielt · ${g.solo.won} gewonnen</b></div>
       <div class="stats-row"><span>Koop</span><b>${g.coop.played} gespielt · ${g.coop.won} gewonnen</b></div>
       <div class="stats-row"><span>Mehrspieler</span><b>${g.multiplayer.played} gespielt</b></div>
+      <div class="menu-actions" style="margin-top:10px;"><button class="btn-ghost" onclick="openRecap()">Jahresrückblick ansehen</button></div>
       <div class="stats-note">
         ${since ? `Erfasst seit ${since}. ` : `Noch keine Daten — sie erscheinen nach deiner ersten Karte. `}
         Siegquote: nur Solo und Koop (Mehrspieler-Runden haben mehrere Spieler und zählen nur als gespielt).
@@ -5358,7 +5941,7 @@ document.addEventListener("click", e => {
 
 /* ============ DARSTELLUNG & BARRIEREFREIHEIT ============ */
 const PREFS_KEY = "chronohit_prefs";
-const PREF_DEFAULTS = { reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, autoSave: "turn", autoSaveSec: 30, sound: true, soundVolume: 0.5, soundGroups: null };
+const PREF_DEFAULTS = { reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, autoSave: "turn", autoSaveSec: 30, seasonal: "off", fontFamily: "theme", cardSize: "m", density: "normal", autoNextSec: 0, keys: true, sound: true, soundVolume: 0.5, soundGroups: null };
 let prefs = { ...PREF_DEFAULTS, reduceMotion: false, soundGroups: defaultSoundGroups() };
 function loadPrefs(){
   let saved = {};
@@ -5372,6 +5955,12 @@ function loadPrefs(){
   const sv = parseFloat(prefs.soundVolume);
   prefs.soundVolume = isFinite(sv) ? Math.min(1, Math.max(0, sv)) : 0.5;
   if(!["off", "turn", "interval"].includes(prefs.autoSave)) prefs.autoSave = "turn";
+  if(!["off", "events", "all"].includes(prefs.seasonal)) prefs.seasonal = "off";
+  if(typeof prefs.fontFamily !== "string") prefs.fontFamily = "theme";
+  if(!["s", "m", "l", "xl"].includes(prefs.cardSize)) prefs.cardSize = "m";
+  if(!["tight", "normal", "wide"].includes(prefs.density)) prefs.density = "normal";
+  if(![0, 3, 5, 8, 10, 15, 20].includes(prefs.autoNextSec)) prefs.autoNextSec = 0;
+  prefs.keys = prefs.keys !== false;
   { const as = parseInt(prefs.autoSaveSec, 10); prefs.autoSaveSec = [10, 15, 30, 60, 120, 300].includes(as) ? as : 30; }
   const fs = parseFloat(prefs.fontScale);
   prefs.fontScale = isFinite(fs) ? Math.min(1.3, Math.max(0.85, fs)) : 1;
@@ -5387,6 +5976,8 @@ function applyPrefs(){
   root.classList.toggle("high-contrast", !!prefs.highContrast);
   root.classList.toggle("cb-safe", !!prefs.colorSafe);
   root.style.setProperty("--font-scale", String(prefs.fontScale));
+  { const cw = { s: 96, m: 118, l: 146, xl: 176 }[prefs.cardSize] || 118, gw = { tight: 14, normal: 26, wide: 44 }[prefs.density] || 26;
+    root.style.setProperty("--card-w", cw + "px"); root.style.setProperty("--card-scale", String(cw / 118)); root.style.setProperty("--gap-w", gw + "px"); }
   syncDesign();
 }
 function togglePref(key){
@@ -5511,7 +6102,7 @@ const NET_LOCAL_DEFAULTS = {
 const NET = {
   role: null, peer: null, status: "idle", error: "", notice: "",
   roomLabel: "", roomId: "", macKey: null, myName: "", hostPw: "", showPw: false,
-  seats: [], entries: new Map(), pending: new Set(), started: false, config: null, resume: false,
+  seats: [], specs: [], spec: false, entries: new Map(), pending: new Set(), started: false, config: null, resume: false,
   hostConn: null, lobby: { seats: [], info: null }, lastHost: 0, reconnectTries: 0, reconnectTimer: null,
   bcTimer: null, lastSig: "", seq: 0, guessTimer: null, saveTimer: null, tickTimer: null,
   depth: 0, bypass: false, playedTurn: -1, prevSettings: null, leaving: false, idRetry: 0,
@@ -5671,7 +6262,8 @@ function netPublicSettings(s){
   return {
     mode: s.mode, difficulty: s.difficulty, target: s.target, tokens: !!s.tokens, maxTokens: s.maxTokens,
     startTokens: s.startTokens, turnLimit: s.turnLimit || 0, playerCount: s.playerCount || 0, challenge: !!s.challenge,
-    challengeMode: ["manual", "5", "10", "limit"].includes(s.challengeMode) ? s.challengeMode : "manual"
+    challengeMode: ["manual", "5", "10", "limit"].includes(s.challengeMode) ? s.challengeMode : "manual",
+    yearTol: netInt(s.yearTol, 0, 0, 5)
   };
 }
 function netBuildSnapshot(){
@@ -5687,7 +6279,7 @@ function netBuildSnapshot(){
     tokens: st.tokens, correctCount: st.correctCount, wrongCount: st.wrongCount, won: st.won, bonusClaimed: st.bonusClaimed,
     guess: st.guess, guessResult: st.guessResult, skippedInfo: st.skippedInfo, wrongSongs: st.wrongSongs || [],
     challenge: st.challenge ? { caller: st.challenge.caller, gap: st.challenge.gap } : null,
-    players: st.players || [], currentPlayer: st.currentPlayer || 0, winners: st.winners || [],
+    players: st.players || [], currentPlayer: st.currentPlayer || 0, winners: st.winners || [], chronicle: (st.chronicle || []).slice(-300),
     turnNo: st.turnNo || 0, deckCount: st.deck.length,
     net: { seats: NET.seats.map(x => ({ name: x.name, connected: !!x.connected })), turn: (st.net && st.net.turn) || 0 }
   };
@@ -5732,6 +6324,13 @@ function netCleanSong(x){
 }
 function netCleanSongs(list){ return (Array.isArray(list) ? list : []).slice(0, 200).map(netCleanSong).filter(Boolean); }
 function netInt(v, d, lo, hi){ const n = parseInt(v, 10); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : d; }
+function netCleanChronicle(list){
+  const cl = (v, n) => String(v == null ? "" : v).replace(/[\u0000-\u001f<>]/g, "").slice(0, n || 80);
+  return (Array.isArray(list) ? list.slice(-300) : []).map(e => ({
+    n: netInt(e && e.n, 0, 0, 1e6), p: cl(e && e.p, 40), t: cl(e && e.t), a: cl(e && e.a), y: netInt(e && e.y, 0, 0, 3000),
+    k: ["ok", "wrong", "timeout", "skip", "buy"].includes(e && e.k) ? e.k : "wrong", c: cl(e && e.c, 60)
+  }));
+}
 function netCleanSnapshot(s){
   const PH = ["draw", "placing", "revealed_pending", "challenge", "feedback", "empty"];
   const set = s.settings || {};
@@ -5740,7 +6339,8 @@ function netCleanSnapshot(s){
     difficulty: ["normal", "pro", "expert"].includes(set.difficulty) ? set.difficulty : "normal",
     target: netInt(set.target, 10, 1, 50), tokens: !!set.tokens, maxTokens: netInt(set.maxTokens, 5, 0, 50),
     startTokens: netInt(set.startTokens, 0, 0, 50), turnLimit: netInt(set.turnLimit, 0, 0, 600), playerCount: netInt(set.playerCount, 0, 0, NET_MAX_PLAYERS), challenge: !!set.challenge,
-    challengeMode: ["manual", "5", "10", "limit"].includes(set.challengeMode) ? set.challengeMode : "manual"
+    challengeMode: ["manual", "5", "10", "limit"].includes(set.challengeMode) ? set.challengeMode : "manual",
+    yearTol: netInt(set.yearTol, 0, 0, 5)
   };
   const seatsIn = s.net && Array.isArray(s.net.seats) ? s.net.seats.slice(0, NET_MAX_PLAYERS) : [];
   const seats = seatsIn.map(x => ({ name: netCleanName(x && x.name), connected: !!(x && x.connected) })).filter(x => x.name);
@@ -5775,7 +6375,7 @@ function netCleanSnapshot(s){
     challenge: s.challenge && typeof s.challenge === "object" ? { caller: s.challenge.caller == null ? null : netInt(s.challenge.caller, 0, 0, NET_MAX_PLAYERS), gap: s.challenge.gap == null ? null : netInt(s.challenge.gap, 0, 0, 500) } : null,
     wrongSongs: netCleanSongs(s.wrongSongs), players, currentPlayer: netInt(s.currentPlayer, 0, 0, NET_MAX_PLAYERS),
     winners: (Array.isArray(s.winners) ? s.winners : []).map(i => netInt(i, 0, 0, NET_MAX_PLAYERS)).slice(0, NET_MAX_PLAYERS),
-    turnNo: netInt(s.turnNo, 0, 0, 1e6), deckCount: netInt(s.deckCount, 0, 0, 1e5),
+    turnNo: netInt(s.turnNo, 0, 0, 1e6), deckCount: netInt(s.deckCount, 0, 0, 1e5), chronicle: netCleanChronicle(s.chronicle),
     net: { seats, turn: netInt(s.net.turn, 0, 0, 1e6) }
   };
 }
@@ -5785,6 +6385,7 @@ function netGuestApplyState(msg){
   const prev = state;
   const keep = {};
   Object.keys(NET_LOCAL_DEFAULTS).forEach(k => { keep[k] = (k in prev) ? prev[k] : NET_LOCAL_DEFAULTS[k]; });
+  if((prev.screen === "end" || prev.screen === "timeline") && clean.screen !== "end") keep.statsRecorded = false;   // neues Spiel (Rematch)
   const screen = clean.screen === "end" ? (prev.screen === "timeline" ? "timeline" : "end") : "game";
   const typing = prev.online && prev.phase === "revealed_pending" && clean.phase === "revealed_pending" && netMyTurn();
   state = Object.assign({}, keep, clean, {
@@ -5829,6 +6430,7 @@ render = function(){
   if(NET.role === "guest" && NET.status === "connected" && !state.online && (state.screen === "join" || state.screen === "online")) state.screen = "lobby";
   __renderOrig.apply(this, arguments);
   if(NET.role === "host" && NET.started && state.online) netScheduleBroadcast();
+  reactUiSync(); pauseUiSync();
 };
 
 /* ---------- Host ---------- */
@@ -5851,7 +6453,7 @@ function netResetRuntime(){
     role: null, peer: null, status: "idle", error: "", roomLabel: "", roomId: "", macKey: null, myName: "", hostPw: "", showPw: false,
     seats: [], started: false, config: null, resume: false, hostConn: null, lobby: { seats: [], info: null }, lastHost: 0,
     reconnectTries: 0, reconnectTimer: null, bcTimer: null, lastSig: "", seq: 0, guessTimer: null, saveTimer: null, tickTimer: null,
-    depth: 0, bypass: false, playedTurn: -1, leaving: false, idRetry: 0
+    depth: 0, bypass: false, playedTurn: -1, leaving: false, idRetry: 0, spec: false, specs: []
   });
   NET.entries = new Map(); NET.pending = new Set();
 }
@@ -5885,6 +6487,7 @@ window.addEventListener("beforeunload", () => {
 });
 
 async function netHostOpen(room, password, hostName, config, resume){
+  NET.specs = [];
   netResetRuntime();
   NET.role = "host"; NET.status = "opening"; NET.roomLabel = String(room).trim(); NET.hostPw = password;
   NET.myName = hostName; NET.config = config; NET.resume = !!resume;
@@ -5961,11 +6564,13 @@ function netDeny(entry, code){
 }
 async function netHostHandle(entry, d){
   if(!entry.authed){ if(d.t === "auth") await netHostAuth(entry, d); return; }
+  if(entry.spec && !["ping", "react", "bye"].includes(d.t)) return;
   switch(d.t){
     case "ping": netSend(entry.conn, { t: "pong" }); break;
     case "act": netHostAct(entry, d); break;
     case "guess": netHostGuess(entry, d); break;
     case "ready": netHostReady(entry, d); break;
+    case "react": netHostReact(entry, d); break;
     case "bye": try{ entry.conn.close(); }catch(e){} break;
   }
 }
@@ -5978,6 +6583,21 @@ async function netHostAuth(entry, d){
   if(!fp) return netDeny(entry, "sec");
   const ok = await netMacOk(NET.macKey, ["guest", entry.nh, d.ng, name, fp.local, fp.remote], d.mac);
   if(!ok) return netDeny(entry, "auth");
+  if(d.spec === true){ // Zuschauer: kein Sitz, darf auch nach Spielstart beitreten
+    if(NET.seats.some(q => netSameName(q.name, name))) return netDeny(entry, "specname");
+    const skey = "~" + netKey(name), oldS = NET.entries.get(skey);
+    if(!oldS && NET.specs.length >= 20) return netDeny(entry, "full");
+    if(oldS && oldS !== entry){ netSend(oldS.conn, { t: "kick", reason: "Du hast dich an einem anderen Gerät angemeldet." }); NET.entries.delete(skey); try{ oldS.conn.close(); }catch(e){} }
+    if(!NET.specs.some(x => netSameName(x, name))) NET.specs.push(name);
+    entry.authed = true; entry.key = skey; entry.spec = true; clearTimeout(entry.authTimer);
+    NET.pending.delete(entry); NET.entries.set(skey, entry);
+    const macS = await netMac(NET.macKey, ["host", d.ng, entry.nh, fp.local, fp.remote, "-1"]);
+    netSend(entry.conn, { t: "welcome", seat: -1, mac: macS, started: NET.started, spec: true });
+    netSeatsChanged();
+    if(NET.started) netBroadcastState(true, skey);
+    return;
+  }
+  if(NET.specs.some(x => netSameName(x, name))) return netDeny(entry, "name");
   let seat = NET.seats.findIndex(s => netSameName(s.name, name));
   if(seat === 0) return netDeny(entry, "name");
   const key = netKey(name);
@@ -6009,6 +6629,7 @@ function netHostOnClose(entry){
   clearTimeout(entry.authTimer);
   if(!entry.authed || NET.entries.get(entry.key) !== entry) return;
   NET.entries.delete(entry.key);
+  if(entry.spec){ NET.specs = NET.specs.filter(x => "~" + netKey(x) !== entry.key); netSeatsChanged(); return; }
   const seat = NET.seats.findIndex(s => netKey(s.name) === entry.key);
   if(seat > 0){
     if(NET.started || NET.resume) NET.seats[seat].connected = false;
@@ -6027,7 +6648,7 @@ function netSeatsChanged(){
 }
 function netLobbyInfo(){
   const s = NET.resume ? state.settings : (NET.config && NET.config.settings) || {};
-  return { room: NET.roomLabel, mode: s.mode, difficulty: s.difficulty, target: s.target, turnLimit: s.turnLimit || 0, tokens: !!s.tokens, resume: NET.resume, ordered: netOrderValid(), start: netOrderValid() ? NET.orderStart : 0 };
+  return { room: NET.roomLabel, mode: s.mode, difficulty: s.difficulty, target: s.target, turnLimit: s.turnLimit || 0, tokens: !!s.tokens, resume: NET.resume, specs: (NET.specs || []).slice(0, 20), ordered: netOrderValid(), start: netOrderValid() ? NET.orderStart : 0 };
 }
 function netBroadcastLobby(){
   if(NET.role !== "host" || NET.started) return;
@@ -6160,6 +6781,7 @@ async function netJoin(){
   const prevSettings = state.settings;
   netResetRuntime();
   NET.prevSettings = prevSettings;
+  NET.spec = !!f.spec;
   NET.role = "guest"; NET.myName = name; NET.roomLabel = room; NET.status = "connecting"; NET.error = "";
   render();
   let keys;
@@ -6222,14 +6844,14 @@ function netGuestConnect(first){
           const fp = netFingerprints(conn);
           if(!fp) return giveUp("Die Sicherheitsprüfung der Verbindung war nicht möglich.");
           const mac = await netMac(NET.macKey, ["guest", nh, ng, NET.myName, fp.remote, fp.local]);
-          netSend(conn, { t: "auth", name: NET.myName, ng, mac });
+          netSend(conn, { t: "auth", name: NET.myName, ng, mac, spec: !!NET.spec });
           setTimeout(() => { if(!verified && !done && NET.hostConn === conn) giveUp("Der Host hat die Anmeldung nicht beantwortet. Versuche es noch einmal."); }, 10000);
           break;
         }
         case "welcome": {
           const fp = netFingerprints(conn);
           const seat = netInt(d.seat, -1, -1, NET_MAX_PLAYERS);
-          if(!fp || !nh || !ng || seat < 0 || !(await netMacOk(NET.macKey, ["host", ng, nh, fp.remote, fp.local, String(seat)], d.mac)))
+          if(!fp || !nh || !ng || (seat < 0 && !NET.spec) || !(await netMacOk(NET.macKey, ["host", ng, nh, fp.remote, fp.local, String(seat)], d.mac)))
             return giveUp("Der Host konnte nicht verifiziert werden. Die Verbindung wurde aus Sicherheitsgründen abgebrochen.");
           clearTimeout(timeout); done = true; verified = true;
           NET.status = "connected"; NET.reconnectTries = 0; NET.started = !!d.started;
@@ -6240,7 +6862,7 @@ function netGuestConnect(first){
         case "deny": {
           const m = { auth: "Anmeldung abgelehnt: Passwort oder Sicherheitsprüfung stimmt nicht.", sec: "Die Sicherheitsprüfung der Verbindung war nicht möglich.",
             name: "Dieser Name ist der Host-Name und kann nicht verwendet werden.", started: "Das Spiel läuft schon. Nur Spieler, die schon dabei waren, können mit ihrem alten Namen wieder beitreten.",
-            full: "Der Raum ist voll.", bad: "Ungültige Anmeldung." };
+            full: "Der Raum ist voll.", specname: "Dieser Name gehört zu einem Mitspieler. Wähle einen anderen Namen zum Zuschauen.", bad: "Ungültige Anmeldung." };
           giveUp(m[d.code] || "Der Host hat die Anmeldung abgelehnt.");
           break;
         }
@@ -6249,10 +6871,11 @@ function netGuestConnect(first){
         case "lobby": {
           const seats = Array.isArray(d.seats) ? d.seats.slice(0, NET_MAX_PLAYERS).map(x => ({ name: netCleanName(x && x.name), connected: !!(x && x.connected), ready: !!(x && x.ready) })).filter(x => x.name) : [];
           const i = d.info || {};
-          NET.lobby = { seats, info: { room: String(i.room || "").slice(0, 60), mode: i.mode, difficulty: i.difficulty, target: netInt(i.target, 10, 1, 50), turnLimit: netInt(i.turnLimit, 0, 0, 600), tokens: !!i.tokens, resume: !!i.resume, ordered: !!i.ordered, start: netInt(i.start, 0, 0, NET_MAX_PLAYERS) } };
+          NET.lobby = { seats, info: { room: String(i.room || "").slice(0, 60), mode: i.mode, difficulty: i.difficulty, target: netInt(i.target, 10, 1, 50), turnLimit: netInt(i.turnLimit, 0, 0, 600), tokens: !!i.tokens, resume: !!i.resume, ordered: !!i.ordered, start: netInt(i.start, 0, 0, NET_MAX_PLAYERS), specs: Array.isArray(i.specs) ? i.specs.slice(0, 20).map(netCleanName).filter(Boolean) : [] } };
           if(!state.online){ if(state.screen === "join" || state.screen === "online") state.screen = "lobby"; netUiUpdate(); }
           break;
         }
+        case "react": { if(NET_REACTS.includes(d.e)) showReaction(netCleanName(d.n) || "?", d.e); break; }
         case "state": netGuestApplyState(d); break;
         case "guess": {
           if(!state.online || netMyTurn()) break;
@@ -6311,6 +6934,7 @@ function renderJoin(){
           <input class="guess-input" type="${f.showPw ? 'text' : 'password'}" maxlength="64" autocomplete="off" spellcheck="false" placeholder="Passwort" value="${esc(f.pw)}" oninput="NET.form.pw=this.value"
             onkeydown="if(event.key==='Enter') netJoin()">
           <button class="btn-ghost btn-small" style="margin-top:8px;" onclick="NET.form.showPw=!NET.form.showPw; render()">${f.showPw ? 'Verbergen' : 'Anzeigen'}</button></div>
+        <label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;"><input type="checkbox" ${f.spec ? 'checked' : ''} onchange="NET.form.spec=this.checked" style="margin-top:4px;"><span><b>Nur zuschauen</b><br><span style="color:var(--muted); font-size:calc(13px * var(--font-scale));">Kein Spielplatz: du siehst das Spiel mit, kannst aber nicht mitspielen. Auch nach Spielstart möglich.</span></span></label>
       </div>
       ${NET.error ? `<div class="planned-notice" style="border-color:var(--wrong); margin-top:14px;">${esc(NET.error)}</div>` : ``}
       ${busy ? `<div class="planned-notice" style="margin-top:14px;">Verbinde … (Schlüssel wird berechnet und der Host gesucht)</div>` : ``}
@@ -6346,10 +6970,10 @@ async function netHostFromWizard(){
   const w = state.wizard;
   const settings = w.mode === "coop" ? {
     tokens: true, target: w.target, maxTokens: w.coopTokens, startTokens: w.coopTokens, mode: w.mode, difficulty: w.difficulty,
-    turnLimit: w.timer ? w.turnLimit : 0, challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false, challengeMode: wizardChallengeMode(w), ...songFilterFromWizard(w)
+    turnLimit: w.timer ? w.turnLimit : 0, challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false, challengeMode: wizardChallengeMode(w), yearTol: w.difficulty === "expert" ? Math.max(0, Math.min(5, w.yearTol | 0)) : 0, ...songFilterFromWizard(w)
   } : {
     tokens: w.tokens, target: w.target, maxTokens: w.maxTokens, startTokens: w.startTokens, mode: w.mode, difficulty: w.difficulty,
-    turnLimit: w.timer ? w.turnLimit : 0, challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false, challengeMode: wizardChallengeMode(w), ...songFilterFromWizard(w)
+    turnLimit: w.timer ? w.turnLimit : 0, challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false, challengeMode: wizardChallengeMode(w), yearTol: w.difficulty === "expert" ? Math.max(0, Math.min(5, w.yearTol | 0)) : 0, ...songFilterFromWizard(w)
   };
   const room = (w.name || "").trim(), hostName = netCleanName(w.hostName), pw = w.password;
   try{ localStorage.setItem("chronohit_netname", hostName); }catch(e){}
@@ -6402,7 +7026,7 @@ function renderLobby(){
       <span class="lobby-name">${info.ordered ? '<b>' + (k + 1) + '.</b> ' : ''}${esc(x.name)}${i === 0 ? ' <small>(Host)</small>' : ''}${netSameName(x.name, NET.myName) ? ' <small>(du)</small>' : ''}</span>
       ${!info.resume ? `<span class="lobby-ready" style="font-size:calc(13px * var(--font-scale)); color:${i === 0 || (x.connected && x.ready) ? 'var(--correct, #3ecf8e)' : 'var(--muted)'};">${i === 0 ? '✓ Bereit' : (x.connected && x.ready ? '✓ Bereit' : 'Wartet …')}</span>` : ``}
       ${host && !NET.started && !NET.resume && i > 0 ? `<button class="btn-ghost btn-small" onclick="netKick(${i})">Entfernen</button>` : ``}
-    </div>`; }).join("");
+    </div>`; }).join("") + (info.specs || []).map(n => `<div class="lobby-row"><span class="net-dot"></span><span class="lobby-name">👁 ${esc(n)} <small>(Zuschauer)</small></span></div>`).join("");
   const connected = seats.filter(x => x.connected).length;
   const canStart = host && NET.status === "open" && (NET.resume ? true : (connected >= 2 && seats.every((x, i) => i === 0 || !x.connected || x.ready)));
   const statusText = NET.status === "opening" ? "Raum wird geöffnet … (Schlüssel wird berechnet)"
@@ -6449,6 +7073,7 @@ function netBannerHtml(){
       <span class="turn-label">Am Zug</span>
       <span class="turn-name">${esc((seats[a] || {}).name || '')}</span>
       <div class="net-chips">${chips}</div>
+      ${NET.spec ? `<div class="net-wait">👁 Du schaust nur zu.</div>` : ``}
       ${lost ? `<div class="net-wait">Verbindung zum Host verloren – verbinde neu … <button class="btn-ghost btn-small" onclick="netRetryNow()">Jetzt erneut versuchen</button></div>` : ``}
       ${w >= 0 && !lost ? `<div class="net-wait">Warte auf ${esc(seats[w].name)} – die Verbindung ist getrennt.
         ${NET.role === "host" ? `<button class="btn-ghost btn-small" onclick="netSkipWaiting()">Zug überspringen</button>` : `Der Host kann den Zug überspringen.`}</div>` : ``}
@@ -6472,6 +7097,7 @@ function netWatchCaption(){
   applyPrefs();
   setInterval(turnTick, 250);
   setInterval(chTick, 250);
+  setInterval(autoNextTick, 250);
   setInterval(autoSaveIntervalTick, 1000);
   slotsCache = await loadAllSlots();
   const saved = await loadSave();
