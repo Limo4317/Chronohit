@@ -6,7 +6,7 @@
 <title>Chronohit</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNTAwIDUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDwhLS0gw6R1w59lcmVyIFJhaG1lbnJpbmcsIG1hY2h0IGRpZSBydW5kZSBGb3JtIGVpbmRldXRpZyAtLT4KICA8Y2lyY2xlIGN4PSIyNTAiIGN5PSIyNTAiIHI9IjIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjIiIG9wYWNpdHk9IjAuMzUiLz4KCiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjUwLDI1MCkgc2NhbGUoNCkiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+CiAgICA8IS0tIFplaXRsZWlzdGUgLS0+CiAgICA8bGluZSB4MT0iLTQ0IiB5MT0iMCIgeDI9IjQ0IiB5Mj0iMCIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDxjaXJjbGUgY3g9Ii0zMiIgY3k9IjAiIHI9IjEuNyIgZmlsbD0iI2U4YTMzZCIvPgogICAgPGNpcmNsZSBjeD0iMzIiIGN5PSIwIiByPSIxLjciIGZpbGw9IiNlOGEzM2QiLz4KCiAgICA8IS0tIFZpbnlsLVJpbGxlbiAtLT4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIyMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIxNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjEiIG9wYWNpdHk9IjAuNTUiLz4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSI4LjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U4YTMzZCIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjMiLz4KCiAgICA8IS0tIFBsYXktRHJlaWVjayBpbSBaZW50cnVtIC0tPgogICAgPHBvbHlnb24gcG9pbnRzPSItNCwtNiAtNCw2IDgsMCIgZmlsbD0iI2U4YTMzZCIvPgogIDwvZz4KPC9zdmc+Cg==">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Outfit:wght@200;300;400;500;600&family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Outfit:wght@200;300;400;500;600&family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg: #14151d;
@@ -214,8 +214,9 @@
   }
   :root[data-theme="glass"] .card.pending{ border:1px dashed var(--accent); background-image:none; }
 
-  /* ---- Theme: Norisk (angelehnt an die NoRisk-Website) ----
-     Reines Schwarz, blauer Akzent, Pixel-Überschriften (Minecraft-Look), hauchdünne Rahmen, Listenzeilen mit Akzentbalken. */
+  /* ---- Theme: NRC (angelehnt an die NoRisk-Website) ----
+     Reines Schwarz, blauer Akzent, Pixel-Überschriften (Minecraft-Look), schlanke
+     Outfit-Schrift, hauchdünne Rahmen, Listenzeilen mit Akzentbalken. */
   :root[data-theme="norisk"]{
     --bg: #000000;
     --bg-2: #070707;
@@ -234,8 +235,8 @@
     --line: rgba(255,255,255,0.08);
     --radius: 16px;
     --btn-radius: 8px;
-    --heading-font: 'VT323', 'Minecraft', monospace;
-    --body-font: 'Minecraftia', sans-serif;
+    --heading-font: Space Grotesk; 'Pixelify Sans', 'Minecraft', monospace;
+    --body-font: Space Grotesk; 'Outfit', sans-serif;
     --body-weight: 300;
     --panel-blur: 0px;
     --body-bg-image: radial-gradient(900px 420px at 50% -10%, rgba(79,142,255,.12), transparent 70%);
@@ -620,6 +621,48 @@
   .pool-info b{ color:var(--text); }
   .pool-info.bad{ border-color:var(--wrong); }
   .pool-info.bad div{ margin-top:4px; color:var(--wrong); }
+  /* ---- Seitenmenü ---- */
+  .qm-button{
+    position:fixed; top:14px; left:14px; z-index:29; width:46px; height:46px; padding:0;
+    border-radius:50%; display:none; align-items:center; justify-content:center;
+    background:var(--panel); border:1px solid var(--line); color:var(--text);
+    box-shadow:0 6px 18px rgba(0,0,0,.28);
+    backdrop-filter:blur(var(--panel-blur)); -webkit-backdrop-filter:blur(var(--panel-blur));
+  }
+  .qm-button.show{ display:flex; }
+  .qm-button:hover{ border-color:var(--accent); }
+  .qm-backdrop{
+    position:fixed; inset:0; z-index:40; background:rgba(0,0,0,.5);
+    opacity:0; pointer-events:none; transition:opacity .25s ease;
+  }
+  .qm-backdrop.open{ opacity:1; pointer-events:auto; }
+  .qm-panel{
+    position:fixed; top:0; left:0; bottom:0; z-index:41; width:min(88vw, 340px);
+    padding:18px 16px 28px; overflow-y:auto;
+    background:var(--bg-2); border-right:1px solid var(--line);
+    box-shadow:12px 0 32px rgba(0,0,0,.35);
+    transform:translateX(-106%); transition:transform .28s ease;
+  }
+  .qm-panel.open{ transform:none; }
+  .qm-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+  .qm-brand{ display:flex; align-items:center; gap:10px; font-family:var(--heading-font); font-size:20px; }
+  .qm-section{ margin-bottom:24px; }
+  .qm-title{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+  .qm-panel .theme-desc{ display:none; }
+  .qm-panel .theme-swatch{ padding:9px 12px; }
+  .qm-custom{ margin-top:14px; padding-top:14px; border-top:1px dashed var(--line); }
+  .qm-custom .custom-theme-grid{ grid-template-columns:1fr 1fr; gap:10px 14px; }
+  .qm-custom .setting-row{ gap:10px; }
+  .qm-custom input[type="range"]{ width:110px !important; }
+  @media (max-width: 900px){ html.has-qm body{ padding-top:76px; } }
+  :root[data-theme="glass"] .qm-button,
+  :root[data-theme="glass"] .qm-panel{
+    background-color:rgba(24,40,92,.55);
+    background-image:linear-gradient(135deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,.07) 30%, rgba(255,255,255,.02) 58%, rgba(255,255,255,.12) 100%);
+    border:1px solid rgba(255,255,255,.26);
+    box-shadow:inset 1.5px 1.5px 1px -.5px rgba(255,255,255,.8), inset -1px -1px 1px -.5px rgba(255,255,255,.4), 0 14px 44px rgba(6,12,45,.34);
+    backdrop-filter:var(--glass-filter); -webkit-backdrop-filter:var(--glass-filter);
+  }
   .theme-info{ flex:1; }
   .theme-label{ font-family:var(--heading-font); font-size:16px; color:var(--text); }
   .theme-label .wizard-check{ font-size:14px; }
@@ -1018,6 +1061,42 @@
   </filter>
 </svg>
 <div id="app"></div>
+<button id="qm-button" class="qm-button" onclick="toggleQuickMenu()" aria-label="Menü öffnen" title="Menü">
+  <svg width="28" height="28" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="250" cy="250" r="230" fill="none" stroke="var(--accent)" stroke-width="14" opacity="0.35"/>
+    <g transform="translate(250,250) scale(4)" stroke-linecap="round">
+      <line x1="-44" y1="0" x2="44" y2="0" stroke="var(--accent)" stroke-width="2"/>
+      <circle cx="-32" cy="0" r="1.7" fill="var(--accent)"/>
+      <circle cx="32" cy="0" r="1.7" fill="var(--accent)"/>
+      <circle cx="0" cy="0" r="22" fill="none" stroke="var(--accent)" stroke-width="2"/>
+      <circle cx="0" cy="0" r="15" fill="none" stroke="var(--accent)" stroke-width="1" opacity="0.55"/>
+      <circle cx="0" cy="0" r="8.5" fill="none" stroke="var(--accent)" stroke-width="1" opacity="0.3"/>
+      <polygon points="-4,-6 -4,6 8,0" fill="var(--accent)"/>
+    </g>
+  </svg>
+</button>
+<div id="qm-backdrop" class="qm-backdrop" onclick="toggleQuickMenu(false)"></div>
+<aside id="qm-panel" class="qm-panel" aria-label="Menü">
+  <div class="qm-head">
+    <div class="qm-brand">
+      <svg width="26" height="26" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="250" cy="250" r="230" fill="none" stroke="var(--accent)" stroke-width="14" opacity="0.35"/>
+    <g transform="translate(250,250) scale(4)" stroke-linecap="round">
+      <line x1="-44" y1="0" x2="44" y2="0" stroke="var(--accent)" stroke-width="2"/>
+      <circle cx="-32" cy="0" r="1.7" fill="var(--accent)"/>
+      <circle cx="32" cy="0" r="1.7" fill="var(--accent)"/>
+      <circle cx="0" cy="0" r="22" fill="none" stroke="var(--accent)" stroke-width="2"/>
+      <circle cx="0" cy="0" r="15" fill="none" stroke="var(--accent)" stroke-width="1" opacity="0.55"/>
+      <circle cx="0" cy="0" r="8.5" fill="none" stroke="var(--accent)" stroke-width="1" opacity="0.3"/>
+      <polygon points="-4,-6 -4,6 8,0" fill="var(--accent)"/>
+    </g>
+  </svg>
+      <span>Chronohit</span>
+    </div>
+    <button class="btn-ghost btn-small icon-btn" onclick="toggleQuickMenu(false)" aria-label="Schließen">✕</button>
+  </div>
+  <div id="qm-content"></div>
+</aside>
 <div id="spotify-embed-host" style="position:absolute !important;width:1px !important;height:1px !important;overflow:hidden !important;clip:rect(0,0,0,0) !important;clip-path:inset(50%) !important;white-space:nowrap !important;pointer-events:none !important;">
   <div id="spotify-embed-root"></div>
 </div>
@@ -2773,7 +2852,7 @@ const THEME_INFO = [
   { key:"light", label:"Hell", desc:"Das Dunkel-Theme umgekehrt: helle Flächen, dunkle Karten, blauer Akzent." },
   { key:"modern", label:"Modern", desc:"Konsolen-Look mit Türkis-Akzent, schärferen Kanten, Monospace-Schrift und leicht angeglasten Flächen." },
   { key:"glass", label:"Liquid Glass", desc:"Echtes Glas-Material: Lichtkanten, Glanzreflex, Milchglas-Blur — in Chrome/Edge zusätzlich mit Lichtbrechung." },
-  { key:"norisk", label:"Norisk", desc:"Reines Schwarz, Pixel-Überschriften, schlanke Outfit-Schrift und blauer Akzent — angelehnt an die NoRisk-Website." },
+  { key:"norisk", label:"NRC", desc:"Reines Schwarz, Pixel-Überschriften und blauer Akzent — angelehnt an die NoRisk Client-Website." },
   { key:"custom", label:"Benutzerdefiniert", desc:"Eigene Farben, Transparenz und Schriftart frei wählen." }
 ];
 
@@ -2820,7 +2899,7 @@ function renderSettings(){
   `;
 }
 
-function renderCustomThemePanel(){
+function customThemeControlsHtml(){
   const c = customTheme;
   const colorRow = (label, key) => `
     <label class="custom-color-row">
@@ -2830,8 +2909,6 @@ function renderCustomThemePanel(){
   const fontOptions = FONT_OPTIONS.map(f =>
     `<option value="${f.key}" ${c.font === f.key ? 'selected' : ''}>${f.key}</option>`).join('');
   return `
-    <div class="menu-card">
-      <h3>Benutzerdefiniert anpassen</h3>
       <div class="custom-theme-grid">
         ${colorRow('Hintergrund', 'bg')}
         ${colorRow('Flächen', 'panel')}
@@ -2851,9 +2928,58 @@ function renderCustomThemePanel(){
       </div>
       <div class="menu-actions" style="margin-top:16px;">
         <button class="btn-ghost btn-small" onclick="resetCustomTheme()">Zurücksetzen</button>
-      </div>
+      </div>`;
+}
+function renderCustomThemePanel(){
+  return `
+    <div class="menu-card">
+      <h3>Benutzerdefiniert anpassen</h3>
+      ${customThemeControlsHtml()}
     </div>`;
 }
+
+/* ============ SEITENMENÜ (links oben, außer auf Start/Laden/Hauptmenü) ============ */
+let quickMenuOpen = false;
+function quickMenuVisible(){
+  return !["splash", "loading", "menu"].includes(state.screen);
+}
+function renderQuickMenuContent(){
+  const el = document.getElementById("qm-content");
+  if(!el) return;
+  const swatches = THEME_INFO.map(t => `
+    <div class="theme-swatch ${currentTheme === t.key ? 'selected' : ''}" onclick="selectTheme('${t.key}')" data-theme-preview="${t.key}">
+      <div class="theme-dots"><span></span><span></span><span></span></div>
+      <div class="theme-info">
+        <div class="theme-label">${t.label}${currentTheme === t.key ? ' <span class="wizard-check">✓</span>' : ''}</div>
+      </div>
+    </div>`).join("");
+  el.innerHTML = `
+    <div class="qm-section">
+      <div class="qm-title">Theme</div>
+      <div class="theme-list">${swatches}</div>
+      ${currentTheme === "custom" ? `<div class="qm-custom">${customThemeControlsHtml()}</div>` : ``}
+    </div>
+    <div class="qm-section">
+      <div class="qm-title">Sprache</div>
+      ${plannedFeatureNotice()}
+    </div>`;
+}
+function toggleQuickMenu(force){
+  quickMenuOpen = typeof force === "boolean" ? force : !quickMenuOpen;
+  if(quickMenuOpen) renderQuickMenuContent();
+  const panel = document.getElementById("qm-panel"), back = document.getElementById("qm-backdrop");
+  if(panel) panel.classList.toggle("open", quickMenuOpen);
+  if(back) back.classList.toggle("open", quickMenuOpen);
+}
+function updateQuickMenu(){
+  const visible = quickMenuVisible();
+  const btn = document.getElementById("qm-button");
+  if(btn) btn.classList.toggle("show", visible);
+  document.documentElement.classList.toggle("has-qm", visible);
+  if(!visible && quickMenuOpen) toggleQuickMenu(false);
+  else if(quickMenuOpen) renderQuickMenuContent();
+}
+document.addEventListener("keydown", e => { if(e.key === "Escape" && quickMenuOpen) toggleQuickMenu(false); });
 
 function renderMenu(){
   app.innerHTML = `
@@ -2973,6 +3099,8 @@ function startCreateWizard(){
     target: 10,
     playerCount: 2,
     playerNames: ["", ""],
+    playerIds: [0, 1],
+    nextPlayerId: 2,
     orderMode: "random",
     genres: Object.fromEntries(LIB.langs.map(l => [l.key, true])),
     styles: Object.fromEntries(LIB.styles.map(x => [x.key, true])),
@@ -2999,22 +3127,52 @@ function wizardBack(){
   else { state.wizard = null; state.screen = "menu"; render(); }
 }
 function wizardSetSlot(n){ state.wizard.slot = n; render(); }
+/* Weiches "Gleiten" bei Umsortierungen (FLIP): Positionen vor der Änderung merken, danach
+   jedes Element von seiner alten Position aus an die neue animieren. Die Ansicht wird bei
+   jeder Änderung neu aufgebaut, daher identifizieren wir Elemente über data-flip. */
+function flipAnimate(itemSelector, mutate){
+  const before = {};
+  document.querySelectorAll(itemSelector).forEach(el => { before[el.dataset.flip] = el.getBoundingClientRect(); });
+  mutate();
+  if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.querySelectorAll(itemSelector).forEach(el => {
+    const b = before[el.dataset.flip];
+    if(!b) return;
+    const a = el.getBoundingClientRect();
+    const dx = b.left - a.left, dy = b.top - a.top;
+    if(!dx && !dy) return;
+    el.style.transition = "none";
+    el.style.transform = `translate(${dx}px, ${dy}px)`;
+    el.style.position = el.style.position || "relative";
+    el.style.zIndex = "2";
+    el.getBoundingClientRect();   // Reflow erzwingen, damit der Startwert greift
+    el.style.transition = "transform .4s cubic-bezier(.22, .9, .3, 1)";
+    el.style.transform = "";
+    const done = () => { el.style.transition = ""; el.style.zIndex = ""; el.style.position = ""; };
+    el.addEventListener("transitionend", done, { once:true });
+    setTimeout(done, 550);
+  });
+}
+
 function wizardStepPlayerCount(delta){
   const w = state.wizard;
   const n = w.playerCount + delta;
   if(n < 1 || n > 10) return;
   w.playerCount = n;
-  while(w.playerNames.length < n) w.playerNames.push("");
-  while(w.playerNames.length > n) w.playerNames.pop();
+  while(w.playerNames.length < n){ w.playerNames.push(""); w.playerIds.push(w.nextPlayerId++); }
+  while(w.playerNames.length > n){ w.playerNames.pop(); w.playerIds.pop(); }
   render();
 }
 function wizardSetOrderMode(mode){ state.wizard.orderMode = mode; render(); }
 function wizardMovePlayer(i, dir){
-  const names = state.wizard.playerNames;
+  const w = state.wizard;
   const j = i + dir;
-  if(j < 0 || j >= names.length) return;
-  [names[i], names[j]] = [names[j], names[i]];
-  render();
+  if(j < 0 || j >= w.playerNames.length) return;
+  flipAnimate(".player-row", () => {
+    [w.playerNames[i], w.playerNames[j]] = [w.playerNames[j], w.playerNames[i]];
+    [w.playerIds[i], w.playerIds[j]] = [w.playerIds[j], w.playerIds[i]];
+    render();
+  });
 }
 function wizardSetMode(v){ state.wizard.mode = v; render(); }
 function wizardSetDifficulty(v){ state.wizard.difficulty = v; render(); }
@@ -3102,8 +3260,10 @@ function wizardMoveFilter(key, dir){
   const order = state.wizard.filterOrder;
   const i = order.indexOf(key), j = i + dir;
   if(i < 0 || j < 0 || j >= order.length) return;
-  [order[i], order[j]] = [order[j], order[i]];
-  render();
+  flipAnimate(".chip-group", () => {
+    [order[i], order[j]] = [order[j], order[i]];
+    render();
+  });
 }
 function wizardPoolSize(){ return wizardStages().final; }
 function wizardPoolNeeded(){
@@ -3217,7 +3377,7 @@ function chipGroup(key, pos, total, st){
     return `<button class="chip ${w[key][it.key] ? 'on' : ''} ${c === 0 ? 'empty' : ''}" onclick="wizardToggleItem('${key}','${it.key}')">${it.label}<span class="chip-n">${c}</span></button>`;
   }).join('');
   return `
-    <div class="chip-group">
+    <div class="chip-group" data-flip="f-${key}">
       <div class="chip-group-head">
         <div class="label-with-info">
           <span class="stage-num">${pos + 1}</span>
@@ -3262,7 +3422,7 @@ function renderWizardPlayers(n){
   const w = state.wizard;
   const custom = w.orderMode === "custom";
   const rows = w.playerNames.map((name, i) => `
-    <div class="player-row">
+    <div class="player-row" data-flip="p${w.playerIds[i]}">
       ${custom ? `<span class="player-num">${i+1}</span>` : ``}
       <input class="guess-input" type="text" maxlength="20" autocomplete="off"
         placeholder="Spieler ${i+1}" value="${esc(name)}"
@@ -3889,6 +4049,7 @@ function render(){
   else if(state.screen === "timeline") renderTimelineOnly();
 
   updateDocumentTitle();
+  updateQuickMenu();
 }
 
 /* ============ SETTINGS HELPERS ============ */
