@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>JAHRGANG — Musik-Zeitleiste</title>
+<title>CHRONOHIT — Musik-Zeitleiste</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -26,6 +26,7 @@
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
+  html{overflow-x:hidden;}
   body{
     background:
       radial-gradient(1200px 600px at 50% -10%, #23263a 0%, var(--bg) 55%);
@@ -223,10 +224,33 @@
   .embed-full iframe{ width:100%; height:152px; border:0; display:block; }
 
   /* ---- timeline ---- */
-  .timeline-wrap{overflow-x:auto; padding:6px 2px 18px;}
+  /* Volle Fensterbreite: erst scrollen, wenn die Karten wirklich
+     über den kompletten Bildschirm hinauslaufen. */
+  .timeline-wrap{
+    width:100vw;
+    margin-left:calc(50% - 50vw);
+    margin-right:calc(50% - 50vw);
+    padding:14px 20px 8px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    overscroll-behavior-x:contain;
+    scrollbar-width:thin;
+    scrollbar-color:var(--accent) var(--panel);
+  }
+  .timeline-wrap::-webkit-scrollbar{ height:10px; }
+  .timeline-wrap::-webkit-scrollbar-track{
+    background:var(--panel); border-radius:999px; margin:0 20px;
+  }
+  .timeline-wrap::-webkit-scrollbar-thumb{
+    background:var(--accent); border-radius:999px;
+    border:2px solid var(--panel);
+  }
+  .timeline-wrap::-webkit-scrollbar-thumb:hover{ background:#f4bb62; }
   .timeline{
     display:flex; align-items:stretch; gap:0; min-height:150px;
-    padding:6px 6px 20px;
+    padding:6px 0 20px;
+    width:max-content;
+    margin:0 auto;   /* zentriert, solange nichts überläuft */
   }
   .gap{
     flex:none; width:26px; display:flex; align-items:center; justify-content:center;
@@ -286,6 +310,43 @@
     font-size:13px; color:var(--muted); margin-top:10px;
   }
   .self-report input{width:16px;height:16px;}
+
+  /* ---- Titel/Interpret raten ---- */
+  .guess-box{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:14px 16px; margin-top:6px; width:100%; max-width:320px;
+    display:flex; flex-direction:column; gap:9px;
+  }
+  .guess-box .head{
+    font-size:13px; font-weight:600; color:var(--text);
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+  }
+  .guess-box .head span{color:var(--accent); font-size:12px;}
+  .guess-input{
+    font-family:'Space Grotesk',sans-serif; font-size:14px;
+    background:var(--bg-2); border:1px solid var(--line); border-radius:10px;
+    padding:10px 12px; color:var(--text); width:100%;
+  }
+  .guess-input:focus{outline:none; border-color:var(--accent);}
+  .guess-input::placeholder{color:var(--muted);}
+  .guess-hint{font-size:11px; color:var(--muted); line-height:1.45;}
+
+  .guess-result{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:12px 16px; margin-top:6px; width:100%; max-width:320px;
+    display:flex; flex-direction:column; gap:6px; font-size:13px;
+  }
+  .guess-result .row{display:flex; gap:8px; align-items:baseline;}
+  .guess-result .row .mark{font-weight:700; width:14px; flex:none;}
+  .guess-result .row.ok .mark{color:var(--correct);}
+  .guess-result .row.bad .mark{color:var(--wrong);}
+  .guess-result .row .said{color:var(--muted); font-size:12px;}
+  .guess-result .verdict{
+    margin-top:4px; padding-top:8px; border-top:1px dashed var(--line);
+    font-weight:600;
+  }
+  .guess-result .verdict.ok{color:var(--accent);}
+  .guess-result .verdict.bad{color:var(--muted);}
 
   /* ---- win screen ---- */
   .win-card{
@@ -479,18 +540,35 @@ const SONGS = [
 ];
 
 /* ============ STORAGE ============ */
-const SAVE_KEY = "jahrgang_solo_v1";
+const SAVE_KEY = "chronohit_solo_v1";
+const LEGACY_SAVE_KEYS = ["jahrgang_solo_v1"];   // Spielstände aus der Zeit vor der Umbenennung
+let memorySave = null;   // Fallback, falls localStorage blockiert ist
 async function saveState(){
-  try{ await window.storage.set(SAVE_KEY, JSON.stringify(state), false); }catch(e){ /* best effort */ }
+  const raw = JSON.stringify(state);
+  memorySave = raw;
+  try{ localStorage.setItem(SAVE_KEY, raw); }catch(e){ /* best effort */ }
 }
 async function loadSave(){
   try{
-    const r = await window.storage.get(SAVE_KEY, false);
-    return r ? JSON.parse(r.value) : null;
-  }catch(e){ return null; }
+    let raw = localStorage.getItem(SAVE_KEY);
+    if(!raw){
+      for(const k of LEGACY_SAVE_KEYS){
+        const old = localStorage.getItem(k);
+        if(old){ raw = old; localStorage.setItem(SAVE_KEY, old); localStorage.removeItem(k); break; }
+      }
+    }
+    raw = raw || memorySave;
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){
+    try{ return memorySave ? JSON.parse(memorySave) : null; }catch(_){ return null; }
+  }
 }
 async function clearSave(){
-  try{ await window.storage.delete(SAVE_KEY, false); }catch(e){}
+  memorySave = null;
+  try{
+    localStorage.removeItem(SAVE_KEY);
+    LEGACY_SAVE_KEYS.forEach(k => localStorage.removeItem(k));
+  }catch(e){}
 }
 
 /* ============ STATE ============ */
@@ -512,8 +590,108 @@ let state = {
   wrongCount: 0,
   hasSave: false,
   showExitDialog: false,
-  bonusClaimed: false
+  bonusClaimed: false,
+  guess: { t:"", a:"" },   // aktuelle Eingabe für Titel/Interpret
+  guessResult: null        // {titleOk, artistOk, both, awarded, said:{t,a}}
 };
+
+/* ============ TITEL/INTERPRET-PRÜFUNG ============
+   Großzügiger Vergleich statt exaktem Textabgleich: Groß-/Kleinschreibung,
+   Akzente, Umlaut-Schreibweisen (ue/ae/oe), Satzzeichen, Artikel und
+   Feature-Zusätze werden ignoriert; danach erlaubt eine Levenshtein-Distanz
+   echte Tippfehler. "enrike iglesias" zählt also als richtig.
+*/
+function normText(s){
+  return String(s||"")
+    .toLowerCase()
+    .replace(/ß/g,"ss")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/&/g," und ")
+    .replace(/[^a-z0-9]+/g," ")
+    .replace(/\b(feat|ft|featuring|the|der|die|das|el|la|los)\b/g," ")
+    .replace(/ae/g,"a").replace(/oe/g,"o").replace(/ue/g,"u")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function levenshtein(a,b){
+  if(a === b) return 0;
+  const m = a.length, n = b.length;
+  if(!m) return n;
+  if(!n) return m;
+  let prev = new Array(n+1), cur = new Array(n+1);
+  for(let j=0;j<=n;j++) prev[j] = j;
+  for(let i=1;i<=m;i++){
+    cur[0] = i;
+    for(let j=1;j<=n;j++){
+      const cost = a[i-1] === b[j-1] ? 0 : 1;
+      cur[j] = Math.min(cur[j-1]+1, prev[j]+1, prev[j-1]+cost);
+    }
+    const tmp = prev; prev = cur; cur = tmp;
+  }
+  return prev[n];
+}
+
+function withinTolerance(a,b){
+  const L = Math.max(a.length, b.length);
+  // je länger der Text, desto mehr Tippfehler sind erlaubt (max. 4)
+  const tol = L <= 4 ? 1 : Math.min(4, Math.max(2, Math.floor(L * 0.25)));
+  return levenshtein(a,b) <= tol;
+}
+
+function fuzzyEq(a,b){
+  if(!a || !b) return false;
+  if(a === b) return true;
+  if(withinTolerance(a,b)) return true;
+  // Anfang genügt, wenn er lang genug ist: "Atemlos" für
+  // "Atemlos durch die Nacht".
+  const short = a.length <= b.length ? a : b;
+  const long  = a.length <= b.length ? b : a;
+  if(short.length >= 6 && short.length >= long.length * 0.35){
+    if(withinTolerance(short, long.slice(0, short.length))) return true;
+  }
+  return false;
+}
+
+function titleVariants(t){
+  const raw = new Set([t]);
+  raw.add(t.replace(/\(.*?\)/g," "));           // "Waka Waka (This Time...)" -> "Waka Waka"
+  const inside = t.match(/\((.*?)\)/);
+  if(inside) raw.add(inside[1]);
+  raw.add(t.split(/\s[-–]\s/)[0]);
+  raw.add(t.replace(/^[.\s]+/,""));             // "...Baby One More Time"
+  return [...raw].map(normText).filter(Boolean);
+}
+
+function artistVariants(a){
+  const raw = new Set([a]);
+  a.replace(/\(.*?\)/g," ")
+   .split(/\s*(?:feat\.|ft\.|featuring|&|,|\bx\b|\bund\b)\s*/i)
+   .forEach(p => {
+     p = p.trim();
+     if(!p) return;
+     raw.add(p);
+     // Nachname allein reicht: "Grönemeyer" statt "Herbert Grönemeyer"
+     const words = p.split(/\s+/);
+     if(words.length > 1){
+       const last = words[words.length-1];
+       if(last.length >= 4) raw.add(last);
+     }
+   });
+  return [...raw].map(normText).filter(Boolean);
+}
+
+function fuzzyMatch(input, variants){
+  const a = normText(input);
+  if(!a) return false;
+  return variants.some(v => fuzzyEq(a, v));
+}
+
+function esc(s){
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
 
 function shuffle(arr){
   const a = arr.slice();
@@ -552,7 +730,9 @@ function newGame(){
     wrongCount: 0,
     hasSave: true,
     showExitDialog: false,
-    bonusClaimed: false
+    bonusClaimed: false,
+    guess: { t:"", a:"" },
+    guessResult: null
   };
   drawNext();
   saveState();
@@ -656,6 +836,8 @@ function drawNext(){
   state.pendingGap = null;
   state.lastResult = null;
   state.bonusClaimed = false;
+  state.guess = { t:"", a:"" };
+  state.guessResult = null;
 }
 
 function playCurrent(){
@@ -739,6 +921,7 @@ function revealCard(){
     state.wrongCount += 1;
   }
   state.lastResult = { ok, song };
+  evaluateGuess(song);
   state.phase = "feedback";
   render(); saveState();
   if(!checkWin()){
@@ -746,13 +929,23 @@ function revealCard(){
   }
 }
 
-function awardBonusToken(){
-  if(state.bonusClaimed) return;
-  state.bonusClaimed = true;
-  if(state.tokens < 5){
-    state.tokens += 1;
+function evaluateGuess(song){
+  state.guessResult = null;
+  if(!state.settings.tokens) return;
+  const said = { t:(state.guess.t||"").trim(), a:(state.guess.a||"").trim() };
+  if(!said.t && !said.a){ state.guess = {t:"",a:""}; return; }
+
+  const titleOk  = said.t ? fuzzyMatch(said.t, titleVariants(song.t))  : false;
+  const artistOk = said.a ? fuzzyMatch(said.a, artistVariants(song.a)) : false;
+  const both = titleOk && artistOk;
+
+  let awarded = false;
+  if(both && !state.bonusClaimed){
+    state.bonusClaimed = true;
+    if(state.tokens < 5){ state.tokens += 1; awarded = true; }
   }
-  render(); saveState();
+  state.guessResult = { titleOk, artistOk, both, awarded, said };
+  state.guess = { t:"", a:"" };
 }
 
 function nextTurn(){
@@ -761,7 +954,9 @@ function nextTurn(){
 }
 
 function checkWin(){
-  if(state.timeline.length >= state.settings.target){
+  // Die Startkarte zählt nicht mit: bei Ziel 10 müssen 10 Karten
+  // wirklich richtig platziert worden sein.
+  if(state.correctCount >= state.settings.target){
     state.screen = "win";
     render(); saveState();
     return true;
@@ -826,7 +1021,7 @@ function renderMenu(){
   app.innerHTML = `
     <div class="brand">
       <div class="mark">MUSIK &middot; ZEITLEISTE</div>
-      <h1>Jahrgang</h1>
+      <h1>Chronohit</h1>
       <p>Ordne Songs nach ihrem Erscheinungsjahr — inspiriert von Hitster, gespielt mit deinem eigenen Spotify.</p>
     </div>
 
@@ -862,7 +1057,7 @@ function renderMenu(){
         <div class="setting-row">
           <div>
             <div class="label">Kartenanzahl bis Sieg</div>
-            <div class="hint">Klassisch: 10 richtige Karten auf der Zeitleiste</div>
+            <div class="hint">Klassisch: 10 richtig erratene Karten — die Startkarte zählt nicht mit</div>
           </div>
           <div class="stepper">
             <button onclick="stepTarget(-1)">–</button>
@@ -895,12 +1090,12 @@ function renderMenu(){
         <p><strong>1. Abspielen:</strong> Du ziehst eine Karte und klickst auf die Schallplatte — der Song spielt unsichtbar im Hintergrund über Spotify, du siehst weder Titel noch Cover. Nochmal auf die Schallplatte klicken pausiert/setzt fort. Mit Spotify Premium läuft der ganze Song, sonst die 30-Sekunden-Vorschau. Falls die Steuerung mal blockiert wird (z. B. durch einen Adblocker), springt das Spiel automatisch auf einen sichtbaren, aber zugeschnittenen Player um.</p>
         <p style="font-size:13px;">Hinweis: Bei einem Song (Enrique Iglesias' "Bailando") lag nur ein Album- statt Track-Link vor — dort öffnet sich stattdessen eine Spotify-Suche in neuem Tab, wo der Titel sichtbar ist.</p>
         <p><strong>2. Platzieren:</strong> Ohne das Jahr zu kennen, legst du die Karte an die Stelle deiner Zeitleiste, die du für chronologisch richtig hältst.</p>
-        <p><strong>3. Aufdecken:</strong> Die Karte wird umgedreht. Liegt sie richtig, bleibt sie liegen und zählt für deinen Sieg. Liegt sie falsch, kommt sie auf den Ablagestapel.</p>
+        <p><strong>3. Aufdecken:</strong> Die Karte wird umgedreht. Liegt sie richtig, bleibt sie liegen und zählt einen Punkt für deinen Sieg (die Startkarte zählt nicht). Liegt sie falsch, kommt sie auf den Ablagestapel.</p>
         ${s.tokens ? `
         <p><strong>Hitster-Tokens (aktiv):</strong> Du startest mit 2 Tokens, maximal kannst du 5 gleichzeitig besitzen.</p>
         <p>&bull; <strong>Song unbekannt?</strong> Wirf für 1 Token die aktuelle Karte ab und ziehe eine neue, ohne sie zu platzieren.</p>
         <p>&bull; <strong>Karte kaufen:</strong> Für 3 Tokens wird die nächste gezogene Karte garantiert korrekt in deine Zeitleiste einsortiert — ganz ohne Rateversuch und ohne Risiko.</p>
-        <p>&bull; <strong>Bonus-Token:</strong> Wenn du nach dem Aufdecken einer Karte auch Titel und Interpret richtig erraten hast, gib das ehrlich über die Checkbox an — du bekommst einen weiteren Token.</p>
+        <p>&bull; <strong>Bonus-Token:</strong> Bevor du aufdeckst, kannst du Titel und Interpret eintippen. Stimmt beides, gibt es einen weiteren Token. Verglichen wird großzügig: Groß-/Kleinschreibung, Akzente, Umlaut-Schreibweisen und Tippfehler werden verziehen, Zusätze wie &bdquo;feat.&ldquo; oder Klammer-Untertitel sind optional.</p>
         ` : `
         <p>Aktiviere Hitster-Tokens im Menü, um Karten überspringen oder kaufen zu können.</p>
         `}
@@ -992,11 +1187,22 @@ function renderGame(){
             <iframe src="https://open.spotify.com/embed/track/${song.id}?utm_source=generator&theme=0"
               loading="lazy" allow="encrypted-media" title="Spotify player"></iframe>
           </div>` : ``}
-        ${s.tokens ? `
-          <label class="self-report">
-            <input type="checkbox" ${state.bonusClaimed ? 'checked disabled' : ''} onchange="this.checked && awardBonusToken()">
-            Titel &amp; Interpret auch richtig erraten? (+1 Token)
-          </label>` : ``}
+        ${s.tokens && state.guessResult ? `
+          <div class="guess-result">
+            <div class="row ${state.guessResult.titleOk ? 'ok':'bad'}">
+              <span class="mark">${state.guessResult.titleOk ? '✓':'✕'}</span>
+              <span>Titel <span class="said">— du: „${esc(state.guessResult.said.t) || '—'}"</span></span>
+            </div>
+            <div class="row ${state.guessResult.artistOk ? 'ok':'bad'}">
+              <span class="mark">${state.guessResult.artistOk ? '✓':'✕'}</span>
+              <span>Interpret <span class="said">— du: „${esc(state.guessResult.said.a) || '—'}"</span></span>
+            </div>
+            <div class="verdict ${state.guessResult.both ? 'ok':'bad'}">
+              ${state.guessResult.both
+                ? (state.guessResult.awarded ? `+1 Bonus-Token ${icon('token')}` : `Beides richtig — aber dein Token-Vorrat ist schon voll (5).`)
+                : `Kein Bonus-Token — beides muss stimmen.`}
+            </div>
+          </div>` : ``}
         <button class="btn-primary" onclick="nextTurn()">Nächste Karte</button>
       </div>`;
   } else if(state.current){
@@ -1039,6 +1245,17 @@ function renderGame(){
         ` : ``}
         ${state.phase === "revealed_pending" ? `
           <div class="draw-caption">Karte liegt bereit. Aufdecken?</div>
+          ${s.tokens ? `
+          <div class="guess-box">
+            <div class="head">Titel &amp; Interpret raten? <span>+1 ${icon('token')}</span></div>
+            <input class="guess-input" type="text" autocomplete="off" spellcheck="false"
+              placeholder="Titel" value="${esc(state.guess.t)}"
+              oninput="state.guess.t=this.value">
+            <input class="guess-input" type="text" autocomplete="off" spellcheck="false"
+              placeholder="Interpret" value="${esc(state.guess.a)}"
+              oninput="state.guess.a=this.value">
+            <div class="guess-hint">Tippfehler, Akzente und Groß-/Kleinschreibung sind egal — „enrike iglesias" zählt. Leer lassen = kein Rateversuch.</div>
+          </div>` : ``}
           <div class="reveal-actions">
             <button class="btn-ghost btn-small" onclick="chooseGap(null); state.phase='placing'; render();">Position ändern</button>
             <button class="btn-primary" onclick="revealCard()">Aufdecken</button>
@@ -1049,7 +1266,7 @@ function renderGame(){
 
   app.innerHTML = `
     <div class="topbar">
-      <div class="stat">Zeitleiste <b>${timeline.length} / ${s.target}</b></div>
+      <div class="stat">Richtig <b>${state.correctCount} / ${s.target}</b></div>
       <div class="stat">Stapel <b>${state.deck.length}</b></div>
       ${s.tokens ? `<div class="stat">Tokens <div class="token-dots">${tokenDots}</div></div>` : ``}
       <button class="btn-ghost btn-small" onclick="openExitDialog()">Zurück zum Menü</button>
@@ -1075,6 +1292,19 @@ function renderGame(){
       </div>
     ` : ``}
   `;
+
+  // Zur gerade relevanten Karte scrollen, falls die Zeitleiste breiter
+  // als das Fenster geworden ist.
+  requestAnimationFrame(() => {
+    const wrap = app.querySelector('.timeline-wrap');
+    if(!wrap || wrap.scrollWidth <= wrap.clientWidth) return;
+    const target = wrap.querySelector('.card.pending, .card.correct, .card.wrong, .gap.active')
+                || wrap.querySelector('.timeline > *:last-child');
+    if(!target) return;
+    const r = target.getBoundingClientRect();
+    const w = wrap.getBoundingClientRect();
+    wrap.scrollBy({ left: (r.left - w.left) - (w.width/2) + (r.width/2), behavior:'smooth' });
+  });
 }
 
 function renderWin(){
@@ -1128,6 +1358,10 @@ async function resumeGame(){
   const saved = await loadSave();
   if(saved){
     state = saved;
+    // Felder aus älteren Spielständen nachziehen
+    if(!state.guess) state.guess = { t:"", a:"" };
+    if(state.guessResult === undefined) state.guessResult = null;
+    if(typeof state.correctCount !== "number") state.correctCount = 0;
     state.screen = "game";
     render();
   }
