@@ -130,6 +130,20 @@
   }
   .chip.on{ color:var(--accent-ink); background:var(--accent); border-color:var(--accent); }
 
+  .dropdown{
+    background:var(--panel-2); color:var(--text); border:1px solid var(--line);
+    border-radius:999px; padding:9px 14px; font-family:'Space Grotesk',sans-serif;
+    font-size:14px; font-weight:600; cursor:pointer; flex:none;
+  }
+  .dropdown:hover{ border-color:var(--accent); }
+
+  .planned-notice{
+    background:var(--panel-2); border:1px dashed var(--line); border-radius:12px;
+    padding:12px 14px; font-size:13px; color:var(--muted); line-height:1.5;
+    margin-top:-8px;
+  }
+  .planned-notice a{ color:var(--accent); font-weight:600; }
+
   .stepper{display:flex; align-items:center; gap:14px;}
   .stepper button{
     width:32px; height:32px; padding:0; border-radius:50%;
@@ -655,10 +669,12 @@ function loadSlot(n){
   if(!data) return;
   state = JSON.parse(JSON.stringify(data));
   // Felder aus älteren Spielständen nachziehen
-  if(!state.guess) state.guess = { t:"", a:"" };
+  if(!state.guess) state.guess = { t:"", a:"", y:"" };
   if(state.guessResult === undefined) state.guessResult = null;
   if(typeof state.correctCount !== "number") state.correctCount = 0;
   if(typeof state.settings.maxTokens !== "number") state.settings.maxTokens = 5;
+  if(!state.settings.mode) state.settings.mode = "solo";
+  if(!state.settings.difficulty) state.settings.difficulty = "normal";
   state.pendingSpend = null;
   state.showExitDialog = false;
   state.saveSlotDialogOpen = false;
@@ -688,6 +704,8 @@ let state = {
     // strictYear: false, // vorerst deaktiviert – siehe isPlacementCorrect() weiter unten
     target: 10,
     maxTokens: 5,
+    mode: "solo",        // solo | multiplayer | coop
+    difficulty: "normal", // normal | pro | expert
     genres: { de:true, en:true, es:true }
   },
   deck: [], discard: [], timeline: [],
@@ -702,7 +720,7 @@ let state = {
   hasSave: false,
   showExitDialog: false,
   bonusClaimed: false,
-  guess: { t:"", a:"" },   // aktuelle Eingabe für Titel/Interpret
+  guess: { t:"", a:"", y:"" },   // aktuelle Eingabe für Titel/Interpret
   guessResult: null,        // {titleOk, artistOk, both, awarded, said:{t,a}}
   pendingSpend: null,        // {type:"skip"|"buy", amount} — wartet auf Bestätigung
   saveSlotDialogOpen: false,
@@ -848,7 +866,7 @@ function newGame(){
     hasSave: true,
     showExitDialog: false,
     bonusClaimed: false,
-    guess: { t:"", a:"" },
+    guess: { t:"", a:"", y:"" },
     guessResult: null,
     pendingSpend: null,
     saveSlotDialogOpen: false,
@@ -1052,12 +1070,34 @@ function isPlacementCorrect(song, gapIndex){
   return true;
 }
 
+function computeGuessCheck(song){
+  const said = {
+    t:(state.guess.t||"").trim(),
+    a:(state.guess.a||"").trim(),
+    y:(state.guess.y||"").trim()
+  };
+  const titleOk  = said.t ? fuzzyMatch(said.t, titleVariants(song.t))  : false;
+  const artistOk = said.a ? fuzzyMatch(said.a, artistVariants(song.a)) : false;
+  const yearOk   = said.y !== "" ? (parseInt(said.y, 10) === song.y) : false;
+  return { said, titleOk, artistOk, yearOk, both: titleOk && artistOk };
+}
+
 function revealCard(){
   if(state.phase !== "revealed_pending") return;
   pauseSpotifyPlayback();
   const song = state.current;
   const gapIndex = state.pendingGap;
-  const ok = isPlacementCorrect(song, gapIndex);
+  const positionOk = isPlacementCorrect(song, gapIndex);
+  const diff = state.settings.difficulty;
+  const guessCheck = computeGuessCheck(song);
+
+  let ok = positionOk;
+  if(diff === "pro"){
+    ok = positionOk && guessCheck.titleOk && guessCheck.artistOk;
+  } else if(diff === "expert"){
+    ok = positionOk && guessCheck.titleOk && guessCheck.artistOk && guessCheck.yearOk;
+  }
+
   if(ok){
     state.timeline.splice(gapIndex, 0, song);
     state.correctCount += 1;
@@ -1065,20 +1105,27 @@ function revealCard(){
     state.discard.push(song);
     state.wrongCount += 1;
   }
-  state.lastResult = { ok, song };
-  evaluateGuess(song);
+  state.lastResult = { ok, song, positionOk, guessCheck, difficulty: diff };
+
+  if(diff === "normal"){
+    // Bonus-Chrono-Token fürs Raten gibt's nur im Normal-Modus — in
+    // Pro/Expert ist das Raten ja bereits Pflicht fürs Zählen der Karte.
+    evaluateGuess(song);
+  } else {
+    state.guessResult = null;
+    state.guess = { t:"", a:"", y:"" };
+  }
+
   state.phase = "feedback";
   render(); saveState();
-  if(!checkWin()){
-    // weiter geht's erst nach Klick auf "Nächste Karte"
-  }
+  checkWin();
 }
 
 function evaluateGuess(song){
   state.guessResult = null;
   if(!state.settings.tokens) return;
   const said = { t:(state.guess.t||"").trim(), a:(state.guess.a||"").trim() };
-  if(!said.t && !said.a){ state.guess = {t:"",a:""}; return; }
+  if(!said.t && !said.a){ state.guess = {t:"",a:"",y:""}; return; }
 
   const titleOk  = said.t ? fuzzyMatch(said.t, titleVariants(song.t))  : false;
   const artistOk = said.a ? fuzzyMatch(said.a, artistVariants(song.a)) : false;
@@ -1090,7 +1137,7 @@ function evaluateGuess(song){
     if(state.tokens < state.settings.maxTokens){ state.tokens += 1; awarded = true; }
   }
   state.guessResult = { titleOk, artistOk, both, awarded, said };
-  state.guess = { t:"", a:"" };
+  state.guess = { t:"", a:"", y:"" };
 }
 
 function nextTurn(){
@@ -1253,6 +1300,35 @@ function renderMenu(){
       <h3 style="margin-bottom:18px;font-size:18px;">Einstellungen</h3>
       <div class="settings-grid">
 
+        <div class="setting-row" style="align-items:flex-start;">
+          <div>
+            <div class="label">Spielmodus</div>
+            <div class="hint">Solo ist spielbar, Mehrspieler &amp; Koop sind geplant</div>
+          </div>
+          <select class="dropdown" onchange="setMode(this.value)">
+            <option value="solo" ${s.mode==='solo'?'selected':''}>Solo</option>
+            <option value="multiplayer" ${s.mode==='multiplayer'?'selected':''}>Mehrspieler</option>
+            <option value="coop" ${s.mode==='coop'?'selected':''}>Koop</option>
+          </select>
+        </div>
+        ${s.mode !== 'solo' ? plannedFeatureNotice() : ``}
+
+        <div class="setting-row" style="align-items:flex-start;">
+          <div>
+            <div class="label">Schwierigkeit</div>
+            <div class="hint">${
+              s.difficulty === 'expert' ? 'Titel, Interpret UND exaktes Jahr müssen stimmen'
+              : s.difficulty === 'pro' ? 'Titel und Interpret müssen für den Punkt stimmen'
+              : 'Nur die richtige Position auf der Zeitleiste zählt'
+            }</div>
+          </div>
+          <select class="dropdown" onchange="setDifficulty(this.value)">
+            <option value="normal" ${s.difficulty==='normal'?'selected':''}>Normal</option>
+            <option value="pro" ${s.difficulty==='pro'?'selected':''}>Pro</option>
+            <option value="expert" ${s.difficulty==='expert'?'selected':''}>Expert</option>
+          </select>
+        </div>
+
         <div class="setting-row">
           <div>
             <div class="label">Chrono-Tokens</div>
@@ -1322,11 +1398,19 @@ function renderMenu(){
         <p style="font-size:13px;">Hinweis: Bei einem Song (Enrique Iglesias' "Bailando") lag nur ein Album- statt Track-Link vor — dort öffnet sich stattdessen eine Spotify-Suche in neuem Tab, wo der Titel sichtbar ist.</p>
         <p><strong>2. Platzieren:</strong> Ohne das Jahr zu kennen, legst du die Karte an die Stelle deiner Zeitleiste, die du für chronologisch richtig hältst.</p>
         <p><strong>3. Aufdecken:</strong> Die Karte wird umgedreht. Liegt sie richtig, bleibt sie liegen und zählt einen Punkt für deinen Sieg (die Startkarte zählt nicht). Liegt sie falsch, kommt sie auf den Ablagestapel.</p>
+        <p><strong>Schwierigkeit — ${s.difficulty === 'expert' ? 'Expert (aktiv)' : s.difficulty === 'pro' ? 'Pro (aktiv)' : 'Normal (aktiv)'}:</strong>
+          ${s.difficulty === 'expert'
+            ? 'Für den Punkt müssen Position, Titel, Interpret UND das exakte Erscheinungsjahr stimmen — vor dem Aufdecken trägst du alle drei ein.'
+            : s.difficulty === 'pro'
+            ? 'Für den Punkt müssen Position, Titel und Interpret stimmen — vor dem Aufdecken trägst du beides ein.'
+            : 'Nur die richtige Position auf der Zeitleiste zählt für den Punkt.'}
+        </p>
         ${s.tokens ? `
         <p><strong>Chrono-Tokens (aktiv):</strong> Du startest mit 2 Chrono-Tokens, maximal kannst du ${s.maxTokens} gleichzeitig besitzen.</p>
         <p>&bull; <strong>Song unbekannt?</strong> Wirf für 1 Chrono-Token die aktuelle Karte ab und ziehe eine neue, ohne sie zu platzieren.</p>
         <p>&bull; <strong>Karte kaufen:</strong> Für 3 Chrono-Tokens wird die nächste gezogene Karte garantiert korrekt in deine Zeitleiste einsortiert — ganz ohne Rateversuch und ohne Risiko.</p>
-        <p>&bull; <strong>Bonus-Chrono-Token:</strong> Bevor du aufdeckst, kannst du Titel und Interpret eintippen. Stimmt beides, gibt es einen weiteren Chrono-Token. Verglichen wird großzügig: Groß-/Kleinschreibung, Akzente, Umlaut-Schreibweisen und Tippfehler werden verziehen, Zusätze wie &bdquo;feat.&ldquo; oder Klammer-Untertitel sind optional.</p>
+        <p>&bull; <strong>Bonus-Chrono-Token (nur im Normal-Modus):</strong> Bevor du aufdeckst, kannst du Titel und Interpret eintippen. Stimmt beides, gibt es einen weiteren Chrono-Token. Verglichen wird großzügig: Groß-/Kleinschreibung, Akzente, Umlaut-Schreibweisen und Tippfehler werden verziehen, Zusätze wie &bdquo;feat.&ldquo; oder Klammer-Untertitel sind optional.</p>
+        ${s.difficulty !== 'normal' ? `<p style="font-size:13px;">In Pro/Expert ist das Eintippen ohnehin Pflicht fürs Zählen der Karte, daher entfällt hier der separate Bonus-Token.</p>` : ``}
         ` : `
         <p>Aktiviere Chrono-Tokens im Menü, um Karten überspringen oder kaufen zu können.</p>
         `}
@@ -1403,18 +1487,41 @@ function renderGame(){
 
   let drawZoneHtml = "";
   if(state.phase === "feedback"){
-    const ok = state.lastResult.ok;
-    const song = state.lastResult.song;
+    const r = state.lastResult;
+    const ok = r.ok;
+    const song = r.song;
+    const diff = r.difficulty || "normal";
     drawZoneHtml = `
       <div class="draw-zone">
-        <div class="feedback ${ok?'ok':'bad'}">${ok ? 'Richtig platziert!' : 'Leider falsch.'}</div>
+        <div class="feedback ${ok?'ok':'bad'}">${ok ? 'Richtig!' : 'Leider falsch.'}</div>
         <div class="draw-caption">${song.t} — ${song.a} · ${song.y}</div>
         ${song.id ? `
           <div class="embed-full">
             <iframe src="https://open.spotify.com/embed/track/${song.id}?utm_source=generator&theme=0"
               loading="lazy" allow="encrypted-media" title="Spotify player"></iframe>
           </div>` : ``}
-        ${s.tokens && state.guessResult ? `
+        ${diff !== "normal" ? `
+          <div class="guess-result">
+            <div class="row ${r.positionOk ? 'ok':'bad'}">
+              <span class="mark">${r.positionOk ? '✓':'✕'}</span>
+              <span>Position auf der Zeitleiste</span>
+            </div>
+            <div class="row ${r.guessCheck.titleOk ? 'ok':'bad'}">
+              <span class="mark">${r.guessCheck.titleOk ? '✓':'✕'}</span>
+              <span>Titel <span class="said">— du: „${esc(r.guessCheck.said.t) || '—'}"</span></span>
+            </div>
+            <div class="row ${r.guessCheck.artistOk ? 'ok':'bad'}">
+              <span class="mark">${r.guessCheck.artistOk ? '✓':'✕'}</span>
+              <span>Interpret <span class="said">— du: „${esc(r.guessCheck.said.a) || '—'}"</span></span>
+            </div>
+            ${diff === "expert" ? `
+            <div class="row ${r.guessCheck.yearOk ? 'ok':'bad'}">
+              <span class="mark">${r.guessCheck.yearOk ? '✓':'✕'}</span>
+              <span>Jahr <span class="said">— du: „${esc(r.guessCheck.said.y) || '—'}"</span></span>
+            </div>` : ``}
+          </div>
+        ` : ``}
+        ${diff === "normal" && s.tokens && state.guessResult ? `
           <div class="guess-result">
             <div class="row ${state.guessResult.titleOk ? 'ok':'bad'}">
               <span class="mark">${state.guessResult.titleOk ? '✓':'✕'}</span>
@@ -1426,7 +1533,7 @@ function renderGame(){
             </div>
             <div class="verdict ${state.guessResult.both ? 'ok':'bad'}">
               ${state.guessResult.both
-                ? (state.guessResult.awarded ? `+1 Bonus-Chrono-Token ${icon('token')}` : `Beides richtig — aber dein Chrono-Token-Vorrat ist schon voll (5).`)
+                ? (state.guessResult.awarded ? `+1 Bonus-Chrono-Token ${icon('token')}` : `Beides richtig — aber dein Chrono-Token-Vorrat ist schon voll (${s.maxTokens}).`)
                 : `Kein Bonus-Chrono-Token — beides muss stimmen.`}
             </div>
           </div>` : ``}
@@ -1472,16 +1579,28 @@ function renderGame(){
         ` : ``}
         ${state.phase === "revealed_pending" ? `
           <div class="draw-caption">Karte liegt bereit. Aufdecken?</div>
-          ${s.tokens ? `
+          ${s.tokens || s.difficulty !== 'normal' ? `
           <div class="guess-box">
-            <div class="head">Titel &amp; Interpret raten? <span>+1 ${icon('token')}</span></div>
+            <div class="head">${
+              s.difficulty === 'expert' ? 'Titel, Interpret &amp; Jahr — Pflicht für den Punkt!'
+              : s.difficulty === 'pro' ? 'Titel &amp; Interpret — Pflicht für den Punkt!'
+              : `Titel &amp; Interpret raten? <span>+1 ${icon('token')}</span>`
+            }</div>
             <input class="guess-input" type="text" autocomplete="off" spellcheck="false"
               placeholder="Titel" value="${esc(state.guess.t)}"
               oninput="state.guess.t=this.value">
             <input class="guess-input" type="text" autocomplete="off" spellcheck="false"
               placeholder="Interpret" value="${esc(state.guess.a)}"
               oninput="state.guess.a=this.value">
-            <div class="guess-hint">Tippfehler, Akzente und Groß-/Kleinschreibung sind egal — „enrike iglesias" zählt. Leer lassen = kein Rateversuch.</div>
+            ${s.difficulty === 'expert' ? `
+            <input class="guess-input" type="number" inputmode="numeric" autocomplete="off"
+              placeholder="Jahr (z.B. 1998)" value="${esc(state.guess.y)}"
+              oninput="state.guess.y=this.value">` : ``}
+            <div class="guess-hint">${
+              s.difficulty !== 'normal'
+                ? 'Tippfehler, Akzente und Groß-/Kleinschreibung sind egal. Position, Titel & Interpret' + (s.difficulty==='expert' ? ' & exaktes Jahr' : '') + ' müssen stimmen, sonst zählt die Karte nicht.'
+                : 'Tippfehler, Akzente und Groß-/Kleinschreibung sind egal — „enrike iglesias" zählt. Leer lassen = kein Rateversuch.'
+            }</div>
           </div>` : ``}
           <div class="reveal-actions">
             <button class="btn-ghost btn-small" onclick="chooseGap(null); state.phase='placing'; render();">Position ändern</button>
@@ -1617,6 +1736,17 @@ function render(){
 }
 
 /* ============ SETTINGS HELPERS ============ */
+function plannedFeatureNotice(){
+  return `<div class="planned-notice">Dieses Spiel ist noch in der Entwicklung! Dieses Feature ist für die Zukunft geplant. Die offizielle To-Do-List findest du <a href="https://docs.google.com/spreadsheets/d/1rqiXWYksaIVn-ia4HOzgkgCINeQeQMeZh_-NRV7wddk/edit?usp=sharing" target="_blank" rel="noopener">hier</a>!</div>`;
+}
+function setMode(value){
+  state.settings.mode = value;
+  render(); saveState();
+}
+function setDifficulty(value){
+  state.settings.difficulty = value;
+  render(); saveState();
+}
 function toggleSetting(key){
   state.settings[key] = !state.settings[key];
   render(); saveState();
@@ -1647,10 +1777,12 @@ async function resumeGame(){
   if(saved){
     state = saved;
     // Felder aus älteren Spielständen nachziehen
-    if(!state.guess) state.guess = { t:"", a:"" };
+    if(!state.guess) state.guess = { t:"", a:"", y:"" };
     if(state.guessResult === undefined) state.guessResult = null;
     if(typeof state.correctCount !== "number") state.correctCount = 0;
     if(typeof state.settings.maxTokens !== "number") state.settings.maxTokens = 5;
+  if(!state.settings.mode) state.settings.mode = "solo";
+  if(!state.settings.difficulty) state.settings.difficulty = "normal";
     state.pendingSpend = null;
     state.saveSlotDialogOpen = false;
     state.confirmDeleteSlot = null;
@@ -1666,6 +1798,8 @@ async function resumeGame(){
   if(saved){
     state.settings = saved.settings || state.settings;
     if(typeof state.settings.maxTokens !== "number") state.settings.maxTokens = 5;
+  if(!state.settings.mode) state.settings.mode = "solo";
+  if(!state.settings.difficulty) state.settings.difficulty = "normal";
     state.hasSave = saved.screen === "game";
   }
   render();
