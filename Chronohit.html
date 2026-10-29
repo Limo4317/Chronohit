@@ -6,11 +6,12 @@
 <title>Chronohit</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNTAwIDUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDwhLS0gw6R1w59lcmVyIFJhaG1lbnJpbmcsIG1hY2h0IGRpZSBydW5kZSBGb3JtIGVpbmRldXRpZyAtLT4KICA8Y2lyY2xlIGN4PSIyNTAiIGN5PSIyNTAiIHI9IjIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjIiIG9wYWNpdHk9IjAuMzUiLz4KCiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjUwLDI1MCkgc2NhbGUoNCkiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+CiAgICA8IS0tIFplaXRsZWlzdGUgLS0+CiAgICA8bGluZSB4MT0iLTQ0IiB5MT0iMCIgeDI9IjQ0IiB5Mj0iMCIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDxjaXJjbGUgY3g9Ii0zMiIgY3k9IjAiIHI9IjEuNyIgZmlsbD0iI2U4YTMzZCIvPgogICAgPGNpcmNsZSBjeD0iMzIiIGN5PSIwIiByPSIxLjciIGZpbGw9IiNlOGEzM2QiLz4KCiAgICA8IS0tIFZpbnlsLVJpbGxlbiAtLT4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIyMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIxNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjEiIG9wYWNpdHk9IjAuNTUiLz4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSI4LjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U4YTMzZCIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjMiLz4KCiAgICA8IS0tIFBsYXktRHJlaWVjayBpbSBaZW50cnVtIC0tPgogICAgPHBvbHlnb24gcG9pbnRzPSItNCwtNiAtNCw2IDgsMCIgZmlsbD0iI2U4YTMzZCIvPgogIDwvZz4KPC9zdmc+Cg==">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg: #14151d;
     --bg-2: #1b1d29;
+    --bg-highlight: #23263a;
     --panel: #21232f;
     --panel-2: #2a2d3c;
     --card-face: #f3ead9;
@@ -24,13 +25,69 @@
     --wrong: #c1483b;
     --line: #34364a;
     --radius: 14px;
+    --btn-radius: 999px;
+    --heading-font: 'Fraunces', serif;
+  }
+
+  /* ---- Theme: Dunkel (Gelb->Weiß, Blau->Schwarz) ---- */
+  :root[data-theme="dark"]{
+    --bg: #0a0a0a;
+    --bg-2: #000000;
+    --bg-highlight: #1a1a1a;
+    --panel: #161616;
+    --panel-2: #1f1f1f;
+    --text: #f2f2f2;
+    --muted: #8a8a8a;
+    --accent: #ffffff;
+    --accent-ink: #14151d;
+    --correct: #6fbf8f;
+    --wrong: #d6564a;
+    --line: #2c2c2c;
+  }
+
+  /* ---- Theme: Hell (Dunkel-Theme invertiert) ---- */
+  :root[data-theme="light"]{
+    --bg: #ebeae2;
+    --bg-2: #e4e2d6;
+    --bg-highlight: #f5f4ee;
+    --panel: #dedcd0;
+    --panel-2: #d5d2c3;
+    --card-face: #0c1526;
+    --card-face-2: #16233d;
+    --ink: #dddfe5;
+    --text: #131824;
+    --muted: #6b6d5c;
+    --accent: #175cc2;
+    --accent-ink: #eaf1fc;
+    --correct: #2f7d52;
+    --wrong: #b23b30;
+    --line: #c9c7b3;
+  }
+
+  /* ---- Theme: Modern (Konsolen-Look) ---- */
+  :root[data-theme="modern"]{
+    --bg: #0d1416;
+    --bg-2: #10181a;
+    --bg-highlight: #16302c;
+    --panel: #141d21;
+    --panel-2: #182226;
+    --text: #dfe9ea;
+    --muted: #6d8288;
+    --accent: #5eead4;
+    --accent-ink: #06302a;
+    --correct: #34d399;
+    --wrong: #e0453f;
+    --line: #233034;
+    --radius: 10px;
+    --btn-radius: 8px;
+    --heading-font: 'Space Mono', monospace;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   html{overflow-x:hidden;}
   body{
     background:
-      radial-gradient(1200px 600px at 50% -10%, #23263a 0%, var(--bg) 55%);
+      radial-gradient(1200px 600px at 50% -10%, var(--bg-highlight) 0%, var(--bg) 55%);
     color:var(--text);
     font-family:'Space Grotesk', sans-serif;
     min-height:100vh;
@@ -40,7 +97,7 @@
     padding:28px 16px 60px;
   }
   h1,h2,h3, .num{
-    font-family:'Fraunces', serif;
+    font-family:var(--heading-font);
     font-weight:600;
     margin:0;
   }
@@ -79,7 +136,7 @@
     gap:36px;
   }
   .splash-title{
-    font-family:'Fraunces',serif; font-weight:700; font-size:44px;
+    font-family:var(--heading-font); font-weight:700; font-size:44px;
     color:var(--accent); letter-spacing:.03em; text-align:center;
   }
   .splash-play{
@@ -102,7 +159,7 @@
   @keyframes loadingBoxFadeOut{ from{opacity:1} to{opacity:0} }
   #app.fade-in{ animation: appFadeIn .4s ease; }
   @keyframes appFadeIn{ from{opacity:0} to{opacity:1} }
-  .loading-label{ font-family:'Fraunces',serif; font-size:20px; color:var(--accent); }
+  .loading-label{ font-family:var(--heading-font); font-size:20px; color:var(--accent); }
   .loading-frame{
     width:100%; height:16px; border:2px solid var(--accent); border-radius:5px;
     overflow:hidden; background:var(--panel-2); padding:2px;
@@ -120,7 +177,7 @@
   }
   .todo-fab{
     background:var(--panel); border:1px solid var(--line); color:var(--muted);
-    border-radius:999px; padding:10px 16px; font-size:13px; font-weight:600;
+    border-radius:var(--btn-radius); padding:10px 16px; font-size:13px; font-weight:600;
     text-decoration:none; display:inline-block;
   }
   .todo-fab:hover{ color:var(--accent); border-color:var(--accent); }
@@ -133,15 +190,44 @@
   .wizard-actions{ flex-direction:row !important; justify-content:space-between; }
   .wizard-actions button{ width:auto; }
   .wizard-slot{ cursor:pointer; }
+
+  /* ---- theme picker ---- */
+  .theme-list{ display:flex; flex-direction:column; gap:10px; }
+  .theme-swatch{
+    display:flex; align-items:center; gap:14px; cursor:pointer;
+    background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+    padding:12px 14px;
+  }
+  .theme-swatch.selected{ border-color:var(--accent); }
+  .theme-dots{ display:flex; gap:5px; flex:none; }
+  .theme-dots span{
+    width:18px; height:18px; border-radius:50%; border:1px solid rgba(255,255,255,.15);
+  }
+  .theme-swatch[data-theme-preview="og"] .theme-dots span:nth-child(1){ background:#14151d; }
+  .theme-swatch[data-theme-preview="og"] .theme-dots span:nth-child(2){ background:#21232f; }
+  .theme-swatch[data-theme-preview="og"] .theme-dots span:nth-child(3){ background:#e8a33d; }
+  .theme-swatch[data-theme-preview="dark"] .theme-dots span:nth-child(1){ background:#0a0a0a; }
+  .theme-swatch[data-theme-preview="dark"] .theme-dots span:nth-child(2){ background:#161616; }
+  .theme-swatch[data-theme-preview="dark"] .theme-dots span:nth-child(3){ background:#ffffff; }
+  .theme-swatch[data-theme-preview="light"] .theme-dots span:nth-child(1){ background:#ebeae2; }
+  .theme-swatch[data-theme-preview="light"] .theme-dots span:nth-child(2){ background:#dedcd0; }
+  .theme-swatch[data-theme-preview="light"] .theme-dots span:nth-child(3){ background:#175cc2; }
+  .theme-swatch[data-theme-preview="modern"] .theme-dots span:nth-child(1){ background:#0d1416; }
+  .theme-swatch[data-theme-preview="modern"] .theme-dots span:nth-child(2){ background:#141d21; }
+  .theme-swatch[data-theme-preview="modern"] .theme-dots span:nth-child(3){ background:#5eead4; }
+  .theme-info{ flex:1; }
+  .theme-label{ font-family:var(--heading-font); font-size:16px; color:var(--text); }
+  .theme-label .wizard-check{ font-size:14px; }
+  .theme-desc{ font-size:12px; color:var(--muted); margin-top:2px; }
   .wizard-slot.selected{ border-color:var(--accent); }
-  .wizard-check{ color:var(--correct); font-family:'Fraunces',serif; font-size:18px; flex:none; }
+  .wizard-check{ color:var(--correct); font-family:var(--heading-font); font-size:18px; flex:none; }
 
   /* ---- info-i ---- */
   .label-with-info{ display:flex; align-items:center; gap:8px; }
   .info-btn{
     width:18px; height:18px; padding:0; border-radius:50%;
     background:var(--panel-2); border:1px solid var(--line); color:var(--muted);
-    font-family:'Fraunces',serif; font-style:italic; font-size:12px; line-height:1;
+    font-family:var(--heading-font); font-style:italic; font-size:12px; line-height:1;
     display:flex; align-items:center; justify-content:center; flex:none;
   }
   .info-btn:hover{ border-color:var(--accent); color:var(--accent); }
@@ -165,7 +251,7 @@
     font-family:'Space Grotesk', sans-serif;
     cursor:pointer;
     border:none;
-    border-radius:999px;
+    border-radius:var(--btn-radius);
     font-size:15px;
     font-weight:600;
     padding:13px 22px;
@@ -178,7 +264,7 @@
   .btn-ghost{ background:transparent; color:var(--text); border:1px solid var(--line); }
   .btn-ghost:hover:not(:disabled){border-color:var(--accent); color:var(--accent);}
   .btn-danger{ background:transparent; color:var(--wrong); border:1px solid var(--wrong); }
-  .btn-small{ padding:8px 14px; font-size:13px; border-radius:999px; }
+  .btn-small{ padding:8px 14px; font-size:13px; border-radius:var(--btn-radius); }
 
   /* ---- menu ---- */
   .menu-card{
@@ -203,7 +289,7 @@
   .setting-row .hint{color:var(--muted); font-size:13px; margin-top:3px;}
 
   .switch{
-    position:relative; width:46px; height:26px; border-radius:999px;
+    position:relative; width:46px; height:26px; border-radius:var(--btn-radius);
     background:var(--panel-2); border:1px solid var(--line); flex:none;
   }
   .switch.on{background:var(--accent); border-color:var(--accent);}
@@ -215,14 +301,14 @@
 
   .chip-row{display:flex; gap:8px; flex-wrap:wrap;}
   .chip{
-    padding:7px 14px; border-radius:999px; border:1px solid var(--line);
+    padding:7px 14px; border-radius:var(--btn-radius); border:1px solid var(--line);
     font-size:13px; font-weight:600; color:var(--muted); background:transparent;
   }
   .chip.on{ color:var(--accent-ink); background:var(--accent); border-color:var(--accent); }
 
   .dropdown{
     background:var(--panel-2); color:var(--text); border:1px solid var(--line);
-    border-radius:999px; padding:9px 14px; font-family:'Space Grotesk',sans-serif;
+    border-radius:var(--btn-radius); padding:9px 14px; font-family:'Space Grotesk',sans-serif;
     font-size:14px; font-weight:600; cursor:pointer; flex:none;
   }
   .dropdown:hover{ border-color:var(--accent); }
@@ -240,7 +326,7 @@
     background:var(--panel-2); color:var(--text); border:1px solid var(--line);
     font-size:16px; line-height:1;
   }
-  .stepper .val{ font-family:'Fraunces',serif; font-size:20px; min-width:28px; text-align:center; }
+  .stepper .val{ font-family:var(--heading-font); font-size:20px; min-width:28px; text-align:center; }
 
   details.info{
     background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
@@ -265,7 +351,7 @@
     background:var(--panel); border:1px solid var(--line); border-radius:999px;
     padding:8px 16px; font-size:13px; color:var(--muted); display:flex; gap:8px; align-items:center;
   }
-  .stat b{color:var(--text); font-family:'Fraunces',serif; font-size:15px;}
+  .stat b{color:var(--text); font-family:var(--heading-font); font-size:15px;}
   .token-dots{display:flex; gap:4px;}
   .token-dots span{width:9px;height:9px;border-radius:50%; background:var(--line);}
   .token-dots span.filled{background:var(--accent);}
@@ -376,14 +462,14 @@
     box-shadow:0 6px 16px rgba(0,0,0,.28);
     border:1px solid rgba(0,0,0,.08);
   }
-  .card .year{font-family:'Fraunces',serif; font-size:26px; font-weight:700;}
+  .card .year{font-family:var(--heading-font); font-size:26px; font-weight:700;}
   .card .title{font-size:12px; font-weight:600; line-height:1.3; margin-top:6px;}
   .card .artist{font-size:11px; color:#5c5645; margin-top:2px;}
   .card.pending{
     background:var(--panel-2); border:1px dashed var(--accent);
     align-items:center; justify-content:center;
   }
-  .card.pending .q{font-family:'Fraunces',serif; font-size:28px; color:var(--muted);}
+  .card.pending .q{font-family:var(--heading-font); font-size:28px; color:var(--muted);}
   .card.correct{outline:2px solid var(--correct);}
   .card.wrong{outline:2px solid var(--wrong); opacity:.55;}
   .card .tag{
@@ -459,7 +545,7 @@
   .win-card .num{font-size:64px; color:var(--accent);}
   .win-card p{color:var(--muted); margin-top:6px;}
   .end-heading{
-    font-family:'Fraunces',serif; font-weight:700; font-size:42px;
+    font-family:var(--heading-font); font-weight:700; font-size:42px;
     margin-bottom:4px;
   }
   .end-heading.won{ color:var(--correct); }
@@ -467,7 +553,7 @@
   .timeline.final-view{ gap:10px; }
   .win-stats{display:flex; justify-content:center; gap:26px; margin:22px 0; flex-wrap:wrap;}
   .win-stats div{text-align:center;}
-  .win-stats .n{font-family:'Fraunces',serif; font-size:24px;}
+  .win-stats .n{font-family:var(--heading-font); font-size:24px;}
   .win-stats .l{font-size:12px; color:var(--muted);}
 
   .modal-backdrop{
@@ -489,7 +575,7 @@
     background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
     padding:12px 14px;
   }
-  .slot-title{font-family:'Fraunces',serif; font-size:16px;}
+  .slot-title{font-family:var(--heading-font); font-size:16px;}
   .slot-meta{font-size:12px; color:var(--muted); margin-top:2px;}
   .slot-actions{display:flex; gap:8px; flex:none;}
 
@@ -1452,15 +1538,15 @@ function renderSplash(){
       <div class="splash-title">CHRONOHIT</div>
       <button class="splash-play" onclick="goToMenu()" aria-label="Chronohit starten">
         <svg width="92" height="92" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="250" cy="250" r="230" fill="none" stroke="#e8a33d" stroke-width="2" opacity="0.35"/>
+          <circle cx="250" cy="250" r="230" fill="none" stroke="var(--accent)" stroke-width="2" opacity="0.35"/>
           <g transform="translate(250,250) scale(4)" stroke-linecap="round">
-            <line x1="-44" y1="0" x2="44" y2="0" stroke="#e8a33d" stroke-width="2"/>
-            <circle cx="-32" cy="0" r="1.7" fill="#e8a33d"/>
-            <circle cx="32" cy="0" r="1.7" fill="#e8a33d"/>
-            <circle cx="0" cy="0" r="22" fill="none" stroke="#e8a33d" stroke-width="2"/>
-            <circle cx="0" cy="0" r="15" fill="none" stroke="#e8a33d" stroke-width="1" opacity="0.55"/>
-            <circle cx="0" cy="0" r="8.5" fill="none" stroke="#e8a33d" stroke-width="1" opacity="0.3"/>
-            <polygon points="-4,-6 -4,6 8,0" fill="#e8a33d"/>
+            <line x1="-44" y1="0" x2="44" y2="0" stroke="var(--accent)" stroke-width="2"/>
+            <circle cx="-32" cy="0" r="1.7" fill="var(--accent)"/>
+            <circle cx="32" cy="0" r="1.7" fill="var(--accent)"/>
+            <circle cx="0" cy="0" r="22" fill="none" stroke="var(--accent)" stroke-width="2"/>
+            <circle cx="0" cy="0" r="15" fill="none" stroke="var(--accent)" stroke-width="1" opacity="0.55"/>
+            <circle cx="0" cy="0" r="8.5" fill="none" stroke="var(--accent)" stroke-width="1" opacity="0.3"/>
+            <polygon points="-4,-6 -4,6 8,0" fill="var(--accent)"/>
           </g>
         </svg>
       </button>
@@ -1488,6 +1574,51 @@ function openTutorial(){
   state.screen = "tutorial";
   render();
 }
+function openSettings(){
+  state.screen = "settings";
+  render();
+}
+
+const THEME_INFO = [
+  { key:"og", label:"OG", desc:"Das klassische Chronohit-Look: dunkles Blaugrau mit goldenem Akzent." },
+  { key:"dark", label:"Dunkel", desc:"Reines Schwarz statt Blaugrau, weißer statt goldener Akzent." },
+  { key:"light", label:"Hell", desc:"Das Dunkel-Theme umgekehrt: helle Flächen, dunkle Karten, blauer Akzent." },
+  { key:"modern", label:"Modern", desc:"Konsolen-Look mit Türkis-Akzent, schärferen Kanten und Monospace-Schrift." }
+];
+
+function selectTheme(key){
+  applyTheme(key);
+  render();
+}
+
+function renderSettings(){
+  const swatches = THEME_INFO.map(t => `
+    <div class="theme-swatch ${currentTheme===t.key ? 'selected':''}" onclick="selectTheme('${t.key}')" data-theme-preview="${t.key}">
+      <div class="theme-dots"><span></span><span></span><span></span></div>
+      <div class="theme-info">
+        <div class="theme-label">${t.label}${currentTheme===t.key ? ' <span class="wizard-check">✓</span>' : ''}</div>
+        <div class="theme-desc">${t.desc}</div>
+      </div>
+    </div>`).join('');
+
+  app.innerHTML = `
+    <div class="brand"><h1 style="font-size:30px;">Einstellungen</h1></div>
+
+    <div class="menu-card">
+      <h3>Sprache</h3>
+      ${plannedFeatureNotice()}
+    </div>
+
+    <div class="menu-card">
+      <h3>Themes</h3>
+      <div class="theme-list">${swatches}</div>
+    </div>
+
+    <div class="menu-actions">
+      <button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button>
+    </div>
+  `;
+}
 
 function renderMenu(){
   app.innerHTML = `
@@ -1498,6 +1629,7 @@ function renderMenu(){
       <div class="menu-actions">
         <button class="btn-primary" onclick="startCreateWizard()">Spiel starten</button>
         <button class="btn-ghost" onclick="openLoadGame()">Spiel laden</button>
+        <button class="btn-ghost" onclick="openSettings()">Einstellungen</button>
         <button class="btn-ghost" onclick="openTutorial()">Tutorial</button>
       </div>
     </div>
@@ -2168,6 +2300,7 @@ function updateDocumentTitle(){
     menu: "Hauptmenü - Chronohit",
     loadgame: "Spielstände - Chronohit",
     tutorial: "Tutorial - Chronohit",
+    settings: "Einstellungen - Chronohit",
     create: "Spiel erstellen - Chronohit",
     game: `${state.activeSaveName ? state.activeSaveName : "Unbenannt"} - Chronohit`,
     end: `${state.won ? "Gewonnen" : "Verloren"} - Chronohit`,
@@ -2182,6 +2315,7 @@ function render(){
   else if(state.screen === "menu") renderMenu();
   else if(state.screen === "loadgame") renderLoadGame();
   else if(state.screen === "tutorial") renderTutorial();
+  else if(state.screen === "settings") renderSettings();
   else if(state.screen === "create") renderCreateGame();
   else if(state.screen === "game") renderGame();
   else if(state.screen === "end") renderEnd();
@@ -2247,8 +2381,23 @@ async function resumeGame(){
   }
 }
 
+/* ============ THEME ============ */
+const THEME_STORAGE_KEY = "chronohit_theme";
+let currentTheme = "og";
+function applyTheme(theme){
+  currentTheme = theme;
+  document.documentElement.setAttribute("data-theme", theme);
+  try{ localStorage.setItem(THEME_STORAGE_KEY, theme); }catch(e){ /* best effort */ }
+}
+function loadTheme(){
+  let saved = null;
+  try{ saved = localStorage.getItem(THEME_STORAGE_KEY); }catch(e){}
+  applyTheme(saved && THEME_INFO.some(t => t.key === saved) ? saved : "og");
+}
+
 /* ============ INIT ============ */
 (async function init(){
+  loadTheme();
   slotsCache = await loadAllSlots();
   const saved = await loadSave();
   if(saved){
