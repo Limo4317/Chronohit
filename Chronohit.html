@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHRONOHIT — Musik-Zeitleiste</title>
+<title>Chronohit</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNTAwIDUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNTAwIiBoZWlnaHQ9IjUwMCIgZmlsbD0iIzAwMDAwMCIvPgoKICA8IS0tIMOkdcOfZXJlciBSYWhtZW5yaW5nLCBtYWNodCBkaWUgcnVuZGUgRm9ybSBlaW5kZXV0aWcgLS0+CiAgPGNpcmNsZSBjeD0iMjUwIiBjeT0iMjUwIiByPSIyMzAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U4YTMzZCIgc3Ryb2tlLXdpZHRoPSIyIiBvcGFjaXR5PSIwLjM1Ii8+CgogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI1MCwyNTApIHNjYWxlKDQpIiBzdHJva2UtbGluZWNhcD0icm91bmQiPgogICAgPCEtLSBaZWl0bGVpc3RlIC0tPgogICAgPGxpbmUgeDE9Ii00NCIgeTE9IjAiIHgyPSI0NCIgeTI9IjAiIHN0cm9rZT0iI2U4YTMzZCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8Y2lyY2xlIGN4PSItMzIiIGN5PSIwIiByPSIxLjciIGZpbGw9IiNlOGEzM2QiLz4KICAgIDxjaXJjbGUgY3g9IjMyIiBjeT0iMCIgcj0iMS43IiBmaWxsPSIjZThhMzNkIi8+CgogICAgPCEtLSBWaW55bC1SaWxsZW4gLS0+CiAgICA8Y2lyY2xlIGN4PSIwIiBjeT0iMCIgcj0iMjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U4YTMzZCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8Y2lyY2xlIGN4PSIwIiBjeT0iMCIgcj0iMTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U4YTMzZCIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjU1Ii8+CiAgICA8Y2lyY2xlIGN4PSIwIiBjeT0iMCIgcj0iOC41IiBmaWxsPSJub25lIiBzdHJva2U9IiNlOGEzM2QiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC4zIi8+CgogICAgPCEtLSBQbGF5LURyZWllY2sgaW0gWmVudHJ1bSAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iLTQsLTYgLTQsNiA4LDAiIGZpbGw9IiNlOGEzM2QiLz4KICA8L2c+Cjwvc3ZnPgo=">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -94,7 +95,13 @@
   .splash-play:hover{ transform:scale(1.06); }
 
   /* ---- loading ---- */
-  .loading-box{ display:flex; flex-direction:column; align-items:center; gap:16px; width:260px; }
+  .loading-box{
+    display:flex; flex-direction:column; align-items:center; gap:16px; width:260px;
+    animation: loadingBoxFadeOut .4s ease 1.1s forwards;
+  }
+  @keyframes loadingBoxFadeOut{ from{opacity:1} to{opacity:0} }
+  #app.fade-in{ animation: appFadeIn .4s ease; }
+  @keyframes appFadeIn{ from{opacity:0} to{opacity:1} }
   .loading-label{ font-family:'Fraunces',serif; font-size:20px; color:var(--accent); }
   .loading-frame{
     width:100%; height:16px; border:2px solid var(--accent); border-radius:5px;
@@ -107,11 +114,14 @@
   @keyframes loadingFill{ from{width:0%} to{width:100%} }
 
   /* ---- to-do fab ---- */
+  .fab-stack{
+    position:fixed; right:18px; bottom:18px; z-index:20;
+    display:flex; flex-direction:column; gap:10px; align-items:flex-end;
+  }
   .todo-fab{
-    position:fixed; right:18px; bottom:18px;
     background:var(--panel); border:1px solid var(--line); color:var(--muted);
     border-radius:999px; padding:10px 16px; font-size:13px; font-weight:600;
-    text-decoration:none; z-index:20;
+    text-decoration:none; display:inline-block;
   }
   .todo-fab:hover{ color:var(--accent); border-color:var(--accent); }
 
@@ -942,7 +952,7 @@ function newGame(customSettings){
   const settings = customSettings || state.settings;
   const pool = filteredPool(settings);
   let deck = shuffle(pool);
-  const starter = deck.shift();
+  const starter = { ...deck.shift(), __starter: true };
   state = {
     screen: "game",
     settings,
@@ -1408,12 +1418,19 @@ function goToMenu(){
   setTimeout(() => {
     state.screen = "menu";
     render();
-  }, 1200);
+    app.classList.remove("fade-in");
+    void app.offsetWidth; // Reflow erzwingen, damit die Animation neu startet
+    app.classList.add("fade-in");
+  }, 1500);
+}
+function backToMenuInstant(){
+  state.screen = "menu";
+  render();
 }
 function renderSplash(){
   app.innerHTML = `
     <div class="splash-wrap">
-      <div class="splash-title">CHRONOHIT</div>
+      <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTIwMCAzNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHJlY3Qgd2lkdGg9IjEyMDAiIGhlaWdodD0iMzYwIiBmaWxsPSIjMDAwMDAwIi8+CgogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDMwMCwxODApIHNjYWxlKDMpIiBzdHJva2UtbGluZWNhcD0icm91bmQiPgogICAgPCEtLSBaZWl0bGVpc3RlIC0tPgogICAgPGxpbmUgeDE9Ii00NCIgeTE9IjAiIHgyPSI0NCIgeTI9IjAiIHN0cm9rZT0iI2U4YTMzZCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8Y2lyY2xlIGN4PSItMzIiIGN5PSIwIiByPSIxLjciIGZpbGw9IiNlOGEzM2QiLz4KICAgIDxjaXJjbGUgY3g9IjMyIiBjeT0iMCIgcj0iMS43IiBmaWxsPSIjZThhMzNkIi8+CgogICAgPCEtLSBWaW55bC1SaWxsZW4gLS0+CiAgICA8Y2lyY2xlIGN4PSIwIiBjeT0iMCIgcj0iMjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U4YTMzZCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8Y2lyY2xlIGN4PSIwIiBjeT0iMCIgcj0iMTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U4YTMzZCIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjU1Ii8+CiAgICA8Y2lyY2xlIGN4PSIwIiBjeT0iMCIgcj0iOC41IiBmaWxsPSJub25lIiBzdHJva2U9IiNlOGEzM2QiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC4zIi8+CgogICAgPCEtLSBQbGF5LURyZWllY2sgaW0gWmVudHJ1bSAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iLTQsLTYgLTQsNiA4LDAiIGZpbGw9IiNlOGEzM2QiLz4KICA8L2c+CgogIDx0ZXh0IHg9IjQ3MCIgeT0iMTgwIiBmb250LWZhbWlseT0iJ1NwYWNlIEdyb3Rlc2snLCBBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjcwMCIKICAgICAgICBmb250LXNpemU9IjkyIiBsZXR0ZXItc3BhY2luZz0iNiIgZmlsbD0iI2U4YTMzZCIKICAgICAgICB0ZXh0LWFuY2hvcj0ic3RhcnQiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5DSFJPTk9ISVQ8L3RleHQ+Cjwvc3ZnPgo=" alt="Chronohit" style="width:min(90vw, 480px); height:auto; display:block;">
       <button class="splash-play" onclick="goToMenu()" aria-label="Chronohit starten">
         <svg width="32" height="32" viewBox="0 0 20 20"><polygon points="5,3 16,10 5,17" fill="currentColor"/></svg>
       </button>
@@ -1454,7 +1471,10 @@ function renderMenu(){
         <button class="btn-ghost" onclick="openTutorial()">Tutorial</button>
       </div>
     </div>
-    <a class="todo-fab" href="https://docs.google.com/spreadsheets/d/1rqiXWYksaIVn-ia4HOzgkgCINeQeQMeZh_-NRV7wddk/edit?usp=sharing" target="_blank" rel="noopener">To-Do-Liste ↗</a>
+    <div class="fab-stack">
+      <a class="todo-fab" href="https://forms.gle/cvKQuWEpUhbSPMFx9" target="_blank" rel="noopener">Vorschläge ↗</a>
+      <a class="todo-fab" href="https://docs.google.com/spreadsheets/d/1_-Ud2AE-zAwF1ktxfawKfEWAKZf54e6rmZJ6jXU7S7E/edit?usp=sharing" target="_blank" rel="noopener">To-Do-Liste ↗</a>
+    </div>
   `;
 }
 
@@ -1500,7 +1520,7 @@ function renderLoadGame(){
       <div class="save-slot-list">${rows}</div>
     </div>
     <div class="menu-actions">
-      <button class="btn-ghost" onclick="goToMenu()">← Zurück zum Hauptmenü</button>
+      <button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button>
     </div>
     ${state.confirmDeleteSlot ? renderDeleteSlotModal() : ``}
   `;
@@ -1528,7 +1548,7 @@ function renderTutorial(){
       </div>
     </div>
     <div class="menu-actions">
-      <button class="btn-ghost" onclick="goToMenu()">← Zurück zum Hauptmenü</button>
+      <button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button>
     </div>
   `;
 }
@@ -1620,7 +1640,7 @@ function renderWizardStep2(){
           </select>`)}
         ${w.mode !== 'solo' ? plannedFeatureNotice() : ``}
         ${infoRow('w-difficulty', 'Schwierigkeit',
-          'Normal: Nur die Position auf der Zeitleiste zählt. Profi: Titel &amp; Interpret müssen zusätzlich stimmen. Experte: zusätzlich auch das exakte Erscheinungsjahr.',
+          '<strong>Normal</strong>: Nur die Position auf der Zeitleiste zählt.<br><strong>Profi</strong>: Titel &amp; Interpret müssen zusätzlich stimmen.<br><strong>Experte</strong>: zusätzlich auch das exakte Erscheinungsjahr.',
           `<select class="dropdown" onchange="wizardSetDifficulty(this.value)">
             <option value="normal" ${w.difficulty==='normal'?'selected':''}>Normal</option>
             <option value="pro" ${w.difficulty==='pro'?'selected':''}>Profi</option>
@@ -1792,7 +1812,7 @@ function renderGame(){
       const isNewlyCorrect = state.phase === "feedback" && state.lastResult && state.lastResult.ok && song === state.lastResult.song;
       timelineHtml += cardHtml(song, {
         cls: isNewlyCorrect ? "correct" : "",
-        tag: i===0 && timeline.length>0 && !isNewlyCorrect && song === timeline[0] && state.correctCount===0 && state.wrongCount===0 && state.phase!=="feedback" ? "Start" : (isNewlyCorrect ? "richtig" : ""),
+        tag: song.__starter && !isNewlyCorrect ? "Start" : (isNewlyCorrect ? "richtig" : ""),
         tagCls: isNewlyCorrect ? "ok" : "start"
       });
     }
@@ -2029,7 +2049,7 @@ function showFinalTimeline(){
 }
 
 function renderTimelineOnly(){
-  const cardsHtml = state.timeline.map((song, i) => simpleCardHtml(song, i===0)).join('');
+  const cardsHtml = state.timeline.map(song => simpleCardHtml(song, !!song.__starter)).join('');
   app.innerHTML = `
     <div class="brand">
       <div class="mark">${state.won ? 'GEWONNEN' : 'VERLOREN'}</div>
@@ -2044,6 +2064,21 @@ function renderTimelineOnly(){
   `;
 }
 
+function updateDocumentTitle(){
+  const map = {
+    splash: "Chronohit",
+    loading: "Lädt... - Chronohit",
+    menu: "Hauptmenü - Chronohit",
+    loadgame: "Spielstände - Chronohit",
+    tutorial: "Tutorial - Chronohit",
+    create: "Spiel erstellen - Chronohit",
+    game: `${state.activeSaveName ? state.activeSaveName : "Unbenannt"} - Chronohit`,
+    end: `${state.won ? "Gewonnen" : "Verloren"} - Chronohit`,
+    timeline: "Zeitleiste - Chronohit"
+  };
+  document.title = map[state.screen] || "Chronohit";
+}
+
 function render(){
   if(state.screen === "splash") renderSplash();
   else if(state.screen === "loading") renderLoading();
@@ -2054,11 +2089,13 @@ function render(){
   else if(state.screen === "game") renderGame();
   else if(state.screen === "end") renderEnd();
   else if(state.screen === "timeline") renderTimelineOnly();
+
+  updateDocumentTitle();
 }
 
 /* ============ SETTINGS HELPERS ============ */
 function plannedFeatureNotice(){
-  return `<div class="planned-notice">Dieses Spiel ist noch in der Entwicklung! Dieses Feature ist für die Zukunft geplant. Die offizielle To-Do-List findest du <a href="https://docs.google.com/spreadsheets/d/1rqiXWYksaIVn-ia4HOzgkgCINeQeQMeZh_-NRV7wddk/edit?usp=sharing" target="_blank" rel="noopener">hier</a>!</div>`;
+  return `<div class="planned-notice">Dieses Spiel ist noch in der Entwicklung! Dieses Feature ist für die Zukunft geplant. Die offizielle To-Do-List findest du <a href="https://docs.google.com/spreadsheets/d/1_-Ud2AE-zAwF1ktxfawKfEWAKZf54e6rmZJ6jXU7S7E/edit?usp=sharing" target="_blank" rel="noopener">hier</a>!</div>`;
 }
 function setMode(value){
   state.settings.mode = value;
