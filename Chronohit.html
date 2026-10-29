@@ -1,0 +1,1147 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JAHRGANG — Musik-Zeitleiste</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14151d;
+    --bg-2: #1b1d29;
+    --panel: #21232f;
+    --panel-2: #2a2d3c;
+    --card-face: #f3ead9;
+    --card-face-2: #e9dcc2;
+    --ink: #22201a;
+    --text: #ece7db;
+    --muted: #9a97a8;
+    --accent: #e8a33d;
+    --accent-ink: #3a2a0f;
+    --correct: #5a9c78;
+    --wrong: #c1483b;
+    --line: #34364a;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #23263a 0%, var(--bg) 55%);
+    color:var(--text);
+    font-family:'Space Grotesk', sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 16px 60px;
+  }
+  h1,h2,h3, .num{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    margin:0;
+  }
+  #app{width:100%;max-width:760px;}
+  .brand{
+    text-align:center;
+    margin-bottom:28px;
+  }
+  .brand .mark{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    font-size:13px;
+    letter-spacing:.14em;
+    color:var(--accent);
+    margin-bottom:6px;
+  }
+  .brand .mark::before, .brand .mark::after{
+    content:"";
+    width:26px;height:1px;background:var(--line);
+  }
+  .brand h1{
+    font-size:42px;
+    color:var(--text);
+  }
+  .brand p{
+    color:var(--muted);
+    margin-top:8px;
+    font-size:15px;
+  }
+
+  /* ---- buttons ---- */
+  button{
+    font-family:'Space Grotesk', sans-serif;
+    cursor:pointer;
+    border:none;
+    border-radius:999px;
+    font-size:15px;
+    font-weight:600;
+    padding:13px 22px;
+    transition:transform .12s ease, opacity .12s ease;
+  }
+  button:active{transform:scale(.96);}
+  button:disabled{opacity:.35; cursor:not-allowed;}
+  .btn-primary{ background:var(--accent); color:var(--accent-ink); }
+  .btn-primary:hover:not(:disabled){opacity:.92;}
+  .btn-ghost{ background:transparent; color:var(--text); border:1px solid var(--line); }
+  .btn-ghost:hover:not(:disabled){border-color:var(--accent); color:var(--accent);}
+  .btn-danger{ background:transparent; color:var(--wrong); border:1px solid var(--wrong); }
+  .btn-small{ padding:8px 14px; font-size:13px; border-radius:999px; }
+
+  /* ---- menu ---- */
+  .menu-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:26px;
+    margin-bottom:16px;
+  }
+  .menu-actions{display:flex; flex-direction:column; gap:12px; align-items:stretch;}
+  .menu-actions button{width:100%;}
+
+  .settings-grid{display:flex; flex-direction:column; gap:22px;}
+  .setting-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+  }
+  .setting-row .label{font-weight:600; font-size:15px;}
+  .setting-row .hint{color:var(--muted); font-size:13px; margin-top:3px;}
+
+  .switch{
+    position:relative; width:46px; height:26px; border-radius:999px;
+    background:var(--panel-2); border:1px solid var(--line); flex:none;
+  }
+  .switch.on{background:var(--accent); border-color:var(--accent);}
+  .switch .knob{
+    position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%;
+    background:var(--text); transition:left .15s ease;
+  }
+  .switch.on .knob{left:22px; background:var(--accent-ink);}
+
+  .chip-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .chip{
+    padding:7px 14px; border-radius:999px; border:1px solid var(--line);
+    font-size:13px; font-weight:600; color:var(--muted); background:transparent;
+  }
+  .chip.on{ color:var(--accent-ink); background:var(--accent); border-color:var(--accent); }
+
+  .stepper{display:flex; align-items:center; gap:14px;}
+  .stepper button{
+    width:32px; height:32px; padding:0; border-radius:50%;
+    background:var(--panel-2); color:var(--text); border:1px solid var(--line);
+    font-size:16px; line-height:1;
+  }
+  .stepper .val{ font-family:'Fraunces',serif; font-size:20px; min-width:28px; text-align:center; }
+
+  details.info{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 22px; margin-top:8px;
+  }
+  details.info summary{cursor:pointer; font-weight:600; color:var(--accent); font-size:14px;}
+  details.info .body{margin-top:12px; color:var(--muted); font-size:14px; line-height:1.6;}
+  details.info .body p{margin:0 0 10px;}
+
+  .note{
+    font-size:13px; color:var(--muted); border-top:1px dashed var(--line);
+    padding-top:14px; margin-top:18px; line-height:1.6;
+  }
+  .note strong{color:var(--text);}
+
+  /* ---- game header ---- */
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:18px; gap:12px; flex-wrap:wrap;
+  }
+  .stat{
+    background:var(--panel); border:1px solid var(--line); border-radius:999px;
+    padding:8px 16px; font-size:13px; color:var(--muted); display:flex; gap:8px; align-items:center;
+  }
+  .stat b{color:var(--text); font-family:'Fraunces',serif; font-size:15px;}
+  .token-dots{display:flex; gap:4px;}
+  .token-dots span{width:9px;height:9px;border-radius:50%; background:var(--line);}
+  .token-dots span.filled{background:var(--accent);}
+
+  /* ---- draw area ---- */
+  .draw-zone{
+    display:flex; flex-direction:column; align-items:center; gap:16px;
+    margin:20px 0 32px;
+  }
+  .vinyl-wrap{
+    width:150px;height:150px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+    box-shadow:0 10px 30px rgba(0,0,0,.4);
+  }
+  .vinyl-wrap.clickable{cursor:pointer;}
+  .vinyl-wrap.clickable:hover .vinyl{filter:brightness(1.08);}
+  .vinyl{
+    width:100%;height:100%;border-radius:50%;
+    background:
+      radial-gradient(circle at center, var(--card-face) 0 18px, #0000 18px),
+      repeating-radial-gradient(circle at center, #2c2e3d 0 3px, #23252f 3px 6px);
+    border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    transform-origin:50% 50%;
+  }
+  .vinyl .label{
+    width:60px;height:60px;border-radius:50%;background:var(--accent);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--accent-ink);
+  }
+  .vinyl.spin{animation:spin 5s linear infinite;}
+  @keyframes spin{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+  .preview-bar{ width:150px; height:4px; border-radius:999px; background:var(--panel-2); overflow:hidden; }
+  .preview-bar .fill{ height:100%; width:0%; background:var(--accent); }
+  .preview-bar.running .fill{ animation: fillbar 30s linear forwards; }
+  @keyframes fillbar{ from{width:0%} to{width:100%} }
+
+  .draw-caption{text-align:center; color:var(--muted); font-size:14px; max-width:320px;}
+  .draw-actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:center;}
+
+  .embed-crop{
+    width:300px; height:64px; margin:2px auto 0;
+    overflow:hidden; border-radius:10px; position:relative;
+    background:var(--panel-2); border:1px solid var(--line);
+    opacity:0; animation: embedFadeIn .35s ease .45s forwards;
+  }
+  .embed-crop iframe{
+    position:absolute; top:-88px; left:0; width:300px; height:152px; border:0;
+  }
+  @keyframes embedFadeIn{ to{opacity:1} }
+  .embed-crop .crop-hint{
+    position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:center;
+    padding-bottom:2px; pointer-events:none; font-size:10px; color:var(--muted); opacity:.6;
+  }
+  .embed-full{
+    width:100%; max-width:300px; margin:2px auto 0; border-radius:10px; overflow:hidden;
+  }
+  .embed-full iframe{ width:100%; height:152px; border:0; display:block; }
+
+  /* ---- timeline ---- */
+  .timeline-wrap{overflow-x:auto; padding:6px 2px 18px;}
+  .timeline{
+    display:flex; align-items:stretch; gap:0; min-height:150px;
+    padding:6px 6px 20px;
+  }
+  .gap{
+    flex:none; width:26px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; position:relative;
+  }
+  .gap .dot{
+    width:14px;height:14px; border-radius:50%; border:2px solid var(--line);
+    background:var(--bg-2); transition:all .12s ease;
+  }
+  .gap.active .dot{ border-color:var(--accent); background:var(--accent); transform:scale(1.3); }
+  .gap:not(.locked):hover .dot{ border-color:var(--accent); }
+  .gap.locked{cursor:default;}
+
+  .card{
+    flex:none; width:118px; background:var(--card-face);
+    border-radius:10px; color:var(--ink);
+    display:flex; flex-direction:column; justify-content:space-between;
+    padding:12px 10px; position:relative;
+    box-shadow:0 6px 16px rgba(0,0,0,.28);
+    border:1px solid rgba(0,0,0,.08);
+  }
+  .card .year{font-family:'Fraunces',serif; font-size:26px; font-weight:700;}
+  .card .title{font-size:12px; font-weight:600; line-height:1.3; margin-top:6px;}
+  .card .artist{font-size:11px; color:#5c5645; margin-top:2px;}
+  .card.pending{
+    background:var(--panel-2); border:1px dashed var(--accent);
+    align-items:center; justify-content:center;
+  }
+  .card.pending .q{font-family:'Fraunces',serif; font-size:28px; color:var(--muted);}
+  .card.correct{outline:2px solid var(--correct);}
+  .card.wrong{outline:2px solid var(--wrong); opacity:.55;}
+  .card .tag{
+    position:absolute; top:-9px; right:8px; font-size:10px; padding:2px 7px;
+    border-radius:999px; font-weight:700; letter-spacing:.02em;
+  }
+  .card .tag.ok{background:var(--correct); color:#fff;}
+  .card .tag.bad{background:var(--wrong); color:#fff;}
+  .card .tag.start{background:var(--accent); color:var(--accent-ink);}
+
+  .reveal-actions{display:flex; justify-content:center; gap:10px; margin-top:8px;}
+
+  .token-panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px 18px; margin-top:10px; display:flex; flex-direction:column; gap:12px;
+  }
+  .token-panel .row{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;}
+  .token-panel .row .desc{font-size:13px; color:var(--muted);}
+
+  .feedback{
+    text-align:center; font-size:15px; font-weight:600; margin:6px 0 4px;
+  }
+  .feedback.ok{color:var(--correct);}
+  .feedback.bad{color:var(--wrong);}
+
+  .self-report{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    font-size:13px; color:var(--muted); margin-top:10px;
+  }
+  .self-report input{width:16px;height:16px;}
+
+  /* ---- win screen ---- */
+  .win-card{
+    text-align:center; padding:40px 26px;
+  }
+  .win-card .num{font-size:64px; color:var(--accent);}
+  .win-card p{color:var(--muted); margin-top:6px;}
+  .win-stats{display:flex; justify-content:center; gap:26px; margin:22px 0; flex-wrap:wrap;}
+  .win-stats div{text-align:center;}
+  .win-stats .n{font-family:'Fraunces',serif; font-size:24px;}
+  .win-stats .l{font-size:12px; color:var(--muted);}
+
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(10,10,14,.72);
+    display:flex; align-items:center; justify-content:center; padding:20px; z-index:50;
+  }
+  .modal-box{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:26px; max-width:360px; width:100%;
+  }
+  .modal-box h3{font-size:19px; margin-bottom:8px;}
+  .modal-box p{color:var(--muted); font-size:14px; line-height:1.5; margin:0 0 20px;}
+  .modal-actions{display:flex; flex-direction:column; gap:10px;}
+  .modal-actions button{width:100%;}
+
+  .top-links{display:flex; justify-content:space-between; width:100%; max-width:760px; margin-bottom:6px;}
+  .top-links button{background:none;border:none;color:var(--muted);font-size:13px;padding:6px 0;}
+  .top-links button:hover{color:var(--accent);}
+
+  @media (max-width:480px){
+    .brand h1{font-size:32px;}
+    .vinyl-wrap{width:120px;height:120px;}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="spotify-embed-host" style="position:absolute !important;width:1px !important;height:1px !important;overflow:hidden !important;clip:rect(0,0,0,0) !important;clip-path:inset(50%) !important;white-space:nowrap !important;pointer-events:none !important;">
+  <div id="spotify-embed-root"></div>
+</div>
+<script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+
+<script>
+/* ============ SONG DATABASE ============
+   Kuratiert: bekannte Radio-/Charts-Hits DE/EN/ES.
+   Jahr + Titel + Interpret sind die Spielgrundlage.
+   "id" = verifizierte Spotify-Track-ID (von dir bestätigt) -> wird als
+   zugeschnittener Embed-Player angezeigt (Titel/Cover verdeckt, nur die
+   Abspielleiste sichtbar), bis die Karte aufgedeckt wird.
+   Songs ohne "id" (aktuell nur "Bailando" von Enrique Iglesias, da nur ein
+   Album- statt Track-Link vorlag) fallen auf einen Spotify-Suchlink in
+   neuem Tab zurück — dort ist der Titel dann leider sichtbar.
+*/
+const SONGS = [
+  {t:"99 Luftballons", a:"Nena", y:1983, g:"de", id:"6jdhEJvstaoKKpxCHgIbUo"},
+  {t:"Rock Me Amadeus", a:"Falco", y:1985, g:"de", id:"0wbdaBHi8t5e7EqXV88nka"},
+  {t:"You're My Heart, You're My Soul", a:"Modern Talking", y:1984, g:"de", id:"0Zn63G0XTiqXwr1KSmARWz"},
+  {t:"Männer", a:"Herbert Grönemeyer", y:1984, g:"de", id:"2PfEAFaaLabTXfmlV58LIj"},
+  {t:"Sonne", a:"Rammstein", y:2001, g:"de", id:"3gVhsZtseYtY1fMuyYq06F"},
+  {t:"Symphonie", a:"Silbermond", y:2005, g:"de", id:"7mOD9NFyZhC8PtW4joWDWT"},
+  {t:"Durch den Monsun", a:"Tokio Hotel", y:2005, g:"de", id:"0UfJZtCHKOeDtsYqBqFTNn"},
+  {t:"Dieser Weg", a:"Xavier Naidoo", y:2005, g:"de", id:"1DyfnnqGAUhvmwt3AsQFxL"},
+  {t:"Perfekte Welle", a:"Juli", y:2004, g:"de", id:"2LV5joNDrsyuXEh4FBARVK"},
+  {t:"Mein Block", a:"Sido", y:2004, g:"de", id:"4T1tVhQahmAOvTF65lKq4o"},
+  {t:"Haus am See", a:"Peter Fox", y:2008, g:"de", id:"7A4KdLy1DXOOC5fhIdDuHz"},
+  {t:"Auf uns", a:"Andreas Bourani", y:2014, g:"de", id:"6dXt4t5jgySnVTeTpT4C0l"},
+  {t:"Atemlos durch die Nacht", a:"Helene Fischer", y:2013, g:"de", id:"1cSXzDZt8vzuUp2XREQEJN"},
+  {t:"Chöre", a:"Mark Forster", y:2014, g:"de", id:"4ZPXuHp219ujq6QJ9oqteR"},
+  {t:"Easy", a:"Cro", y:2012, g:"de", id:"3FwxpJdlexIR6MeTT56HAm"},
+  {t:"Lieblingsmensch", a:"Namika", y:2015, g:"de", id:"6oHDvarQSp0mf5AD1SyNH0"},
+  {t:"Musik sein", a:"Wincent Weiss", y:2017, g:"de", id:"00ZoztotP7jEoezTPNMjvm"},
+  {t:"110", a:"Capital Bra & Samra feat. LEA", y:2019, g:"de", id:"5sdQ7VUx6GOfsRoSxnK1YG"},
+  {t:"Roller", a:"Apache 207", y:2019, g:"de", id:"6hw1Sy9wZ8UCxYGdpKrU6M"},
+  {t:"Bohemian Rhapsody", a:"Queen", y:1975, g:"en", id:"2ODUgS9kk95bqVaf9EzyOU"},
+  {t:"Billie Jean", a:"Michael Jackson", y:1983, g:"en", id:"7J1uxwnxfQLu4APicE5Rnj"},
+  {t:"Don't Stop Believin'", a:"Journey", y:1981, g:"en", id:"77NNZQSqzLNqh2A9JhLRkg"},
+  {t:"I Wanna Dance with Somebody", a:"Whitney Houston", y:1987, g:"en", id:"2tUBqZG2AbRi7Q0BIrVrEj"},
+  {t:"Smells Like Teen Spirit", a:"Nirvana", y:1991, g:"en", id:"4CeeEOM32jQcH3eN9Q2dGj"},
+  {t:"Wannabe", a:"Spice Girls", y:1996, g:"en", id:"7qpvLstF3L1UgyEDBV4pjx"},
+  {t:"...Baby One More Time", a:"Britney Spears", y:1998, g:"en", id:"3MjUtNVVq3C8Fn0MP3zhXa"},
+  {t:"Umbrella", a:"Rihanna ft. Jay-Z", y:2007, g:"en", id:"49FYlytm3dAAraYgpoJZux"},
+  {t:"Viva la Vida", a:"Coldplay", y:2008, g:"en", id:"5S6pYZD8WH3OQapDHTDM9M"},
+  {t:"Poker Face", a:"Lady Gaga", y:2008, g:"en", id:"1QV6tiMFM6fSOKOGLMHYYg"},
+  {t:"I Gotta Feeling", a:"Black Eyed Peas", y:2009, g:"en", id:"4kLLWz7srcuLKA7Et40PQR"},
+  {t:"Rolling in the Deep", a:"Adele", y:2010, g:"en", id:"4OSBTYWVwsQhGLF9NHvIbR"},
+  {t:"Firework", a:"Katy Perry", y:2010, g:"en", id:"4lCv7b86sLynZbXhfScfm2"},
+  {t:"Someone Like You", a:"Adele", y:2011, g:"en", id:"3bNv3VuUOKgrf5hu3YcuRo"},
+  {t:"Radioactive", a:"Imagine Dragons", y:2012, g:"en", id:"1PzoM54jr13a5eUfCycMKc"},
+  {t:"Get Lucky", a:"Daft Punk ft. Pharrell Williams", y:2013, g:"en", id:"69kOkLUCkxIZYexIgSG8rq"},
+  {t:"Wake Me Up", a:"Avicii", y:2013, g:"en", id:"0nrRP2bk19rLc0orkWPQk2"},
+  {t:"Happy", a:"Pharrell Williams", y:2013, g:"en", id:"60nZcImufyMA1MKQY3dcCH"},
+  {t:"Uptown Funk", a:"Mark Ronson ft. Bruno Mars", y:2014, g:"en", id:"32OlwWuMpZ6b0aN2RZOeMS"},
+  {t:"Shape of You", a:"Ed Sheeran", y:2017, g:"en", id:"7qiZfU4dY1lWllzX7mPBI3"},
+  {t:"Blinding Lights", a:"The Weeknd", y:2019, g:"en", id:"0VjIjW4GlUZAMYd2vXMi3b"},
+  {t:"bad guy", a:"Billie Eilish", y:2019, g:"en", id:"2Fxmhks0bxGSBdJ92vM42m"},
+  {t:"Levitating", a:"Dua Lipa", y:2020, g:"en", id:"5uu0D02efCoFMQiLYFT32e"},
+  {t:"As It Was", a:"Harry Styles", y:2022, g:"en", id:"4Dvkj6JhhA12EX05fT7y2e"},
+  {t:"Waka Waka (This Time for Africa)", a:"Shakira", y:2010, g:"es", id:"63Tl9k1sH8tznn3bqoMuyF"},
+  {t:"Bailando", a:"Enrique Iglesias", y:2014, g:"es", id:"2r8wxDebKM8uuDsLUklMEx"},
+  {t:"Sofia", a:"Alvaro Soler", y:2015, g:"es", id:"5vj59ONIVbyhcrI8ZSwoRo"},
+  {t:"Calma", a:"Pedro Capó ft. Farruko", y:2018, g:"es", id:"6aLJnupvPpT9HLv3xaUhe1"},
+  {t:"Despacito", a:"Luis Fonsi ft. Daddy Yankee", y:2017, g:"es", id:"6habFhsOp2NvshLv26DqMb"},
+  {t:"Da Da Da", a:"Trio", y:1982, g:"de", id:"4HCdu48LScraIfJ7Ik7EhE"},
+  {t:"Dickes B", a:"Seeed feat. Black Kappa", y:2001, g:"de", id:"4eRmCZWJoEtLl0wy7EJPwd"},
+  {t:"Denkmal", a:"Wir sind Helden", y:2003, g:"de", id:"58zHoX9U5VlSXLUUmWTfe2"},
+  {t:"Vom selben Stern", a:"Ich + Ich", y:2007, g:"de", id:"4kCYJigsNQJqs6kpMSlsmL"},
+  {t:"Das Beste", a:"Silbermond", y:2009, g:"de", id:"3FEhbAkm1Dy21UvhbYhFM3"},
+  {t:"Freunde bleiben", a:"Revolverheld", y:2010, g:"de", id:"4bzmkrtJDog1RpvWAibK2n"},
+  {t:"Hamma!", a:"Culcha Candela", y:2007, g:"de", id:"3vaBHxfz5WPBLLPt1hTUvI"},
+  {t:"Remmidemmi (Yippie Yippie Yeah)", a:"Deichkind", y:2012, g:"de", id:"31sD77U64ym70wYEMpnSrQ"},
+  {t:"Lieder", a:"Adel Tawil", y:2013, g:"de", id:"2ZoO0uLQRp2WhTlyIH8PJf"},
+  {t:"80 Millionen", a:"Max Giesinger", y:2015, g:"de", id:"2ladamWCFAfQbgIIdkewAx"},
+  {t:"Hey Jude", a:"The Beatles", y:1968, g:"en", id:"1eT2CjXwFXNx6oY5ydvzKU"},
+  {t:"Dreams", a:"Fleetwood Mac", y:1977, g:"en", id:"1lbXEepatjRVjoG8pZMtdp"},
+  {t:"Thriller", a:"Michael Jackson", y:1982, g:"en", id:"2LlQb7Uoj1kKyGhlkBf9aC"},
+  {t:"Like a Virgin", a:"Madonna", y:1984, g:"en", id:"1ZPlNanZsJSPK5h9YZZFbZ"},
+  {t:"Take On Me", a:"a-ha", y:1985, g:"en", id:"2WfaOiMkCvy7F5fcp2zZ8L"},
+  {t:"I Will Always Love You", a:"Whitney Houston", y:1992, g:"en", id:"4eHbdreAnSOrDDsFfc4Fpm"},
+  {t:"Gangsta's Paradise", a:"Coolio ft. L.V.", y:1995, g:"en", id:"1DIXPcTDzTj8ZMHt3PDt8p"},
+  {t:"Wonderwall", a:"Oasis", y:1995, g:"en", id:"1qPbGZqppFwLwcBC1JQ6Vr"},
+  {t:"All I Want for Christmas Is You", a:"Mariah Carey", y:1994, g:"en", id:"0bYg9bo50gSsH3LtXe2SQn"},
+  {t:"I Want It That Way", a:"Backstreet Boys", y:1999, g:"en", id:"47BBI51FKFwOMlIiX6m8ya"},
+  {t:"Say My Name", a:"Destiny's Child", y:1999, g:"en", id:"7H6ev70Weq6DdpZyyTmUXk"},
+  {t:"No Scrubs", a:"TLC", y:1999, g:"en", id:"1KGi9sZVMeszgZOWivFpxs"},
+  {t:"Get Busy", a:"Sean Paul", y:2002, g:"en", id:"6bK9BH9Ts8Gj5JFvnQkzak"},
+  {t:"Lose Yourself", a:"Eminem", y:2002, g:"en", id:"5Z01UMMf7V1o0MzF86s6WJ"},
+  {t:"Crazy in Love", a:"Beyoncé ft. Jay-Z", y:2003, g:"en", id:"0TwBtDAWpkpM3srywFVOV5"},
+  {t:"Hey Ya!", a:"OutKast", y:2003, g:"en", id:"2PpruBYCo4H7WOBJ7Q2EwM"},
+  {t:"Crazy", a:"Gnarls Barkley", y:2006, g:"en", id:"0BtXtxmKBm1HwGnM3kO3rY"},
+  {t:"Rehab", a:"Amy Winehouse", y:2006, g:"en", id:"1L5tZi0izXsi5Kk5OJf4W0"},
+  {t:"Sex on Fire", a:"Kings of Leon", y:2008, g:"en", id:"0ntQJM78wzOLVeCUAW7Y45"},
+  {t:"Bad Romance", a:"Lady Gaga", y:2009, g:"en", id:"0SiywuOBRcynK0uKGWdCnn"},
+  {t:"Teenage Dream", a:"Katy Perry", y:2010, g:"en", id:"235LXPXfi0SmOaS9TaCh3c"},
+  {t:"Party Rock Anthem", a:"LMFAO", y:2011, g:"en", id:"7mitXLIMCflkhZiD34uEQI"},
+  {t:"Somebody That I Used to Know", a:"Gotye ft. Kimbra", y:2011, g:"en", id:"6md4w95cnKaW64JyEQ3A0L"},
+  {t:"We Are Young", a:"fun. ft. Janelle Monáe", y:2012, g:"en", id:"7a86XRg84qjasly9f6bPSD"},
+  {t:"Blurred Lines", a:"Robin Thicke ft. Pharrell", y:2013, g:"en", id:"0n4bITAu0Y0nigrz3MFJMb"},
+  {t:"All of Me", a:"John Legend", y:2013, g:"en", id:"3U4isOIWM3VvDubwSI3y7a"},
+  {t:"Chandelier", a:"Sia", y:2014, g:"en", id:"4VrWlk8IQxevMvERoX08iC"},
+  {t:"Cheerleader", a:"OMI", y:2014, g:"en", id:"5ByIHT8s38diBQf6dkEWbt"},
+  {t:"Sorry", a:"Justin Bieber", y:2015, g:"en", id:"09CtPGIpYB4BrO8qb1RGsF"},
+  {t:"Stressed Out", a:"Twenty One Pilots", y:2015, g:"en", id:"3CRDbSIZ4r5MsZ0YwxuEkn"},
+  {t:"Work", a:"Rihanna ft. Drake", y:2016, g:"en", id:"72TFWvU3wUYdUuxejTTIzt"},
+  {t:"Rockabye", a:"Clean Bandit ft. Sean Paul & Anne-Marie", y:2016, g:"en", id:"3fvY2U1AzW0diYF0hnBbKt"},
+  {t:"Havana", a:"Camila Cabello ft. Young Thug", y:2017, g:"en", id:"1rfofaqEpACxVEHIZBJe6W"},
+  {t:"Sunflower", a:"Post Malone & Swae Lee", y:2018, g:"en", id:"3KkXRkHbMCARz0aVfEt68P"},
+  {t:"Old Town Road", a:"Lil Nas X", y:2019, g:"en", id:"0F7FA14euOIX8KcbEturGH"},
+  {t:"Heat Waves", a:"Glass Animals", y:2020, g:"en", id:"3USxtqRwSYz57Ewm6wWRMp"},
+  {t:"drivers license", a:"Olivia Rodrigo", y:2021, g:"en", id:"4ml4WlnHDEpOK8HRVYTCWf"},
+  {t:"Flowers", a:"Miley Cyrus", y:2023, g:"en", id:"7DSAEUvxU8FajXtRloy8M0"},
+  {t:"Livin' la Vida Loca", a:"Ricky Martin", y:1999, g:"es", id:"0Ph6L4l8dYUuXFmb71Ajnd"},
+  {t:"Clandestino", a:"Manu Chao", y:1998, g:"es", id:"51R2M1JgyFfRS3e6v5wCt3"},
+  {t:"Hero", a:"Enrique Iglesias", y:2001, g:"es", id:"1PAgmT6YqGhd6zT9kN9gIo"},
+  {t:"La Camisa Negra", a:"Juanes", y:2004, g:"es", id:"2ZmCYW6bxYtvkthFexIFXL"},
+  {t:"Hips Don't Lie", a:"Shakira ft. Wyclef Jean", y:2006, g:"es", id:"3d0WouFnFmr0K3kjeza3fF"},
+  {t:"Mi Gente", a:"J Balvin ft. Willy William", y:2017, g:"es", id:"5r6X3m7zrVHmU2lSp3DXmP"},
+  {t:"Malamente", a:"Rosalía", y:2018, g:"es", id:"1B0BQaSRHxhI0AUlItY3LK"},
+  {t:"Taki Taki", a:"DJ Snake ft. Selena Gomez, Ozuna & Cardi B", y:2018, g:"es", id:"0KoiMHhqKLoL4xM54rcWYY"},
+  {t:"Callaita", a:"Bad Bunny", y:2019, g:"es", id:"71wFwRo8xGc4lrcyKwsvba"},
+  {t:"La Bachata", a:"Manuel Turizo", y:2022, g:"es", id:"5ww2BF9slyYgNOk37BlC4u"},
+  {t:"Easy On Me", a:"Adele", y:2021, g:"en", id:"0gplL1WMoJ6iYaPgMCL0gX"},
+  {t:"Komet", a:"Udo Lindenberg ft. Apache 207", y:2023, g:"de", id:"7oQepKHmXDaPC3rgeLRvQu"},
+  {t:"Wildberry Lillet", a:"Nina Chuba", y:2022, g:"de", id:"6yeZM8gyykjaf8w0GqRfK4"},
+  {t:"NINA", a:"Nina Chuba", y:2024, g:"de", id:"0j4WzFni16kp0YquOHOwL8"},
+  {t:"Diamonds", a:"Rihanna", y:2012, g:"en", id:"6O20JhBJPePEkBdrB5sqRx"},
+  {t:"Can't Stop the Feeling!", a:"Justin Timberlake", y:2016, g:"en", id:"6JV2JOEocMgcZxYSZelKcc"},
+  {t:"Feuerwerk", a:"Wincent Weiss", y:2017, g:"de", id:"3GRoxbBauU8Ui1zUJwn9aD"},
+  {t:"Skyfall", a:"Adele", y:2012, g:"en", id:"6VObnIkLVruX4UVyxWhlqm"},
+  {t:"Hello", a:"Adele", y:2015, g:"en", id:"1Yk0cQdMLx5RzzFTYwmuld"},
+  {t:"Someone You Loved", a:"Lewis Capaldi", y:2018, g:"en", id:"7qEHsqek33rTcFNT9PFqLf"},
+  {t:"Call Me Maybe", a:"Carly Rae Jepsen", y:2011, g:"en", id:"20I6sIOMTCkB6w7ryavxtO"},
+  {t:"Wake Me Up Before You Go-Go", a:"Wham!", y:1984, g:"en", id:"0ikz6tENMONtK6qGkOrU3c"},
+  {t:"Dai Dai", a:"Shakira & Burna Boy", y:2026, g:"en", id:"0kosUz0jePvjiz4ctmR6wL"},
+  {t:"Bailando", a:"Loona", y:1998, g:"es", id:"0oxOXYVVZ7vDknU6kagLwO"},
+  {t:"Señorita", a:"Shawn Mendes & Camila Cabello", y:2019, g:"en", id:"0TK2YIli7K1leLovkQiNik"},
+  {t:"Major Tom (völlig losgelöst)", a:"Peter Schilling", y:1982, g:"de", id:"6lXKNdOsnaLv9LwulZbxNl"},
+  {t:"Nur ein Wort", a:"Wir sind Helden", y:2005, g:"de", id:"4hYinIaRxdaoEFSQni6K6I"},
+  {t:"Pflaster", a:"Ich + Ich", y:2009, g:"de", id:"2y9woPM180Da3Tgf1bBE2K"},
+  {t:"Astronaut", a:"Sido feat. Andreas Bourani", y:2015, g:"de", id:"0pQr5WsobmdZHnuObT0sc2"},
+  {t:"Die Reklamation (Guten Tag)", a:"Wir sind Helden", y:2003, g:"de", id:"5YVAa5A1w987AIeCn6I0UI"},
+  {t:"Skandal im Sperrbezirk", a:"Spider Murphy Gang", y:1981, g:"de", id:"26kXONuhWX8sutaxnmcpPg"},
+  {t:"Mr. Brightside", a:"The Killers", y:2003, g:"en", id:"003vvx7Niy0yvhvHt4a68B"},
+  {t:"Kung Fu Fighting", a:"Carl Douglas", y:1974, g:"en", id:"7K8QsHbmUpSX37oOCL4e2g"},
+  {t:"American Girls", a:"Harry Styles", y:2026, g:"en", id:"7gtG45ieyQzKtNKobfLd49"},
+  {t:"Empire State of Mind", a:"Jay-Z ft. Alicia Keys", y:2009, g:"en", id:"2igwFfvr1OAGX9SKDCPBwO"},
+  {t:"Empire State of Mind (Part II) Broken Down", a:"Alicia Keys", y:2010, g:"en", id:"5sra5UY6sD658OabHL3QtI"},
+  {t:"We Don't Need Another Hero (Thunderdome)", a:"Tina Turner", y:1985, g:"en", id:"1qyJ6XpMHdsJD8pkiA7Qww"},
+  {t:"Anti-Hero", a:"Taylor Swift", y:2022, g:"en", id:"0V3wPSX9ygBnCm8psDIegu"},
+  {t:"Livin' on a Prayer", a:"Bon Jovi", y:1986, g:"en", id:"37ZJ0p5Jm13JPevGcx4SkF"},
+  {t:"Bailando", a:"Paradisio", y:1996, g:"es", id:"6PwbVXIomkvk4YcafiOc6i"},
+];
+
+/* ============ STORAGE ============ */
+const SAVE_KEY = "jahrgang_solo_v1";
+async function saveState(){
+  try{ await window.storage.set(SAVE_KEY, JSON.stringify(state), false); }catch(e){ /* best effort */ }
+}
+async function loadSave(){
+  try{
+    const r = await window.storage.get(SAVE_KEY, false);
+    return r ? JSON.parse(r.value) : null;
+  }catch(e){ return null; }
+}
+async function clearSave(){
+  try{ await window.storage.delete(SAVE_KEY, false); }catch(e){}
+}
+
+/* ============ STATE ============ */
+let state = {
+  screen: "menu",           // menu | game | win
+  settings: {
+    tokens: false,
+    // strictYear: false, // vorerst deaktiviert – siehe isPlacementCorrect() weiter unten
+    target: 10,
+    genres: { de:true, en:true, es:true }
+  },
+  deck: [], discard: [], timeline: [],
+  current: null,            // current drawn song
+  phase: "draw",            // draw | listening | placing | revealed | boughtPending
+  pendingGap: null,
+  lastResult: null,          // {ok:bool, song}
+  tokens: 0,
+  correctCount: 0,
+  wrongCount: 0,
+  hasSave: false,
+  showExitDialog: false,
+  bonusClaimed: false
+};
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function filteredPool(){
+  return SONGS.filter(s => state.settings.genres[s.g]);
+}
+
+function spotifySearchUrl(song){
+  const q = encodeURIComponent(`${song.t} ${song.a}`);
+  return `https://open.spotify.com/search/${q}`;
+}
+
+/* ============ GAME ACTIONS ============ */
+function newGame(){
+  const pool = filteredPool();
+  let deck = shuffle(pool);
+  const starter = deck.shift();
+  state = {
+    screen: "game",
+    settings: state.settings,
+    deck, discard: [],
+    timeline: [starter],
+    current: null,
+    phase: "draw",
+    pendingGap: null,
+    lastResult: null,
+    tokens: state.settings.tokens ? 2 : 0,
+    correctCount: 0,
+    wrongCount: 0,
+    hasSave: true,
+    showExitDialog: false,
+    bonusClaimed: false
+  };
+  drawNext();
+  saveState();
+  render();
+}
+
+/* ============ SPOTIFY IFRAME API ============
+   Offizielle Embed-Steuerung (kein Login nötig): erlaubt Play/Pause
+   programmatisch auszulösen und liefert echte Wiedergabe-Events
+   (Position/Dauer) -> der Embed bleibt komplett unsichtbar, der Vinyl-
+   Klick startet wirklich die Wiedergabe, und der Fortschrittsbalken ist
+   echt statt geraten.
+   Fällt automatisch auf den sichtbaren Zuschnitt-Player zurück, falls die
+   API blockiert wird (z.B. Adblocker) oder nicht rechtzeitig lädt.
+*/
+let spotifyController = null;
+let spotifyApiObj = null;
+let spotifyPendingUri = null;
+let spotifyWatchdogStarted = false;
+let useFallbackEmbed = false;
+
+window.onSpotifyIframeApiReady = (IFrameAPI) => {
+  spotifyApiObj = IFrameAPI;
+  if(spotifyPendingUri){
+    createSpotifyController(spotifyPendingUri);
+    spotifyPendingUri = null;
+  }
+};
+
+function createSpotifyController(uri){
+  if(!spotifyApiObj || spotifyController) return;
+  const el = document.getElementById('spotify-embed-root');
+  if(!el) return;
+  spotifyApiObj.createController(el, {uri, width:'300', height:'80'}, (controller) => {
+    spotifyController = controller;
+    controller.addListener('ready', () => {
+      try{ controller.play(); }catch(e){}
+    });
+    controller.addListener('playback_update', e => {
+      onSpotifyPlaybackUpdate(e.data);
+    });
+  });
+}
+
+function onSpotifyPlaybackUpdate(data){
+  const fill = document.getElementById('live-progress-fill');
+  if(fill && data && data.duration){
+    const pct = Math.max(0, Math.min(100, (data.position / data.duration) * 100));
+    fill.style.width = pct + '%';
+  }
+}
+
+function requestSpotifyPlay(song){
+  if(useFallbackEmbed) return;
+  const uri = 'spotify:track:' + song.id;
+  if(spotifyController){
+    spotifyController.loadUri(uri);
+    setTimeout(() => { try{ spotifyController.play(); }catch(e){} }, 150);
+  } else if(spotifyApiObj){
+    createSpotifyController(uri);
+  } else {
+    spotifyPendingUri = uri;
+  }
+  if(!spotifyWatchdogStarted){
+    spotifyWatchdogStarted = true;
+    setTimeout(() => {
+      if(!spotifyController){
+        useFallbackEmbed = true;
+        render();
+      }
+    }, 4000);
+  }
+}
+
+function toggleSpotifyPlayback(){
+  if(!spotifyController || useFallbackEmbed) return;
+  try{ spotifyController.togglePlay(); }catch(e){}
+}
+
+function pauseSpotifyPlayback(){
+  if(spotifyController){ try{ spotifyController.pause(); }catch(e){} }
+}
+
+function reshuffleIfNeeded(){
+  if(state.deck.length === 0 && state.discard.length > 0){
+    state.deck = shuffle(state.discard);
+    state.discard = [];
+  }
+}
+
+function drawNext(){
+  pauseSpotifyPlayback();
+  reshuffleIfNeeded();
+  if(state.deck.length === 0){
+    state.current = null;
+    state.phase = "empty";
+    return;
+  }
+  state.current = state.deck.shift();
+  state.phase = "draw";
+  state.pendingGap = null;
+  state.lastResult = null;
+  state.bonusClaimed = false;
+}
+
+function playCurrent(){
+  if(!state.current) return;
+  state.phase = "placing";
+  render(); saveState();
+  if(state.current.id){
+    if(!useFallbackEmbed){
+      requestSpotifyPlay(state.current);
+    }
+    // im Fallback-Modus übernimmt der sichtbare zugeschnittene Player (siehe render())
+  } else {
+    window.open(spotifySearchUrl(state.current), "_blank", "noopener");
+  }
+}
+
+function skipWithToken(){
+  if(state.tokens < 1 || !state.current) return;
+  state.tokens -= 1;
+  state.discard.push(state.current);
+  drawNext();
+  render(); saveState();
+}
+
+function buyWithTokens(){
+  if(state.tokens < 3 || !state.current) return;
+  state.tokens -= 3;
+  // Gekaufte Karte: garantiert korrekt, wird automatisch chronologisch einsortiert
+  const song = state.current;
+  let idx = state.timeline.findIndex(c => c.y > song.y);
+  if(idx === -1) idx = state.timeline.length;
+  state.timeline.splice(idx, 0, song);
+  state.correctCount += 1;
+  checkWin();
+  if(state.screen === "game"){ drawNext(); }
+  render(); saveState();
+}
+
+function chooseGap(gapIndex){
+  if(state.phase !== "placing") return;
+  state.pendingGap = gapIndex;
+  state.phase = "revealed_pending";
+  render(); saveState();
+}
+
+function isPlacementCorrect(song, gapIndex){
+  const left = state.timeline[gapIndex - 1];
+  const right = state.timeline[gapIndex];
+  if(left && song.y < left.y) return false;
+  if(right && song.y > right.y) return false;
+  /* "Exaktes Jahr bei Gleichstand" – vorerst deaktiviert.
+     War als Zeile unten ohnehin ein No-Op (Bug), da sie so oder so auf
+     "return true" hinauslief. Zwei mögliche echte Umsetzungen für später:
+
+     A) Pro-Modus (näher am echten Hitster): Nach dem Platzieren muss
+        zusätzlich das exakte Jahr eingegeben werden. Nur richtige Position
+        UND richtiges Jahr zählt als Treffer – spürbar schwerer als reines
+        chronologisches Einsortieren.
+
+     B) Reine Gleichstand-Regel: Nur wenn eine neue Karte exakt dasselbe
+        Jahr wie eine direkt benachbarte Karte auf der Zeitleiste hat, wird
+        eine strengere Sonderprüfung angewendet. Ändert im Normalfall
+        (unterschiedliche Jahre) nichts am Verhalten.
+
+     if(state.settings.strictYear && left && song.y === left.y) return true;
+  */
+  return true;
+}
+
+function revealCard(){
+  if(state.phase !== "revealed_pending") return;
+  pauseSpotifyPlayback();
+  const song = state.current;
+  const gapIndex = state.pendingGap;
+  const ok = isPlacementCorrect(song, gapIndex);
+  if(ok){
+    state.timeline.splice(gapIndex, 0, song);
+    state.correctCount += 1;
+  } else {
+    state.discard.push(song);
+    state.wrongCount += 1;
+  }
+  state.lastResult = { ok, song };
+  state.phase = "feedback";
+  render(); saveState();
+  if(!checkWin()){
+    // weiter geht's erst nach Klick auf "Nächste Karte"
+  }
+}
+
+function awardBonusToken(){
+  if(state.bonusClaimed) return;
+  state.bonusClaimed = true;
+  if(state.tokens < 5){
+    state.tokens += 1;
+  }
+  render(); saveState();
+}
+
+function nextTurn(){
+  drawNext();
+  render(); saveState();
+}
+
+function checkWin(){
+  if(state.timeline.length >= state.settings.target){
+    state.screen = "win";
+    render(); saveState();
+    return true;
+  }
+  return false;
+}
+
+function backToMenu(){
+  state.screen = "menu";
+  render();
+}
+
+function openExitDialog(){
+  state.showExitDialog = true;
+  render();
+}
+function closeExitDialog(){
+  state.showExitDialog = false;
+  render();
+}
+function saveAndMenu(){
+  state.showExitDialog = false;
+  state.hasSave = true;
+  state.screen = "menu";
+  saveState();
+  render();
+}
+async function discardAndMenu(){
+  await clearSave();
+  const keepSettings = state.settings;
+  state = {
+    screen: "menu",
+    settings: keepSettings,
+    deck: [], discard: [], timeline: [],
+    current: null, phase: "draw", pendingGap: null, lastResult: null,
+    tokens: 0, correctCount: 0, wrongCount: 0, hasSave: false, showExitDialog: false, bonusClaimed: false
+  };
+  render();
+}
+function abandonGame(){
+  clearSave();
+  state.hasSave = false;
+  state.screen = "menu";
+  render();
+}
+
+/* ============ RENDER ============ */
+const app = document.getElementById("app");
+
+function icon(name){
+  const map = {
+    play: "▶", check:"✓", cross:"✕", token:"◆"
+  };
+  return map[name] || "";
+}
+
+function renderMenu(){
+  const s = state.settings;
+  const genreChip = (key,label) => `
+    <button class="chip ${s.genres[key] ? 'on':''}" onclick="toggleGenre('${key}')">${label}</button>`;
+
+  app.innerHTML = `
+    <div class="brand">
+      <div class="mark">MUSIK &middot; ZEITLEISTE</div>
+      <h1>Jahrgang</h1>
+      <p>Ordne Songs nach ihrem Erscheinungsjahr — inspiriert von Hitster, gespielt mit deinem eigenen Spotify.</p>
+    </div>
+
+    <div class="menu-card">
+      <div class="menu-actions">
+        <button class="btn-primary" onclick="newGame()">Neues Spiel starten</button>
+        ${state.hasSave ? `<button class="btn-ghost" onclick="resumeGame()">Spiel fortsetzen</button>` : ``}
+      </div>
+    </div>
+
+    <div class="menu-card">
+      <h3 style="margin-bottom:18px;font-size:18px;">Einstellungen</h3>
+      <div class="settings-grid">
+
+        <div class="setting-row">
+          <div>
+            <div class="label">Hitster-Tokens</div>
+            <div class="hint">Karte überspringen, kaufen oder Bonus für Titel &amp; Interpret</div>
+          </div>
+          <div class="switch ${s.tokens?'on':''}" onclick="toggleSetting('tokens')"><div class="knob"></div></div>
+        </div>
+
+        <!--
+        <div class="setting-row">
+          <div>
+            <div class="label">Exaktes Jahr bei Gleichstand</div>
+            <div class="hint">Strengere Prüfung, wenn zwei Karten dasselbe Jahr haben könnten</div>
+          </div>
+          <div class="switch ${s.strictYear?'on':''}" onclick="toggleSetting('strictYear')"><div class="knob"></div></div>
+        </div>
+        -->
+
+        <div class="setting-row">
+          <div>
+            <div class="label">Kartenanzahl bis Sieg</div>
+            <div class="hint">Klassisch: 10 richtige Karten auf der Zeitleiste</div>
+          </div>
+          <div class="stepper">
+            <button onclick="stepTarget(-1)">–</button>
+            <div class="val">${s.target}</div>
+            <button onclick="stepTarget(1)">+</button>
+          </div>
+        </div>
+
+        <div class="setting-row" style="align-items:flex-start;">
+          <div>
+            <div class="label">Sprachen im Kartenstapel</div>
+            <div class="hint">Bisher verfügbar — weitere Sprachen können ergänzt werden</div>
+          </div>
+          <div class="chip-row">
+            ${genreChip('de','Deutsch')}
+            ${genreChip('en','Englisch')}
+            ${genreChip('es','Spanisch')}
+          </div>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>Modus:</strong> Solo-Testmodus. Mehrspieler mit Kartendiebstahl (&bdquo;HITSTER!&ldquo;-Ruf), Pro- und Expert-Varianten sowie ein Kooperativ-Modus sind als Nächstes geplant.
+      </div>
+    </div>
+
+    <details class="info">
+      <summary>Wie funktioniert's?</summary>
+      <div class="body">
+        <p><strong>1. Abspielen:</strong> Du ziehst eine Karte und klickst auf die Schallplatte — der Song spielt unsichtbar im Hintergrund über Spotify, du siehst weder Titel noch Cover. Nochmal auf die Schallplatte klicken pausiert/setzt fort. Mit Spotify Premium läuft der ganze Song, sonst die 30-Sekunden-Vorschau. Falls die Steuerung mal blockiert wird (z. B. durch einen Adblocker), springt das Spiel automatisch auf einen sichtbaren, aber zugeschnittenen Player um.</p>
+        <p style="font-size:13px;">Hinweis: Bei einem Song (Enrique Iglesias' "Bailando") lag nur ein Album- statt Track-Link vor — dort öffnet sich stattdessen eine Spotify-Suche in neuem Tab, wo der Titel sichtbar ist.</p>
+        <p><strong>2. Platzieren:</strong> Ohne das Jahr zu kennen, legst du die Karte an die Stelle deiner Zeitleiste, die du für chronologisch richtig hältst.</p>
+        <p><strong>3. Aufdecken:</strong> Die Karte wird umgedreht. Liegt sie richtig, bleibt sie liegen und zählt für deinen Sieg. Liegt sie falsch, kommt sie auf den Ablagestapel.</p>
+        ${s.tokens ? `
+        <p><strong>Hitster-Tokens (aktiv):</strong> Du startest mit 2 Tokens, maximal kannst du 5 gleichzeitig besitzen.</p>
+        <p>&bull; <strong>Song unbekannt?</strong> Wirf für 1 Token die aktuelle Karte ab und ziehe eine neue, ohne sie zu platzieren.</p>
+        <p>&bull; <strong>Karte kaufen:</strong> Für 3 Tokens wird die nächste gezogene Karte garantiert korrekt in deine Zeitleiste einsortiert — ganz ohne Rateversuch und ohne Risiko.</p>
+        <p>&bull; <strong>Bonus-Token:</strong> Wenn du nach dem Aufdecken einer Karte auch Titel und Interpret richtig erraten hast, gib das ehrlich über die Checkbox an — du bekommst einen weiteren Token.</p>
+        ` : `
+        <p>Aktiviere Hitster-Tokens im Menü, um Karten überspringen oder kaufen zu können.</p>
+        `}
+      </div>
+    </details>
+  `;
+}
+
+function renderTag(song, timeline, idxInTimeline){
+  if(idxInTimeline === 0 && song.__starter) return `<span class="tag start">Start</span>`;
+  return "";
+}
+
+function renderGame(){
+  const s = state.settings;
+  const timeline = state.timeline;
+
+  const gaps = [];
+  for(let i=0;i<=timeline.length;i++){
+    const isPendingCard = (state.phase === "revealed_pending" || state.phase === "feedback") && state.pendingGap === i;
+    gaps.push(i);
+  }
+
+  function cardHtml(song, opts={}){
+    return `
+      <div class="card ${opts.cls||''}">
+        ${opts.tag ? `<span class="tag ${opts.tagCls}">${opts.tag}</span>` : ``}
+        <div>
+          <div class="year">${song.y}</div>
+        </div>
+        <div>
+          <div class="title">${song.t}</div>
+          <div class="artist">${song.a}</div>
+        </div>
+      </div>`;
+  }
+
+  function pendingCardHtml(){
+    return `<div class="card pending"><div class="q">?</div></div>`;
+  }
+
+  let timelineHtml = "";
+  for(let i=0;i<=timeline.length;i++){
+    const clickable = state.phase === "placing";
+    const showPendingHere = (state.phase === "revealed_pending" || state.phase === "feedback") && state.pendingGap === i;
+
+    timelineHtml += `<div class="gap ${clickable ? '' : 'locked'} ${showPendingHere?'active':''}"
+        ${clickable ? `onclick="chooseGap(${i})"` : ``}>
+        <div class="dot"></div>
+      </div>`;
+
+    if(showPendingHere){
+      if(state.phase === "revealed_pending"){
+        timelineHtml += pendingCardHtml();
+      } else if(state.phase === "feedback" && state.lastResult && !state.lastResult.ok){
+        timelineHtml += cardHtml(state.lastResult.song, {cls:"wrong", tag:"falsch", tagCls:"bad"});
+      }
+    }
+
+    if(i < timeline.length){
+      const song = timeline[i];
+      const isNewlyCorrect = state.phase === "feedback" && state.lastResult && state.lastResult.ok && song === state.lastResult.song;
+      timelineHtml += cardHtml(song, {
+        cls: isNewlyCorrect ? "correct" : "",
+        tag: i===0 && timeline.length>0 && !isNewlyCorrect && song === timeline[0] && state.correctCount===0 && state.wrongCount===0 && state.phase!=="feedback" ? "Start" : (isNewlyCorrect ? "richtig" : ""),
+        tagCls: isNewlyCorrect ? "ok" : "start"
+      });
+    }
+  }
+
+  const tokenDots = Array.from({length:5}, (_,i) => `<span class="${i < state.tokens ? 'filled':''}"></span>`).join("");
+
+  let drawZoneHtml = "";
+  if(state.phase === "empty"){
+    drawZoneHtml = `
+      <div class="draw-zone">
+        <div class="draw-caption">Der Stapel ist leer — starte eine neue Runde oder passe die Songauswahl im Menü an.</div>
+        <button class="btn-primary" onclick="backToMenu()">Zurück zum Menü</button>
+      </div>`;
+  } else if(state.phase === "feedback"){
+    const ok = state.lastResult.ok;
+    const song = state.lastResult.song;
+    drawZoneHtml = `
+      <div class="draw-zone">
+        <div class="feedback ${ok?'ok':'bad'}">${ok ? 'Richtig platziert!' : 'Leider falsch.'}</div>
+        <div class="draw-caption">${song.t} — ${song.a} · ${song.y}</div>
+        ${song.id ? `
+          <div class="embed-full">
+            <iframe src="https://open.spotify.com/embed/track/${song.id}?utm_source=generator&theme=0"
+              loading="lazy" allow="encrypted-media" title="Spotify player"></iframe>
+          </div>` : ``}
+        ${s.tokens ? `
+          <label class="self-report">
+            <input type="checkbox" ${state.bonusClaimed ? 'checked disabled' : ''} onchange="this.checked && awardBonusToken()">
+            Titel &amp; Interpret auch richtig erraten? (+1 Token)
+          </label>` : ``}
+        <button class="btn-primary" onclick="nextTurn()">Nächste Karte</button>
+      </div>`;
+  } else if(state.current){
+    const spinning = state.phase === "placing" || state.phase === "revealed_pending";
+    const showPlaybackUI = (state.phase === "placing" || state.phase === "revealed_pending") && state.current.id;
+    const canToggle = state.phase === "placing" && state.current.id && !useFallbackEmbed;
+    const vinylClickable = state.phase === "draw" || canToggle;
+    const vinylOnClick = state.phase === "draw" ? "playCurrent()" : "toggleSpotifyPlayback()";
+    drawZoneHtml = `
+      <div class="draw-zone">
+        <div class="vinyl-wrap ${vinylClickable ? 'clickable':''}" ${vinylClickable ? `onclick="${vinylOnClick}"` : ``}>
+          <div class="vinyl ${spinning ? 'spin':''}"><div class="label"><svg width="20" height="20" viewBox="0 0 20 20"><polygon points="6,4 16,10 6,16" fill="currentColor"/></svg></div></div>
+        </div>
+        ${showPlaybackUI ? (useFallbackEmbed ? `
+          <div class="embed-crop">
+            <iframe src="https://open.spotify.com/embed/track/${state.current.id}?utm_source=generator&theme=0"
+              loading="lazy" allow="encrypted-media" title="Spotify player"></iframe>
+          </div>
+          <div class="preview-bar running"><div class="fill"></div></div>
+          <div class="draw-caption" style="font-size:12px;">Eingeschränkter Modus: Die unsichtbare Spotify-Steuerung wurde blockiert (z.B. Adblocker) — hier ist der zugeschnittene Player, Balken ist ein 30s-Richtwert.</div>
+          <button class="btn-ghost btn-small" onclick="render()">↻ Player neu laden</button>
+        ` : `
+          <div class="preview-bar"><div class="fill" id="live-progress-fill"></div></div>
+          <div class="draw-caption" style="font-size:12px;">Spielt unsichtbar über Spotify. Nochmal auf die Schallplatte klicken = Pause/Weiter.</div>
+        `) : ``}
+        ${state.phase === "draw" ? `
+          <div class="draw-caption">${state.current.id ? 'Klick auf die Schallplatte zum Abspielen.' : 'Klick auf die Schallplatte, um den Song bei Spotify zu suchen.'}</div>
+          ${s.tokens ? `
+          <div class="draw-actions">
+            <button class="btn-ghost btn-small" onclick="skipWithToken()" ${state.tokens<1?'disabled':''}>Song unbekannt — überspringen (1 ${icon('token')})</button>
+            <button class="btn-ghost btn-small" onclick="buyWithTokens()" ${state.tokens<3?'disabled':''}>Karte kaufen (3 ${icon('token')})</button>
+          </div>` : ``}
+        ` : ``}
+        ${state.phase === "placing" ? `
+          <div class="draw-caption">${state.current.id ? 'Klicke auf der Zeitleiste die Stelle an, wo die Karte hin soll.' : 'Song läuft auf Spotify (neuer Tab). Klicke auf der Zeitleiste die Stelle an, wo die Karte hin soll.'}</div>
+          ${s.tokens ? `
+          <div class="draw-actions">
+            <button class="btn-ghost btn-small" onclick="skipWithToken()" ${state.tokens<1?'disabled':''}>Song unbekannt — überspringen (1 ${icon('token')})</button>
+          </div>` : ``}
+        ` : ``}
+        ${state.phase === "revealed_pending" ? `
+          <div class="draw-caption">Karte liegt bereit. Aufdecken?</div>
+          <div class="reveal-actions">
+            <button class="btn-ghost btn-small" onclick="chooseGap(null); state.phase='placing'; render();">Position ändern</button>
+            <button class="btn-primary" onclick="revealCard()">Aufdecken</button>
+          </div>
+        ` : ``}
+      </div>`;
+  }
+
+  app.innerHTML = `
+    <div class="topbar">
+      <div class="stat">Zeitleiste <b>${timeline.length} / ${s.target}</b></div>
+      <div class="stat">Stapel <b>${state.deck.length}</b></div>
+      ${s.tokens ? `<div class="stat">Tokens <div class="token-dots">${tokenDots}</div></div>` : ``}
+      <button class="btn-ghost btn-small" onclick="openExitDialog()">Zurück zum Menü</button>
+    </div>
+
+    ${drawZoneHtml}
+
+    <div class="timeline-wrap">
+      <div class="timeline">${timelineHtml}</div>
+    </div>
+
+    ${state.showExitDialog ? `
+      <div class="modal-backdrop" onclick="if(event.target===this) closeExitDialog()">
+        <div class="modal-box">
+          <h3>Spiel verlassen?</h3>
+          <p>Du hast eine laufende Runde. Was möchtest du tun?</p>
+          <div class="modal-actions">
+            <button class="btn-primary" onclick="saveAndMenu()">Speichern und zum Menü</button>
+            <button class="btn-danger" onclick="discardAndMenu()">Ohne Speichern zum Menü</button>
+            <button class="btn-ghost" onclick="closeExitDialog()">Zurück zum Spiel</button>
+          </div>
+        </div>
+      </div>
+    ` : ``}
+  `;
+}
+
+function renderWin(){
+  const s = state.settings;
+  app.innerHTML = `
+    <div class="brand">
+      <div class="mark">RUNDE BEENDET</div>
+    </div>
+    <div class="menu-card win-card">
+      <div class="num">${state.correctCount}</div>
+      <p>richtig platzierte Karten auf deiner Zeitleiste</p>
+      <div class="win-stats">
+        <div><div class="n">${state.wrongCount}</div><div class="l">Falsch platziert</div></div>
+        <div><div class="n">${state.tokens}</div><div class="l">Tokens übrig</div></div>
+        <div><div class="n">${s.target}</div><div class="l">Ziel</div></div>
+      </div>
+      <div class="menu-actions">
+        <button class="btn-primary" onclick="newGame()">Neue Runde</button>
+        <button class="btn-ghost" onclick="abandonGame()">Zurück zum Menü</button>
+      </div>
+    </div>
+  `;
+}
+
+function render(){
+  if(state.screen === "menu") renderMenu();
+  else if(state.screen === "game") renderGame();
+  else if(state.screen === "win") renderWin();
+}
+
+/* ============ SETTINGS HELPERS ============ */
+function toggleSetting(key){
+  state.settings[key] = !state.settings[key];
+  render(); saveState();
+}
+function toggleGenre(key){
+  const g = state.settings.genres;
+  const activeCount = Object.values(g).filter(Boolean).length;
+  if(g[key] && activeCount === 1) return; // mindestens eine Sprache muss aktiv bleiben
+  g[key] = !g[key];
+  render(); saveState();
+}
+function stepTarget(delta){
+  const t = state.settings.target + delta;
+  if(t < 5 || t > 15) return;
+  state.settings.target = t;
+  render(); saveState();
+}
+
+async function resumeGame(){
+  const saved = await loadSave();
+  if(saved){
+    state = saved;
+    state.screen = "game";
+    render();
+  }
+}
+
+/* ============ INIT ============ */
+(async function init(){
+  const saved = await loadSave();
+  if(saved){
+    state.settings = saved.settings || state.settings;
+    state.hasSave = saved.screen === "game";
+  }
+  render();
+})();
+</script>
+</body>
+</html>
