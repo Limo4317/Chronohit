@@ -6,7 +6,7 @@
 <title>Chronohit</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNTAwIDUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDwhLS0gw6R1w59lcmVyIFJhaG1lbnJpbmcsIG1hY2h0IGRpZSBydW5kZSBGb3JtIGVpbmRldXRpZyAtLT4KICA8Y2lyY2xlIGN4PSIyNTAiIGN5PSIyNTAiIHI9IjIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjIiIG9wYWNpdHk9IjAuMzUiLz4KCiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjUwLDI1MCkgc2NhbGUoNCkiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+CiAgICA8IS0tIFplaXRsZWlzdGUgLS0+CiAgICA8bGluZSB4MT0iLTQ0IiB5MT0iMCIgeDI9IjQ0IiB5Mj0iMCIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDxjaXJjbGUgY3g9Ii0zMiIgY3k9IjAiIHI9IjEuNyIgZmlsbD0iI2U4YTMzZCIvPgogICAgPGNpcmNsZSBjeD0iMzIiIGN5PSIwIiByPSIxLjciIGZpbGw9IiNlOGEzM2QiLz4KCiAgICA8IS0tIFZpbnlsLVJpbGxlbiAtLT4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIyMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIxNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThhMzNkIiBzdHJva2Utd2lkdGg9IjEiIG9wYWNpdHk9IjAuNTUiLz4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSI4LjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U4YTMzZCIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjMiLz4KCiAgICA8IS0tIFBsYXktRHJlaWVjayBpbSBaZW50cnVtIC0tPgogICAgPHBvbHlnb24gcG9pbnRzPSItNCwtNiAtNCw2IDgsMCIgZmlsbD0iI2U4YTMzZCIvPgogIDwvZz4KPC9zdmc+Cg==">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Outfit:wght@200;300;400;500;600&family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg: #14151d;
@@ -28,6 +28,7 @@
     --btn-radius: 999px;
     --heading-font: 'Fraunces', serif;
     --body-font: 'Space Grotesk', sans-serif;
+    --body-weight: 400;
     --panel-blur: 0px;
     --body-bg-image: none;
   }
@@ -87,32 +88,227 @@
     --panel-blur: 10px;
     --body-bg-image: radial-gradient(900px 500px at 85% 0%, rgba(94,234,212,0.08), transparent 60%);
   }
-  /* ---- Theme: Liquid Glass (Apple-artig, transluzent) ---- */
+  /* ---- Theme: Liquid Glass ----
+     Material in Schichten: Hintergrund mit bunten Lichtflecken, darüber Flächen mit
+     Blur + Sättigung, diagonalem Glanzverlauf, hellen Lichtkanten (oben links stark,
+     unten rechts schwach) und einem Glanzreflex. In Chromium-Browsern kommt zusätzlich
+     eine echte Lichtbrechung (SVG-Verzerrung des Hintergrunds) dazu. */
   :root[data-theme="glass"]{
-    --bg: #1b2a4a;
-    --bg-2: #24345a;
+    --bg: #13224a;
+    --bg-2: #1b2c5c;
     --bg-highlight: #3a5a9c;
-    --panel: rgba(255,255,255,0.14);
-    --panel-2: rgba(255,255,255,0.22);
+    --panel: rgba(255,255,255,0.07);
+    --panel-2: rgba(255,255,255,0.12);
+    --card-face: rgba(255,255,255,0.84);
+    --card-face-2: rgba(255,255,255,0.70);
+    --ink: #0d2038;
     --text: #ffffff;
-    --muted: rgba(255,255,255,0.68);
+    --muted: rgba(255,255,255,0.74);
     --accent: #00DEFF;
-    --accent-ink: #ffffff;
+    --accent-ink: #04233a;
     --correct: #30d158;
     --wrong: #ff453a;
-    --line: rgba(255,255,255,0.35);
-    --radius: 22px;
+    --line: rgba(255,255,255,0.32);
+    --radius: 24px;
     --btn-radius: 999px;
     --heading-font: 'Space Grotesk', sans-serif;
-    --panel-blur: 22px;
-    --body-bg-image: linear-gradient(160deg, #1e3c72 0%, #2a5298 35%, #7e57c2 65%, #26c6da 100%);
+    --panel-blur: 16px;
+    --glass-filter: blur(var(--panel-blur)) saturate(185%) brightness(1.1);
+    --body-bg-image:
+      radial-gradient(640px 460px at 12% 18%, rgba(255,95,190,.55), transparent 65%),
+      radial-gradient(720px 520px at 88% 26%, rgba(0,222,255,.45), transparent 65%),
+      radial-gradient(820px 620px at 55% 95%, rgba(140,95,255,.60), transparent 65%),
+      linear-gradient(160deg, #1e3c72 0%, #2a5298 38%, #6a4fc2 70%, #1fa9c4 100%);
   }
+  :root.glass-refract[data-theme="glass"]{
+    --glass-filter: url(#glass-refract) blur(5px) saturate(190%) brightness(1.1);
+  }
+  :root[data-theme="glass"] body{ text-shadow:0 1px 10px rgba(8,16,60,.35); }
+
+  /* Große, schwebende Flächen (mit Backdrop-Blur/Brechung) */
   :root[data-theme="glass"] .menu-card,
   :root[data-theme="glass"] .modal-box,
-  :root[data-theme="glass"] .save-slot,
-  :root[data-theme="glass"] .theme-swatch{
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 8px 32px rgba(0,0,0,.28);
+  :root[data-theme="glass"] .players-drawer,
+  :root[data-theme="glass"] .stat,
+  :root[data-theme="glass"] .todo-fab,
+  :root[data-theme="glass"] .drawer-handle,
+  :root[data-theme="glass"] .skip-notice,
+  :root[data-theme="glass"] .guess-box,
+  :root[data-theme="glass"] .guess-result{
+    background-color:var(--panel);
+    background-image:linear-gradient(135deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,.07) 30%, rgba(255,255,255,.02) 58%, rgba(255,255,255,.12) 100%);
+    border:1px solid rgba(255,255,255,.26);
+    box-shadow:
+      inset 1.5px 1.5px 1px -.5px rgba(255,255,255,.80),
+      inset -1px -1px 1px -.5px rgba(255,255,255,.40),
+      inset 0 0 26px rgba(255,255,255,.06),
+      0 14px 44px rgba(6,12,45,.34);
+    backdrop-filter:var(--glass-filter);
+    -webkit-backdrop-filter:var(--glass-filter);
   }
+  :root[data-theme="glass"] .players-drawer{ background-color:rgba(24,40,92,.55); }
+  :root[data-theme="glass"] .modal-box{ background-color:rgba(255,255,255,.10); }
+
+  /* Glanzreflex oben links + schwacher Gegenreflex unten rechts */
+  :root[data-theme="glass"] .menu-card,
+  :root[data-theme="glass"] .modal-box{ position:relative; isolation:isolate; }
+  :root[data-theme="glass"] .menu-card::before,
+  :root[data-theme="glass"] .modal-box::before{
+    content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; border-radius:inherit;
+    background:
+      radial-gradient(130% 70% at 14% -8%, rgba(255,255,255,.42), rgba(255,255,255,0) 52%),
+      radial-gradient(90% 60% at 96% 112%, rgba(255,255,255,.18), rgba(255,255,255,0) 60%);
+  }
+
+  /* Kleine Elemente innerhalb der Flächen: nur Glanz + Lichtkanten */
+  :root[data-theme="glass"] .save-slot,
+  :root[data-theme="glass"] .theme-swatch,
+  :root[data-theme="glass"] .pp,
+  :root[data-theme="glass"] .suggest-opt,
+  :root[data-theme="glass"] .info-desc,
+  :root[data-theme="glass"] .slot-settings-panel,
+  :root[data-theme="glass"] .dropdown,
+  :root[data-theme="glass"] .chip,
+  :root[data-theme="glass"] .btn-ghost,
+  :root[data-theme="glass"] .stepper button,
+  :root[data-theme="glass"] .player-reload{
+    background-color:var(--panel-2);
+    background-image:linear-gradient(160deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,.04) 45%, rgba(255,255,255,.10) 100%);
+    border:1px solid rgba(255,255,255,.28);
+    box-shadow:
+      inset 1px 1px .5px -.5px rgba(255,255,255,.75),
+      inset -1px -1px .5px -.5px rgba(255,255,255,.30),
+      0 6px 18px rgba(6,12,45,.22);
+  }
+  :root[data-theme="glass"] .btn-ghost:hover:not(:disabled),
+  :root[data-theme="glass"] .chip:hover,
+  :root[data-theme="glass"] .save-slot:hover,
+  :root[data-theme="glass"] .theme-swatch:hover,
+  :root[data-theme="glass"] .suggest-opt:hover{ background-color:rgba(255,255,255,.2); }
+  :root[data-theme="glass"] .chip.on{ background-color:var(--accent); background-image:linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,0) 55%); border-color:rgba(255,255,255,.6); }
+  :root[data-theme="glass"] .theme-swatch.selected,
+  :root[data-theme="glass"] .wizard-slot.selected,
+  :root[data-theme="glass"] .pp.current{ border-color:var(--accent); }
+
+  /* Primärbutton: glänzender, leuchtender Glas-Knopf */
+  :root[data-theme="glass"] .btn-primary{
+    background-color:var(--accent);
+    background-image:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0) 58%);
+    border:1px solid rgba(255,255,255,.6);
+    box-shadow:
+      inset 0 1px 1px rgba(255,255,255,.9),
+      inset 0 -3px 8px rgba(0,70,110,.28),
+      0 8px 26px rgba(0,222,255,.38);
+    text-shadow:none;
+  }
+  :root[data-theme="glass"] .switch.on{ box-shadow:0 0 18px rgba(0,222,255,.55); }
+
+  /* Karten: gefrostetes Milchglas */
+  :root[data-theme="glass"] .card{
+    background-image:linear-gradient(135deg, rgba(255,255,255,.55), rgba(255,255,255,0) 50%);
+    border:1px solid rgba(255,255,255,.75);
+    box-shadow:inset 1px 1px 1px rgba(255,255,255,.95), 0 10px 26px rgba(6,12,45,.30);
+    backdrop-filter:blur(10px) saturate(170%);
+    -webkit-backdrop-filter:blur(10px) saturate(170%);
+    text-shadow:none;
+  }
+  :root[data-theme="glass"] .card.pending{ border:1px dashed var(--accent); background-image:none; }
+
+  /* ---- Theme: Norisk (angelehnt an die NoRisk-Website) ----
+     Reines Schwarz, blauer Akzent, Pixel-Überschriften (Minecraft-Look), schlanke
+     Outfit-Schrift, hauchdünne Rahmen, Listenzeilen mit Akzentbalken. */
+  :root[data-theme="norisk"]{
+    --bg: #000000;
+    --bg-2: #070707;
+    --bg-highlight: #0b1220;
+    --panel: rgba(255,255,255,0.04);
+    --panel-2: rgba(255,255,255,0.07);
+    --card-face: #f2f2f2;
+    --card-face-2: #e2e2e2;
+    --ink: #0a0a0a;
+    --text: #f7f7f7;
+    --muted: #979a9f;
+    --accent: #4f8eff;
+    --accent-ink: #04101f;
+    --correct: #4ade80;
+    --wrong: #f87171;
+    --line: rgba(255,255,255,0.08);
+    --radius: 16px;
+    --btn-radius: 8px;
+    --heading-font: 'Pixelify Sans', 'Minecraft', monospace;
+    --body-font: 'Outfit', sans-serif;
+    --body-weight: 300;
+    --panel-blur: 0px;
+    --body-bg-image: radial-gradient(900px 420px at 50% -10%, rgba(79,142,255,.12), transparent 70%);
+  }
+  :root[data-theme="norisk"] h1,
+  :root[data-theme="norisk"] h2,
+  :root[data-theme="norisk"] h3{ font-weight:400; letter-spacing:-.02em; line-height:1.1; }
+  :root[data-theme="norisk"] .brand h1{ font-size:clamp(2rem, 6vw, 3rem); line-height:1; }
+  /* Kleine Abschnittsüberschriften wie in der NoRisk-Seitenleiste */
+  :root[data-theme="norisk"] .menu-card h3{
+    font-family:var(--body-font); font-size:.6875rem; font-weight:500;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted); line-height:1;
+    margin-bottom:18px;
+  }
+  :root[data-theme="norisk"] .menu-card{ background:var(--panel); border:1px solid var(--line); }
+  :root[data-theme="norisk"] .modal-box{
+    background:#0a0a0a; border:1px solid rgba(255,255,255,.10); box-shadow:0 24px 60px rgba(0,0,0,.65);
+  }
+  :root[data-theme="norisk"] .btn-ghost{
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+    color:rgba(255,255,255,.82); font-weight:500;
+  }
+  :root[data-theme="norisk"] .btn-ghost:hover:not(:disabled){
+    background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.16); color:#fff;
+  }
+  :root[data-theme="norisk"] .btn-primary{ font-weight:600; box-shadow:0 0 24px rgba(79,142,255,.28); }
+  :root[data-theme="norisk"] .chip{ border-radius:999px; }
+  :root[data-theme="norisk"] .switch{ border-radius:999px; }
+  :root[data-theme="norisk"] .card{ border:1px solid rgba(255,255,255,.18); border-radius:8px; }
+  :root[data-theme="norisk"] .card .tag{ border-radius:4px; }
+  :root[data-theme="norisk"] button:focus-visible,
+  :root[data-theme="norisk"] a:focus-visible,
+  :root[data-theme="norisk"] input:focus-visible,
+  :root[data-theme="norisk"] select:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  /* Listen: eine Umrandung, Zeilen mit Haarlinien und Akzentbalken beim Hover */
+  :root[data-theme="norisk"] .save-slot-list,
+  :root[data-theme="norisk"] .theme-list,
+  :root[data-theme="norisk"] .suggest-list{
+    gap:0; border:1px solid rgba(255,255,255,.07); border-radius:8px; overflow:hidden;
+    background:rgba(255,255,255,.013);
+  }
+  :root[data-theme="norisk"] .save-slot,
+  :root[data-theme="norisk"] .theme-swatch,
+  :root[data-theme="norisk"] .suggest-opt{
+    position:relative; overflow:hidden; background:transparent; border:none; border-radius:0;
+    border-bottom:1px solid rgba(255,255,255,.07);
+  }
+  :root[data-theme="norisk"] .save-slot:last-child,
+  :root[data-theme="norisk"] .theme-swatch:last-child,
+  :root[data-theme="norisk"] .suggest-opt:last-child{ border-bottom:none; }
+  :root[data-theme="norisk"] .save-slot:hover,
+  :root[data-theme="norisk"] .theme-swatch:hover,
+  :root[data-theme="norisk"] .suggest-opt:hover{ background:rgba(255,255,255,.02); }
+  :root[data-theme="norisk"] .save-slot::before,
+  :root[data-theme="norisk"] .theme-swatch::before,
+  :root[data-theme="norisk"] .suggest-opt::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:2px; background:var(--accent);
+    transform:scaleY(0); transition:transform .4s cubic-bezier(.16, 1, .3, 1);
+  }
+  :root[data-theme="norisk"] .save-slot:hover::before,
+  :root[data-theme="norisk"] .theme-swatch:hover::before,
+  :root[data-theme="norisk"] .suggest-opt:hover::before,
+  :root[data-theme="norisk"] .theme-swatch.selected::before,
+  :root[data-theme="norisk"] .wizard-slot.selected::before{ transform:scaleY(1); }
+  :root[data-theme="norisk"] .theme-swatch.selected{ border-color:transparent; }
+  :root[data-theme="norisk"] .timeline-wrap{ scrollbar-width:thin; }
+  :root[data-theme="norisk"] .timeline-wrap::-webkit-scrollbar{ height:4px; }
+  :root[data-theme="norisk"] .timeline-wrap::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.22); }
+  :root[data-theme="norisk"] .timeline-wrap::-webkit-scrollbar-thumb:hover{ background:var(--accent); }
+  :root[data-theme="norisk"] .players-drawer::-webkit-scrollbar{ width:2px; }
+  :root[data-theme="norisk"] .players-drawer::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.2); }
 
   /* Farb-Variablen als echte <color>-Typen registrieren: dann lassen sie sich
      weich ineinander überblenden (inkl. Verläufe, Rahmen, Schatten usw.) */
@@ -149,6 +345,7 @@
     background-attachment:fixed;
     color:var(--text);
     font-family:var(--body-font);
+    font-weight:var(--body-weight);
     min-height:100vh;
     display:flex;
     flex-direction:column;
@@ -279,6 +476,9 @@
   .theme-swatch[data-theme-preview="glass"] .theme-dots span:nth-child(1){ background:linear-gradient(135deg,#2a5298,#7e57c2); border-color:transparent; }
   .theme-swatch[data-theme-preview="glass"] .theme-dots span:nth-child(2){ background:rgba(255,255,255,0.35); }
   .theme-swatch[data-theme-preview="glass"] .theme-dots span:nth-child(3){ background:#0a84ff; }
+  .theme-swatch[data-theme-preview="norisk"] .theme-dots span:nth-child(1){ background:#000000; }
+  .theme-swatch[data-theme-preview="norisk"] .theme-dots span:nth-child(2){ background:#161616; }
+  .theme-swatch[data-theme-preview="norisk"] .theme-dots span:nth-child(3){ background:#4f8eff; }
   .theme-swatch[data-theme-preview="custom"] .theme-dots span:nth-child(1){ background:conic-gradient(from 0deg, #e8a33d, #5a9c78, #175cc2, #c1483b, #e8a33d); }
   .theme-swatch[data-theme-preview="custom"] .theme-dots span:nth-child(2),
   .theme-swatch[data-theme-preview="custom"] .theme-dots span:nth-child(3){ display:none; }
@@ -786,6 +986,13 @@
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true" focusable="false">
+  <filter id="glass-refract" x="-4%" y="-4%" width="108%" height="108%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.007 0.011" numOctaves="2" seed="11" result="noise"/>
+    <feGaussianBlur in="noise" stdDeviation="3" result="soft"/>
+    <feDisplacementMap in="SourceGraphic" in2="soft" scale="34" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
 <div id="app"></div>
 <div id="spotify-embed-host" style="position:absolute !important;width:1px !important;height:1px !important;overflow:hidden !important;clip:rect(0,0,0,0) !important;clip-path:inset(50%) !important;white-space:nowrap !important;pointer-events:none !important;">
   <div id="spotify-embed-root"></div>
@@ -2416,7 +2623,8 @@ const THEME_INFO = [
   { key:"dark", label:"Dunkel", desc:"Reines Schwarz statt Blaugrau, weißer statt goldener Akzent." },
   { key:"light", label:"Hell", desc:"Das Dunkel-Theme umgekehrt: helle Flächen, dunkle Karten, blauer Akzent." },
   { key:"modern", label:"Modern", desc:"Konsolen-Look mit Türkis-Akzent, schärferen Kanten, Monospace-Schrift und leicht angeglasten Flächen." },
-  { key:"glass", label:"Liquid Glass", desc:"Apple-artig: bunter Verlauf im Hintergrund, stark transluzente, geblurrte Flächen, große Rundungen." },
+  { key:"glass", label:"Liquid Glass", desc:"Echtes Glas-Material: Lichtkanten, Glanzreflex, Milchglas-Blur — in Chrome/Edge zusätzlich mit Lichtbrechung." },
+  { key:"norisk", label:"Norisk", desc:"Reines Schwarz, Pixel-Überschriften, schlanke Outfit-Schrift und blauer Akzent — angelehnt an die NoRisk-Website." },
   { key:"custom", label:"Benutzerdefiniert", desc:"Eigene Farben, Transparenz und Schriftart frei wählen." }
 ];
 
@@ -3489,6 +3697,14 @@ async function resumeGame(){
 const THEME_STORAGE_KEY = "chronohit_theme";
 const CUSTOM_THEME_KEY = "chronohit_custom_theme";
 let currentTheme = "og";
+
+// Lichtbrechung per SVG-Filter funktioniert im Backdrop nur in Chromium-Browsern
+(function detectRefraction(){
+  const ua = navigator.userAgent || "";
+  if(/(Chrome|Chromium|Edg|OPR)\//.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua)){
+    document.documentElement.classList.add("glass-refract");
+  }
+})();
 
 const FONT_OPTIONS = [
   { key:"Space Grotesk",    family:"'Space Grotesk', sans-serif",  google:"Space+Grotesk:wght@400;500;600;700" },
