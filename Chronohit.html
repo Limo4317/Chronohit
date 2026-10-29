@@ -1141,6 +1141,22 @@
   .lobby-name{ flex:1; overflow:hidden; text-overflow:ellipsis; }
   .lobby-name small{ color:var(--muted); }
   .pw-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px; font-size:14px; }
+
+  /* Spielermenü-Griff: button:active (scale) überschrieb translateY(-50%) -> Griff sprang beim Klicken weg, der Klick ging verloren */
+  .drawer-handle:active{ transform:translateY(-50%) scale(.96); }
+
+  /* NRC: Tipp-/Klick-Welle und wabernder Cursor-Hintergrund */
+  .tap-ripple{
+    position:fixed; width:26px; height:26px; margin:-13px 0 0 -13px; border-radius:50%; pointer-events:none; z-index:9999;
+    border:2px solid var(--accent);
+    box-shadow:0 0 16px color-mix(in srgb, var(--accent) 55%, transparent), inset 0 0 10px color-mix(in srgb, var(--accent) 30%, transparent);
+    animation:tapRipple .7s ease-out both;
+  }
+  .tap-ripple.second{ animation-name:tapRipple2; animation-delay:.12s; }
+  @keyframes tapRipple{ 0%{ transform:scale(.3); opacity:.95; } 100%{ transform:scale(5.5); opacity:0; } }
+  @keyframes tapRipple2{ 0%{ transform:scale(.3); opacity:.6; } 100%{ transform:scale(8); opacity:0; } }
+  #cursor-glow.pulse{ animation:glowWobble .6s ease-out; }
+  @keyframes glowWobble{ 0%{ scale:1; } 35%{ scale:1.5; } 65%{ scale:.92; } 100%{ scale:1; } }
 </style>
 </head>
 <body>
@@ -1840,7 +1856,6 @@ const SONGS_RAW = [
   {t:"Vienna", a:"Billy Joel", y:1977, g:"en", id:"4U45aEWtQhrm8A5mxPaFZ7", s:["rock", "pop"], c:["ballad"]},
   {t:"Time After Time", a:"Cyndi Lauper", y:1983, g:"en", id:"7o9uu2GDtVDr9nsR7ZRN73", s:["pop"], c:["ballad"]},
   {t:"Kiss from a Rose", a:"Seal", y:1994, g:"en", id:"3YKptz29AsOlm7WAVnztBh", s:["pop", "rnb"], c:["film", "ballad"]},
-  {t:"Brothers In Arms", a:"Dire Straits", y:1985, g:"en", id:"60bF2b61f7Q5Bt82QCBwvc", s:["rock"], c:["ballad"]},
   {t:"Another Day in Paradise", a:"Phil Collins", y:1989, g:"en", id:"1NCuYqMc8hKMb4cpNTcJbD", s:["pop"], c:["ballad"]},
   {t:"Easy", a:"Commodores", y:1977, g:"en", id:"1JQ6Xm1JrvHfvAqhl5pwaA", s:["rnb"], c:["ballad"]},
   {t:"Purple Rain", a:"Prince", y:1984, g:"en", id:"54X78diSLoUDI3joC2bjMz", s:["rock", "rnb"], c:["film", "ballad"]},
@@ -2697,7 +2712,7 @@ function revealCard(){
   if(ok && !isMultiRound() && (stats.curStreak === 3 || stats.curStreak === 5 || (stats.curStreak > 5 && stats.curStreak % 5 === 0))){
     sfx("streak", sfxLate);
   }
-  state.lastResult = { ok, song, positionOk, guessCheck, difficulty: diff, bonusAwarded };
+  state.lastResult = { ok, song, positionOk, guessCheck, difficulty: diff, bonusAwarded, autoRevealed: autoRevealFlag };
   state.guessResult = null;
   state.guess = { t:"", a:"", y:"" };
 
@@ -3885,7 +3900,7 @@ function renderGame(){
     const diff = r.difficulty || "normal";
     drawZoneHtml = `
       <div class="draw-zone">
-        <div class="feedback ${ok?'ok':'bad'}">${ok ? 'Richtig!' : (r.timedOut ? 'Zeit abgelaufen — Zug verloren.' : 'Leider falsch.')}</div>
+        <div class="feedback ${ok?'ok':'bad'}">${r.autoRevealed ? 'Zeit abgelaufen — deine Auswahl wurde gewertet. ' : ''}${ok ? 'Richtig!' : (r.timedOut ? 'Zeit abgelaufen — Zug verloren.' : 'Leider falsch.')}</div>
         <div class="draw-caption">${song.t} — ${song.a} · ${song.y}</div>
         ${song.id ? `
           <div class="embed-full">
@@ -4006,6 +4021,7 @@ function renderGame(){
       <div class="stat">Richtig <b>${state.correctCount} / ${s.target}</b></div>
       <div class="stat">Stapel <b>${deckSize()}</b></div>
       ${s.tokens ? `<div class="stat">Chrono <div class="token-dots">${tokenDots}</div></div>` : ``}
+      ${online && NET.role === "host" ? `<button class="btn-ghost btn-small" onclick="netShowInvite()">🔑 Passwort</button>` : ``}
       ${online && NET.role === "guest" ? `` : `<button class="btn-ghost btn-small" onclick="requestOverwriteSave()">💾 Speichern</button>`}
       <button class="btn-ghost btn-small" onclick="openExitDialog()">${online && NET.role === "guest" ? 'Raum verlassen' : 'Zurück zum Menü'}</button>
     </div>
@@ -4605,6 +4621,7 @@ document.addEventListener("keydown", e => { if(e.key === "Escape") cancelResetCu
    Spielstands startet der laufende Zug mit der vollen Zeit neu. */
 let turnLastTick = Date.now();
 let turnLastSec = null;
+let autoRevealFlag = false;
 function turnLimitMs(){
   const t = state && state.settings ? state.settings.turnLimit : 0;
   return t > 0 ? t * 1000 : 0;
@@ -4661,6 +4678,15 @@ function turnTick(){
 }
 function timeoutTurn(){
   if(!turnTimerActive()) return;
+  // Position schon gewählt, nur noch nicht bestätigt: die Auswahl wird gewertet (richtig oder falsch)
+  if(state.phase === "revealed_pending" && state.pendingGap != null){
+    pauseSpotifyPlayback();
+    state.turnDeadline = null; state.pendingSpend = null; turnLastSec = null;
+    autoRevealFlag = true;
+    NET.depth++;
+    try{ revealCard(); } finally { NET.depth--; autoRevealFlag = false; }
+    return;
+  }
   pauseSpotifyPlayback();
   const song = state.current;
   state.turnDeadline = null;
@@ -5322,7 +5348,7 @@ function netCleanSnapshot(s){
     const gc = r.guessCheck || {}, said = gc.said || {};
     const str = v => String(v == null ? "" : v).slice(0, 80);
     return {
-      ok: !!r.ok, song: netCleanSong(r.song), positionOk: !!r.positionOk, timedOut: !!r.timedOut, bonusAwarded: !!r.bonusAwarded,
+      ok: !!r.ok, song: netCleanSong(r.song), positionOk: !!r.positionOk, timedOut: !!r.timedOut, bonusAwarded: !!r.bonusAwarded, autoRevealed: !!r.autoRevealed,
       difficulty: ["normal", "pro", "expert"].includes(r.difficulty) ? r.difficulty : "normal",
       guessCheck: { said: { t: str(said.t), a: str(said.a), y: str(said.y) }, titleOk: !!gc.titleOk, artistOk: !!gc.artistOk, yearOk: !!gc.yearOk, both: !!gc.both }
     };
@@ -5390,7 +5416,14 @@ function netGuestEffects(prev, cur, left){
 }
 // Nach jedem Rendern: Host verteilt den (geänderten) Zustand
 const __renderOrig = render;
-render = function(){ __renderOrig.apply(this, arguments); if(NET.role === "host" && NET.started && state.online) netScheduleBroadcast(); };
+render = function(){
+  // Reste einer früheren Online-Runde (z. B. nach "Speichern und zum Menü") nie in Menü/Beitritt mitschleppen
+  if(state.online && !NET.role && (state.screen === "menu" || state.screen === "join" || state.screen === "online")){ state.online = false; state.net = null; }
+  // Gast ist verbunden, steht aber noch auf dem Beitritts-Bildschirm: in die Lobby wechseln
+  if(NET.role === "guest" && NET.status === "connected" && !state.online && (state.screen === "join" || state.screen === "online")) state.screen = "lobby";
+  __renderOrig.apply(this, arguments);
+  if(NET.role === "host" && NET.started && state.online) netScheduleBroadcast();
+};
 
 /* ---------- Host ---------- */
 function netUiUpdate(){
@@ -5653,6 +5686,48 @@ function netPeriodic(){
   }
 }
 
+
+/* ---------- NRC: Tipp-Welle (Handy) und wabernder Cursor-Hintergrund (PC) ---------- */
+document.addEventListener("pointerdown", e => {
+  if(currentDesign() !== "norisk" || prefs.reduceMotion) return;
+  if(e.pointerType === "mouse" && e.button !== 0) return;
+  for(let i = 0; i < 2; i++){
+    const r = document.createElement("div");
+    r.className = "tap-ripple" + (i ? " second" : "");
+    r.style.left = e.clientX + "px"; r.style.top = e.clientY + "px";
+    r.addEventListener("animationend", () => r.remove());
+    document.body.appendChild(r);
+    setTimeout(() => r.remove(), 1200);
+  }
+  const g = document.getElementById("cursor-glow");
+  if(g && e.pointerType === "mouse"){ g.classList.remove("pulse"); void g.offsetWidth; g.classList.add("pulse"); }
+}, true);
+
+/* ---------- Host: Raumname + Passwort während des Spiels erneut anzeigen ---------- */
+function netShowInvite(){
+  if(NET.role !== "host" || document.getElementById("net-invite-modal")) return;
+  const wrap = document.createElement("div");
+  wrap.id = "net-invite-modal";
+  wrap.className = "modal-backdrop";
+  wrap.setAttribute("role", "dialog");
+  wrap.setAttribute("aria-modal", "true");
+  wrap.addEventListener("click", e => { if(e.target === wrap) netHideInvite(); });
+  wrap.innerHTML = `
+    <div class="modal-box">
+      <h3>Einladung</h3>
+      <p>Raumname: <b>${esc(NET.roomLabel)}</b></p>
+      <p>Passwort: <b style="user-select:all;">${esc(NET.hostPw)}</b></p>
+      <p style="font-size:calc(13px * var(--font-scale)); color:var(--muted);">Mitspieler treten über „Spiel hosten / beitreten“ → „Spiel beitreten“ bei. Wer schon dabei war, nimmt seinen alten Namen und landet wieder auf seinem Platz.</p>
+      <div class="modal-actions">
+        <button class="btn-primary" onclick="netCopy('Chronohit – Raum: ' + NET.roomLabel + '  Passwort: ' + NET.hostPw)">Einladung kopieren</button>
+        <button class="btn-ghost" onclick="netHideInvite()">Schließen</button>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+}
+function netHideInvite(){ const el = document.getElementById("net-invite-modal"); if(el) el.remove(); }
+document.addEventListener("keydown", e => { if(e.key === "Escape") netHideInvite(); });
+
 /* ---------- Gast ---------- */
 async function netJoin(){
   const f = NET.form;
@@ -5661,6 +5736,7 @@ async function netJoin(){
   if(room.length < 3){ NET.error = "Bitte gib den Raumnamen ein."; return render(); }
   if(!f.pw){ NET.error = "Bitte gib das Passwort ein."; return render(); }
   try{ localStorage.setItem("chronohit_netname", name); }catch(e){}
+  if(state.online){ state.online = false; state.net = null; }
   const prevSettings = state.settings;
   netResetRuntime();
   NET.prevSettings = prevSettings;
@@ -5684,7 +5760,7 @@ function netGuestConnect(first){
   NET.hostConn = null;
   const peer = new peerjs.Peer("chg-" + netRandHex(12), NET_PEER_OPTIONS);
   NET.peer = peer;
-  let nh = null, ng = null, done = false;
+  let nh = null, ng = null, done = false, opened = false;
   const giveUp = msg => {
     if(done || NET.peer !== peer) return; done = true;
     if(first || !NET.started){ NET.error = msg; NET.status = "error"; try{ peer.destroy(); }catch(e){} NET.peer = null; if(!state.online) state.screen = "join"; render(); }
@@ -5700,15 +5776,22 @@ function netGuestConnect(first){
     else if(type === "browser-incompatible") giveUp("Dieser Browser unterstützt WebRTC nicht.");
     else giveUp("Verbindungsfehler: " + (type || "unbekannt"));
   });
+  peer.on("disconnected", () => {
+    if(NET.peer === peer && !peer.destroyed) setTimeout(() => { try{ if(NET.peer === peer && !peer.destroyed) peer.reconnect(); }catch(e){} }, 1500);
+  });
   peer.on("open", () => {
-    if(NET.peer !== peer) return;
+    if(NET.peer !== peer || opened) return;
+    opened = true;
     const conn = peer.connect(NET.roomId, { reliable: true, serialization: "json" });
     NET.hostConn = conn;
     let q = Promise.resolve(), verified = false;
     conn.on("data", d => {
       if(NET.hostConn !== conn || !d || typeof d !== "object" || typeof d.t !== "string") return;
       NET.lastHost = Date.now();
-      q = q.then(() => handle(d)).catch(() => {});
+      q = q.then(() => handle(d)).catch(err => {
+        console.error("Chronohit Online:", err);
+        if(!verified) giveUp("Beitritt fehlgeschlagen: " + ((err && err.message) || "unbekannter Fehler"));
+      });
     });
     const handle = async d => {
       if(!verified && !["challenge", "welcome", "deny"].includes(d.t)) return;
@@ -5720,6 +5803,7 @@ function netGuestConnect(first){
           if(!fp) return giveUp("Die Sicherheitsprüfung der Verbindung war nicht möglich.");
           const mac = await netMac(NET.macKey, ["guest", nh, ng, NET.myName, fp.remote, fp.local]);
           netSend(conn, { t: "auth", name: NET.myName, ng, mac });
+          setTimeout(() => { if(!verified && !done && NET.hostConn === conn) giveUp("Der Host hat die Anmeldung nicht beantwortet. Versuche es noch einmal."); }, 10000);
           break;
         }
         case "welcome": {
@@ -5729,7 +5813,7 @@ function netGuestConnect(first){
             return giveUp("Der Host konnte nicht verifiziert werden. Die Verbindung wurde aus Sicherheitsgründen abgebrochen.");
           clearTimeout(timeout); done = true; verified = true;
           NET.status = "connected"; NET.reconnectTries = 0; NET.started = !!d.started;
-          if(!state.online && state.screen !== "lobby"){ state.screen = "lobby"; }
+          if(!state.online) state.screen = "lobby";
           render();
           break;
         }
@@ -5746,7 +5830,7 @@ function netGuestConnect(first){
           const seats = Array.isArray(d.seats) ? d.seats.slice(0, NET_MAX_PLAYERS).map(x => ({ name: netCleanName(x && x.name), connected: !!(x && x.connected) })).filter(x => x.name) : [];
           const i = d.info || {};
           NET.lobby = { seats, info: { room: String(i.room || "").slice(0, 60), mode: i.mode, difficulty: i.difficulty, target: netInt(i.target, 10, 1, 50), turnLimit: netInt(i.turnLimit, 0, 0, 600), tokens: !!i.tokens, resume: !!i.resume } };
-          if(!state.online) netUiUpdate();
+          if(!state.online){ if(state.screen === "join" || state.screen === "online") state.screen = "lobby"; netUiUpdate(); }
           break;
         }
         case "state": netGuestApplyState(d); break;
