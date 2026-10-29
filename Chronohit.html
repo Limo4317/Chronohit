@@ -1165,6 +1165,13 @@
   .ch-result{ margin-top:8px; padding:8px 12px; border-radius:var(--radius); border:1px solid var(--line); font-size:14px; text-align:center; }
   .ch-result.ok{ color:var(--correct); border-color:var(--correct); }
   .ch-result.bad{ color:var(--wrong); border-color:var(--wrong); }
+  .autosave-toast{ position:fixed; right:14px; bottom:14px; z-index:9999; padding:8px 12px; border-radius:10px; background:var(--panel, #222); color:var(--text, #fff); border:1px solid var(--line, rgba(255,255,255,.2)); font-size:calc(13px * var(--font-scale)); pointer-events:none; animation:asFade 1.9s ease forwards; }
+  @keyframes asFade{ 0%{opacity:0; transform:translateY(6px)} 12%{opacity:.96; transform:none} 80%{opacity:.96} 100%{opacity:0} }
+  html.reduce-motion .autosave-toast{ animation:none; }
+  @media (hover:hover) and (pointer:fine){
+    select.dropdown{ color-scheme:normal; }
+    select.dropdown option, select.dropdown optgroup{ background-color:var(--bg); color:var(--text); }
+  }
 </style>
 </head>
 <body>
@@ -2066,7 +2073,7 @@ function loadSlot(n){
   if(!state.settings.mode) state.settings.mode = "solo";
   if(!state.settings.difficulty) state.settings.difficulty = "normal";
   state.pendingSpend = null;
-  state.turnDeadline = null;
+  state.turnDeadline = null; state.chDeadline = null;
   state.showExitDialog = false;
   state.saveSlotDialogOpen = false;
   state.confirmOverwriteSave = false;
@@ -2549,7 +2556,7 @@ function drawNext(){
   state.challenge = null; state.autoRevealed = false;
   state.phase = "draw";
   state.pendingGap = null;
-  state.turnDeadline = null;
+  state.turnDeadline = null; state.chDeadline = null;
   state.lastResult = null;
   state.bonusClaimed = false;
   state.guess = { t:"", a:"", y:"" };
@@ -2674,7 +2681,7 @@ function computeGuessCheck(song){
 /* ============ CHRONOHIT!-RUF (Einspruch) ============
    Nur Mehrspieler mit Token-Einstellung. Vor dem Aufdecken kann ein Gegner mit einem Token "Chronohit!" rufen
    und die Lücke wählen, wo die Karte seiner Meinung nach hingehört. Nur ein Einspruch pro Zug (der Erste).
-   Liegt der Aktive falsch und der Rufer richtig, bekommt der Rufer die Karte. Das Token ist immer weg.
+   Liegt der Aktive falsch und der Rufer richtig, bekommt der Rufer die Karte. Der Token ist immer weg.
    Kein Timer: der aktive Spieler (online auch der Host) beendet das Fenster. */
 function challengeEnabled(){
   return isMultiRound() && state.settings.mode === "multiplayer" && !!state.settings.challenge && !!state.settings.tokens;
@@ -2691,6 +2698,7 @@ function callChallenge(i){
   if(!challengeEligible(i)) return;
   state.players[i].tokens -= 1;
   state.challenge = { caller: i, gap: null };
+  state.chDeadline = chNewDeadline(true);
   sfx("call");
   render(); saveState();
 }
@@ -2713,7 +2721,7 @@ function cancelChallenge(){
 function abortChallenge(){
   const ch = state.challenge;
   if(ch && ch.caller != null && state.players[ch.caller]) state.players[ch.caller].tokens += 1;
-  state.challenge = null;
+  state.challenge = null; state.chDeadline = null;
 }
 function resolveChallenge(){
   const ch = state.challenge;
@@ -2729,7 +2737,7 @@ function challengeZoneHtml(){
   const modOk = !online || netMyTurn() || NET.role === "host";       // aktiver Spieler oder Host (lokal: jeder am Gerät)
   const iAmCaller = ch.caller != null && (!online || ch.caller === mySeat);
   const name = ch.caller != null ? esc(state.players[ch.caller].name) : "";
-  let h = `<div class="ch-box"><div class="ch-title">⚡ Chronohit!-Einspruch?</div>`;
+  let h = `<div class="ch-box"><div class="ch-title">⚡ Chronohit!-Einspruch?</div>${chTimerHtml()}`;
   if(ch.caller == null){
     const eligible = challengeCallers();
     h += `<div class="draw-caption">Glaubst du, die Karte liegt falsch? Ruf „Chronohit!“ (1 ${icon('token')}) und wähle die Lücke, wo sie deiner Meinung nach hingehört.</div>`;
@@ -2738,7 +2746,7 @@ function challengeZoneHtml(){
     } else if(eligible.includes(mySeat)){
       h += `<button class="btn-primary" onclick="callChallenge(${mySeat})">Chronohit! rufen (1 ${icon('token')})</button>`;
     } else if(mySeat !== netActiveSeat()){
-      h += `<div class="draw-caption">Du hast kein Token für einen Einspruch.</div>`;
+      h += `<div class="draw-caption">Du hast keinen Token für einen Einspruch.</div>`;
     } else {
       h += `<div class="draw-caption">Die anderen können jetzt Einspruch erheben …</div>`;
     }
@@ -2758,7 +2766,7 @@ function challengeResultHtml(r){
   const c = r.challenge;
   const nm = esc((state.players[c.caller] || {}).name || "?");
   const txt = c.success ? `erfolgreich — ${nm} bekommt die Karte!`
-    : (r.positionOk ? `erfolglos — die Karte lag richtig, das Token ist weg.` : `erfolglos — auch die Lücke von ${nm} war falsch, das Token ist weg.`);
+    : (r.positionOk ? `erfolglos — die Karte lag richtig, der Token ist weg.` : `erfolglos — auch die Lücke von ${nm} war falsch, der Token ist weg.`);
   return `<div class="ch-result ${c.success ? 'ok' : 'bad'}">⚡ Chronohit! von ${nm}: ${txt}</div>`;
 }
 function revealCard(){
@@ -2766,6 +2774,7 @@ function revealCard(){
   if(challengeEnabled() && challengeCallers().length){
     state.phase = "challenge";
     state.challenge = { caller: null, gap: null };
+    state.chDeadline = chNewDeadline(false);
     render(); saveState();
     return;
   }
@@ -2773,6 +2782,7 @@ function revealCard(){
 }
 function doReveal(){
   if(state.phase !== "revealed_pending") return;
+  state.chDeadline = null;
   pauseSpotifyPlayback();
   const song = state.current;
   const gapIndex = state.pendingGap;
@@ -2842,14 +2852,14 @@ function doReveal(){
     sfx("streak", sfxLate);
   }
   if(chResult && chResult.success) sfx("steal", sfxLate);
-  state.lastResult = { ok, song, positionOk, guessCheck, difficulty: diff, bonusAwarded, autoRevealed: autoRevealFlag || !!state.autoRevealed, challenge: chResult };
+  state.lastResult = { ok, song, positionOk, guessCheck, difficulty: diff, bonusAwarded, autoRevealed: autoRevealFlag || !!state.autoRevealed, challenge: chResult, ts: Date.now() };
   state.autoRevealed = false;
   state.guessResult = null;
   state.guess = { t:"", a:"", y:"" };
 
   state.phase = "feedback";
   render(); saveState();
-  checkWin();
+  if(!checkWin()) autoSaveTurn();   // Auto-Speichern „Nach dem Zug“: nach dem Aufdecken (Multiplayer: inkl. Einspruch)
 }
 
 function evaluateGuess(song){
@@ -3193,6 +3203,8 @@ function renderSettings(){
 
     ${renderAccessibilityCard()}
 
+    ${renderSaveCard()}
+
     ${renderSoundCard()}
 
     <div class="menu-actions">
@@ -3274,6 +3286,7 @@ function renderQuickMenuContent(){
         <div class="setting-row"><div class="label">Hoher Kontrast</div>${prefSwitchHtml('highContrast')}</div>
       </div>
     </div>
+    ${autoSaveQmHtml()}
     <div class="qm-section">
       <div class="qm-title">Sound</div>
       <div class="setting-row"><div class="label">Lautstärke</div>${soundVolumeHtml()}</div>
@@ -3339,7 +3352,7 @@ function renderSlotSettingsPanel(slot){
       <div class="row"><span>Chrono-Tokens</span><b>${s.tokens ? `Ja (max. ${s.maxTokens})` : 'Nein'}</b></div>
       <div class="row"><span>Ziel</span><b>${s.target} Karten</b></div>
       <div class="row"><span>Zeitlimit</span><b>${s.turnLimit > 0 ? s.turnLimit + ' s pro Zug' : 'Aus'}</b></div>
-      ${s.mode === 'multiplayer' ? `<div class="row"><span>Chronohit!-Ruf</span><b>${s.challenge ? 'An' : 'Aus'}</b></div>` : ``}
+      ${s.mode === 'multiplayer' ? `<div class="row"><span>Chronohit!-Ruf</span><b>${s.challenge ? 'An · ' + challengeModeLabel(s.challengeMode) : 'Aus'}</b></div>` : ``}
       <div class="row"><span>Sprachen</span><b>${genreLabel(s.genres)}</b></div>
       ${s.styles ? `<div class="row"><span>Genre</span><b>${s.styles.map(k => (STYLE_DEFS.find(d => d.key === k) || {label:k}).label).join(', ')}</b></div>` : ``}
       ${s.decades ? `<div class="row"><span>Jahrzehnte</span><b>${s.decades.map(decadeLabel).join(', ')}</b></div>` : ``}
@@ -3429,6 +3442,7 @@ function startCreateWizard(online){
     timer: false,
     turnLimit: 30,
     challenge: true,
+    challengeMode: "manual",
     playerCount: 2,
     playerNames: ["", ""],
     playerIds: [0, 1],
@@ -3522,6 +3536,32 @@ function wizardSetMode(v){ state.wizard.mode = v; render(); }
 function wizardSetDifficulty(v){ state.wizard.difficulty = v; render(); }
 function wizardToggleTokens(){ state.wizard.tokens = !state.wizard.tokens; render(); }
 function wizardToggleChallenge(){ state.wizard.challenge = !state.wizard.challenge; render(); }
+const CH_MODES = [["manual","Selber klicken"],["5","Nach 5 Sekunden"],["10","Nach 10 Sekunden"],["limit","Beim Ablauf des Zeitlimits"]];
+function wizardChallengeMode(w){
+  const m = w.challengeMode || "manual";
+  if(m === "limit" && !w.timer) return "manual";
+  return CH_MODES.some(x => x[0] === m) ? m : "manual";
+}
+function wizardSetChallengeMode(v){ state.wizard.challengeMode = v; render(); }
+function challengeModeLabel(m){ const f = CH_MODES.find(x => x[0] === m); return f ? f[1] : CH_MODES[0][1]; }
+function chNewDeadline(call){
+  const now = Date.now(), m = state.settings.challengeMode;
+  if(m === "5") return now + 5000;
+  if(m === "10") return now + 10000;
+  if(m === "limit" && turnLimitMs()){
+    // Restzeit des Zeitlimits, mindestens 5 s (kein Ausnutzen durch spätes Aufdecken); ein Ruf verlängert nur auf mind. 5 s
+    const base = call && state.chDeadline ? state.chDeadline : (state.turnDeadline || now + turnLimitMs());
+    return Math.max(base, now + 5000);
+  }
+  return null;
+}
+function challengeWindowMs(){
+  const m = state.settings.challengeMode;
+  if(m === "5") return 5000;
+  if(m === "10") return 10000;
+  if(m === "limit") return turnLimitMs();
+  return 0;
+}
 function wizardStepCoopTokens(delta){
   const t = state.wizard.coopTokens + delta;
   if(t < 1 || t > 10) return;
@@ -3710,8 +3750,11 @@ function renderWizardStep3(n){
             <button onclick="wizardStepMaxTokens(1)">+</button>
           </div>`) : ``}
         ${w.mode === 'multiplayer' && w.tokens ? infoRow('w-challenge', 'Chronohit!-Ruf (Einspruch)',
-          'Bevor eine Karte aufgedeckt wird, kann ein Gegner mit einem Token „Chronohit!“ rufen und die Lücke wählen, wo die Karte seiner Meinung nach hingehört. Liegt der aktive Spieler falsch und der Rufer richtig, bekommt der Rufer die Karte. Das eingesetzte Token ist immer weg. Pro Zug nur ein Einspruch (der Erste). Der aktive Spieler (online auch der Host) beendet das Einspruchsfenster.',
+          'Bevor eine Karte aufgedeckt wird, kann ein Gegner mit einem Token „Chronohit!“ rufen und die Lücke wählen, wo die Karte seiner Meinung nach hingehört. Liegt der aktive Spieler falsch und der Rufer richtig, bekommt der Rufer die Karte. Der eingesetzte Token ist immer weg. Pro Zug nur ein Einspruch (der Erste). Der aktive Spieler (online auch der Host) beendet das Einspruchsfenster.',
           `<div class="switch ${w.challenge !== false ? 'on':''}" onclick="wizardToggleChallenge()"><div class="knob"></div></div>`) : ``}
+        ${w.mode === 'multiplayer' && w.tokens && w.challenge !== false ? infoRow('w-chmode', 'Einspruchsfenster',
+          'Wie der „Chronohit!“-Ruf abläuft: Entweder beendet der aktive Spieler (online auch der Host) das Fenster selbst per Klick, oder es schließt automatisch nach 5 bzw. 10 Sekunden, bzw. (nur mit Zeitlimit) mit der Restzeit des Zeitlimits, mindestens aber 5 Sekunden. Ruft jemand, bleiben dem Rufer zum Wählen der Lücke mindestens 5 Sekunden (bei 5/10 Sekunden startet das Fenster neu). Läuft es ohne gewählte Lücke ab, wird der Ruf zurückgenommen (Token kommt zurück).',
+          `<select class="dropdown" onchange="wizardSetChallengeMode(this.value)">${CH_MODES.filter(x => x[0] !== 'limit' || w.timer).map(x => `<option value="${x[0]}" ${wizardChallengeMode(w) === x[0] ? 'selected' : ''}>${x[1]}</option>`).join('')}</select>`) : ``}
         `}
         ${infoRow('w-target', 'Kartenanzahl bis Sieg',
           'Wie viele Karten du richtig erraten musst, um zu gewinnen — die Startkarte zählt nicht mit.',
@@ -3857,7 +3900,7 @@ async function createGameFromWizard(){
     mode: w.mode,
     difficulty: w.difficulty,
     turnLimit: w.timer ? w.turnLimit : 0,
-    challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false,
+    challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false, challengeMode: wizardChallengeMode(w),
     ...songFilterFromWizard(w)
   } : {
     tokens: w.tokens,
@@ -3867,7 +3910,7 @@ async function createGameFromWizard(){
     mode: w.mode,
     difficulty: w.difficulty,
     turnLimit: w.timer ? w.turnLimit : 0,
-    challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false,
+    challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false, challengeMode: wizardChallengeMode(w),
     ...songFilterFromWizard(w)
   };
   const slotNum = w.slot;
@@ -4441,6 +4484,7 @@ function render(){
   else if(state.screen === "timeline") renderTimelineOnly();
 
   if(state.screen === "end") maybeRecordGameEnd();
+  confettiCheck();
   updateDocumentTitle();
   updateQuickMenu();
 }
@@ -4495,7 +4539,7 @@ async function resumeGame(){
   if(!state.settings.mode) state.settings.mode = "solo";
   if(!state.settings.difficulty) state.settings.difficulty = "normal";
     state.pendingSpend = null;
-    state.turnDeadline = null;
+    state.turnDeadline = null; state.chDeadline = null;
     state.saveSlotDialogOpen = false;
     state.confirmDeleteSlot = null;
     state.playersDrawerOpen = false;
@@ -4825,7 +4869,7 @@ function timeoutTurn(){
   // Position schon gewählt, nur noch nicht bestätigt: die Auswahl wird gewertet (richtig oder falsch)
   if(state.phase === "revealed_pending" && state.pendingGap != null){
     pauseSpotifyPlayback();
-    state.turnDeadline = null; state.pendingSpend = null; turnLastSec = null;
+    state.turnDeadline = null; state.chDeadline = null; state.pendingSpend = null; turnLastSec = null;
     autoRevealFlag = true; state.autoRevealed = true;
     NET.depth++;
     try{ revealCard(); } finally { NET.depth--; autoRevealFlag = false; }
@@ -4833,7 +4877,7 @@ function timeoutTurn(){
   }
   pauseSpotifyPlayback();
   const song = state.current;
-  state.turnDeadline = null;
+  state.turnDeadline = null; state.chDeadline = null;
   state.pendingSpend = null;
   state.discard.push(song);
   state.wrongCount += 1;
@@ -4855,6 +4899,194 @@ function timeoutTurn(){
   state.pendingGap = null;
   state.phase = "feedback";
   render(); saveState();
+}
+
+/* ============ EINSPRUCHSFENSTER (Timer) ============
+   Modus aus den Spiel-Einstellungen (state.settings.challengeMode): manual | 5 | 10 | limit.
+   Der Host (lokal: das Gerät) beendet das Fenster automatisch, Gäste zeigen nur den Countdown. */
+let chLastTick = Date.now();
+function chTimerHtml(){
+  if(!state.chDeadline) return ``;
+  return `<div class="draw-caption">⏱ Einspruchsfenster: noch <b id="ch-timer-text">${Math.max(0, Math.ceil((state.chDeadline - Date.now()) / 1000))}</b> s</div>`;
+}
+function chExpire(){
+  state.chDeadline = null;
+  NET.depth++;
+  try{
+    const ch = state.challenge;
+    if(ch && ch.caller != null && ch.gap == null) cancelChallenge();   // keine Lücke gewählt: Ruf zurücknehmen, Token zurück
+    resolveChallenge();
+  } finally { NET.depth--; }
+}
+function chTick(){
+  const now = Date.now(), dt = now - chLastTick;
+  chLastTick = now;
+  if(state.screen !== "game" || state.phase !== "challenge" || !state.challenge) return;
+  const guest = state.online && NET.role === "guest";
+  if(!guest && chNewDeadline(false) === null){ state.chDeadline = null; return; }
+  if(!state.chDeadline){ if(guest) return; state.chDeadline = chNewDeadline(false); }
+  if(!guest && turnDialogOpen()) state.chDeadline += dt;
+  const left = state.chDeadline - now;
+  const el = document.getElementById("ch-timer-text");
+  if(el) el.textContent = Math.max(0, Math.ceil(left / 1000));
+  if(left <= 0 && !guest) chExpire();
+}
+
+/* ============ AUTO-SPEICHERN ============
+   Schreibt das laufende Spiel in seinen Speicherplatz (online: nur der Host). Modi: off | turn | interval. */
+const AUTOSAVE_SECS = [10, 15, 30, 60, 120, 300];
+let autoSaveLast = Date.now(), autoSaveBusy = false;
+async function autoSaveNow(){
+  if(autoSaveBusy || prefs.autoSave === "off") return;
+  if(!state.activeSlot || state.screen !== "game" || (state.online && NET.role === "guest")) return;
+  autoSaveBusy = true;
+  try{
+    if(isMulti()) syncActiveToPlayer();
+    const snap = JSON.parse(JSON.stringify(state));
+    snap.savedAt = Date.now(); snap.name = state.activeSaveName;
+    snap.turnDeadline = null; snap.chDeadline = null; snap.showExitDialog = false; snap.saveSlotDialogOpen = false; snap.confirmOverwriteSave = false; snap.pendingSpend = null;
+    await writeSlot(state.activeSlot, snap);
+    autoSaveLast = Date.now();
+    autoSaveToast();
+  }catch(e){} finally { autoSaveBusy = false; }
+}
+function autoSaveTurn(){ if(prefs.autoSave === "turn") autoSaveNow(); }
+function autoSaveIntervalTick(){
+  if(state.screen !== "game"){ autoSaveLast = Date.now(); return; }
+  if(prefs.autoSave === "interval" && Date.now() - autoSaveLast >= prefs.autoSaveSec * 1000) autoSaveNow();
+}
+function autoSaveToast(){
+  const el = document.createElement("div");
+  el.className = "autosave-toast"; el.textContent = "💾 Automatisch gespeichert";
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1900);
+}
+function setAutoSave(v){
+  if(!["off", "turn", "interval"].includes(v)) return;
+  prefs.autoSave = v; autoSaveLast = Date.now(); savePrefs();
+  if(state.screen === "settings") render(); else if(quickMenuOpen) renderQuickMenuContent();
+}
+function setAutoSaveSec(v){
+  const n = parseInt(v, 10); if(!AUTOSAVE_SECS.includes(n)) return;
+  prefs.autoSaveSec = n; autoSaveLast = Date.now(); savePrefs();
+}
+function autoSaveSelectsHtml(){
+  const opts = [["off", "Aus"], ["turn", "Nach dem Zug"], ["interval", "Alle x Sekunden"]]
+    .map(([k, l]) => `<option value="${k}" ${prefs.autoSave === k ? 'selected' : ''}>${l}</option>`).join("");
+  const secs = AUTOSAVE_SECS.map(n => `<option value="${n}" ${prefs.autoSaveSec === n ? 'selected' : ''}>${n} s</option>`).join("");
+  return `<select class="dropdown" onchange="setAutoSave(this.value)" aria-label="Auto-Speichern">${opts}</select>` +
+    (prefs.autoSave === "interval" ? `<select class="dropdown" onchange="setAutoSaveSec(this.value)" aria-label="Speicher-Intervall">${secs}</select>` : ``);
+}
+function renderSaveCard(){
+  return `
+    <div class="menu-card">
+      <h3>Speichern</h3>
+      <div class="settings-grid">
+        <div class="setting-row">
+          <div><div class="label">Auto-Speichern</div><div class="hint">Speichert das laufende Spiel automatisch in seinem Speicherplatz (online: beim Host). „Nach dem Zug“ speichert nach dem Aufdecken der Karte (im Multiplayer nach dem Aufdecken inkl. Einspruch); „Alle x Sekunden“ im gewählten Abstand.</div></div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">${autoSaveSelectsHtml()}</div>
+        </div>
+      </div>
+    </div>`;
+}
+function autoSaveQmHtml(){
+  return `
+    <div class="qm-section">
+      <div class="qm-title">Speichern</div>
+      <div class="setting-row"><div class="label">Auto-Speichern</div><div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">${autoSaveSelectsHtml()}</div></div>
+    </div>`;
+}
+
+/* ============ ONLINE-LOBBY: BEREIT & REIHENFOLGE WÜRFELN ============
+   Gäste setzen ein Bereit-Häkchen; der Host kann erst starten, wenn alle verbundenen Gäste bereit sind.
+   Würfeln mischt die Gäste (der Host bleibt technisch Sitz 0) und lost den Startspieler aus: die Zugreihenfolge
+   läuft reihum ab diesem Spieler (zusammen ergibt das jede mögliche Reihenfolge). */
+function netOrderValid(){ return NET.orderStart != null && NET.orderLen === NET.seats.length && NET.seats.length > 1; }
+function netRollOrder(){
+  if(NET.role !== "host" || NET.started || NET.resume || NET.seats.length < 2) return;
+  const guests = shuffle(NET.seats.slice(1));
+  NET.seats = [NET.seats[0], ...guests];
+  NET.orderStart = Math.floor(Math.random() * NET.seats.length);
+  NET.orderLen = NET.seats.length;
+  netBroadcastLobby(); render();
+}
+function netToggleReady(){
+  if(NET.role !== "guest" || NET.status !== "connected") return;
+  const me = NET.lobby.seats.find(x => netSameName(x.name, NET.myName));
+  netSendHost({ t: "ready", v: !(me && me.ready) });
+}
+function netHostReady(entry, d){
+  if(NET.role !== "host" || NET.started || NET.resume) return;
+  const seat = NET.seats.find(x => netKey(x.name) === entry.key);
+  if(!seat) return;
+  seat.ready = !!d.v;
+  netBroadcastLobby(); netUiUpdate();
+}
+function lobbyExtraButtons(host, seats, info){
+  if(info.resume) return ``;
+  if(host) return seats.length >= 2 ? `<button class="btn-ghost" onclick="netRollOrder()">🎲 Reihenfolge würfeln</button>` : ``;
+  if(NET.status !== "connected" || NET.started) return ``;
+  const me = seats.find(x => netSameName(x.name, NET.myName));
+  const on = !!(me && me.ready);
+  return `<button class="${on ? 'btn-primary' : 'btn-ghost'}" onclick="netToggleReady()">${on ? '✓ Bereit' : 'Bereit?'}</button>`;
+}
+
+/* ============ KONFETTI ============
+   big = Sieg (viel), medium = richtige Karte + Bonus-Token, small = richtige Karte bzw. Bonus-Token / erfolgreicher Einspruch.
+   Aus bei „Animationen reduzieren“. */
+const CF = { parts: [], run: false, cv: null };
+let cfLastTs = 0;
+function confettiSpawn(n, o){
+  const w = innerWidth, h = innerHeight;
+  const cs = getComputedStyle(document.documentElement);
+  const colors = [cs.getPropertyValue("--accent").trim() || "#f5c542", "#ff5d73", "#4cc9f0", "#7bd88f", "#ffd166", "#b388ff"];
+  for(let i = 0; i < n; i++){
+    let x, y, vx, vy;
+    if(o.src === "corners"){ const left = i % 2 === 0; x = left ? 0 : w; y = h; vx = (left ? 1 : -1) * (4 + Math.random() * 9); vy = -(10 + Math.random() * 12); }
+    else if(o.src === "top"){ x = Math.random() * w; y = -10; vx = (Math.random() - .5) * 4; vy = 1 + Math.random() * 4; }
+    else { x = w / 2 + (Math.random() - .5) * 80; y = h * 0.55; const a = -Math.PI / 2 + (Math.random() - .5) * 1.6, sp = 6 + Math.random() * 8; vx = Math.cos(a) * sp; vy = Math.sin(a) * sp; }
+    CF.parts.push({ x, y, vx, vy, g: 0.28 + Math.random() * 0.12, r: Math.random() * 6.28, vr: (Math.random() - .5) * 0.4,
+      sz: 6 + Math.random() * 6, c: colors[(Math.random() * colors.length) | 0], life: 0, max: o.life + Math.random() * o.life * 0.5 });
+  }
+  if(!CF.run){ CF.run = true; requestAnimationFrame(confettiLoop); }
+}
+function confettiLoop(){
+  let cv = CF.cv;
+  if(!cv){
+    cv = CF.cv = document.createElement("canvas");
+    cv.style.cssText = "position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9998;";
+    document.body.appendChild(cv);
+  }
+  const dpr = window.devicePixelRatio || 1;
+  if(cv.width !== Math.round(innerWidth * dpr) || cv.height !== Math.round(innerHeight * dpr)){ cv.width = Math.round(innerWidth * dpr); cv.height = Math.round(innerHeight * dpr); }
+  const ctx = cv.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, innerWidth, innerHeight);
+  CF.parts = CF.parts.filter(q => q.life < q.max && q.y < innerHeight + 30);
+  for(const q of CF.parts){
+    q.life++; q.vy += q.g; q.vx *= 0.99; q.vy *= 0.99; q.x += q.vx; q.y += q.vy; q.r += q.vr;
+    ctx.globalAlpha = Math.min(1, (q.max - q.life) / (q.max * 0.25));
+    ctx.save(); ctx.translate(q.x, q.y); ctx.rotate(q.r); ctx.fillStyle = q.c; ctx.fillRect(-q.sz / 2, -q.sz / 4, q.sz, q.sz / 2); ctx.restore();
+  }
+  if(CF.parts.length){ requestAnimationFrame(confettiLoop); }
+  else { CF.run = false; if(CF.cv){ CF.cv.remove(); CF.cv = null; } }
+}
+function confettiBurst(kind){
+  if(prefs.reduceMotion) return;
+  if(kind === "big"){
+    confettiSpawn(110, { src: "corners", life: 140 });
+    setTimeout(() => confettiSpawn(90, { src: "top", life: 170 }), 300);
+    setTimeout(() => confettiSpawn(90, { src: "corners", life: 140 }), 700);
+    setTimeout(() => confettiSpawn(80, { src: "top", life: 170 }), 1200);
+  } else confettiSpawn(kind === "medium" ? 70 : 36, { src: "center", life: 80 });
+}
+function confettiCheck(){
+  const r = state.lastResult;
+  if(state.screen !== "game" || state.phase !== "feedback" || !r || !r.ts || r.ts === cfLastTs) return;
+  cfLastTs = r.ts;
+  if(Date.now() - r.ts > 4000) return;   // geladene Spielstände lösen kein Konfetti aus
+  const good = r.ok || (r.challenge && r.challenge.success);
+  if(good || r.bonusAwarded) confettiBurst(good && r.bonusAwarded ? "medium" : "small");
 }
 
 /* ============ STATISTIKEN ============
@@ -4907,6 +5139,7 @@ function maybeRecordGameEnd(){
   stats.games[mode].played += 1;
   if(mode !== "multiplayer" && state.won) stats.games[mode].won += 1;
   sfx(mode === "multiplayer" || state.won ? "win" : "lose", 0.7);
+  if(mode === "multiplayer" || state.won) confettiBurst("big");
   saveStats();
 }
 function openStats(){ state.screen = "stats"; render(); }
@@ -5125,7 +5358,7 @@ document.addEventListener("click", e => {
 
 /* ============ DARSTELLUNG & BARRIEREFREIHEIT ============ */
 const PREFS_KEY = "chronohit_prefs";
-const PREF_DEFAULTS = { reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, sound: true, soundVolume: 0.5, soundGroups: null };
+const PREF_DEFAULTS = { reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, autoSave: "turn", autoSaveSec: 30, sound: true, soundVolume: 0.5, soundGroups: null };
 let prefs = { ...PREF_DEFAULTS, reduceMotion: false, soundGroups: defaultSoundGroups() };
 function loadPrefs(){
   let saved = {};
@@ -5138,6 +5371,8 @@ function loadPrefs(){
   prefs.soundGroups = { ...defaultSoundGroups(), ...((saved && saved.soundGroups) || {}) };
   const sv = parseFloat(prefs.soundVolume);
   prefs.soundVolume = isFinite(sv) ? Math.min(1, Math.max(0, sv)) : 0.5;
+  if(!["off", "turn", "interval"].includes(prefs.autoSave)) prefs.autoSave = "turn";
+  { const as = parseInt(prefs.autoSaveSec, 10); prefs.autoSaveSec = [10, 15, 30, 60, 120, 300].includes(as) ? as : 30; }
   const fs = parseFloat(prefs.fontScale);
   prefs.fontScale = isFinite(fs) ? Math.min(1.3, Math.max(0.85, fs)) : 1;
 }
@@ -5435,7 +5670,8 @@ function netFlushGuess(){
 function netPublicSettings(s){
   return {
     mode: s.mode, difficulty: s.difficulty, target: s.target, tokens: !!s.tokens, maxTokens: s.maxTokens,
-    startTokens: s.startTokens, turnLimit: s.turnLimit || 0, playerCount: s.playerCount || 0, challenge: !!s.challenge
+    startTokens: s.startTokens, turnLimit: s.turnLimit || 0, playerCount: s.playerCount || 0, challenge: !!s.challenge,
+    challengeMode: ["manual", "5", "10", "limit"].includes(s.challengeMode) ? s.challengeMode : "manual"
   };
 }
 function netBuildSnapshot(){
@@ -5467,19 +5703,19 @@ function netBroadcastState(force, onlyKey){
   if(!force && !onlyKey && sig === NET.lastSig) return;
   if(!onlyKey) NET.lastSig = sig;
   const left = state.turnDeadline ? Math.max(0, state.turnDeadline - Date.now()) : null;
-  const msg = { t: "state", seq: ++NET.seq, left, s };
+  const msg = { t: "state", seq: ++NET.seq, left, chLeft: state.chDeadline ? Math.max(0, state.chDeadline - Date.now()) : null, s };
   if(onlyKey){ const e = NET.entries.get(onlyKey); if(e) netSend(e.conn, msg); }
   else netBroadcast(msg);
   netScheduleAutosave();
 }
 function netScheduleAutosave(){
-  if(NET.saveTimer) return;
+  if(NET.saveTimer || prefs.autoSave === "off" || state.screen !== "end") return;   // laufende Spiele speichert das Auto-Speichern (Einstellung)
   NET.saveTimer = setTimeout(async () => {
     NET.saveTimer = null;
     try{
       if(NET.role === "host" && state.online && state.activeSlot && (state.screen === "game" || state.screen === "end")){
         const snap = JSON.parse(JSON.stringify(state));
-        snap.savedAt = Date.now(); snap.name = state.activeSaveName; snap.turnDeadline = null;
+        snap.savedAt = Date.now(); snap.name = state.activeSaveName; snap.turnDeadline = null; snap.chDeadline = null;
         await writeSlot(state.activeSlot, snap);
       }
     }catch(e){}
@@ -5503,7 +5739,8 @@ function netCleanSnapshot(s){
     mode: ["solo", "coop", "multiplayer"].includes(set.mode) ? set.mode : "solo",
     difficulty: ["normal", "pro", "expert"].includes(set.difficulty) ? set.difficulty : "normal",
     target: netInt(set.target, 10, 1, 50), tokens: !!set.tokens, maxTokens: netInt(set.maxTokens, 5, 0, 50),
-    startTokens: netInt(set.startTokens, 0, 0, 50), turnLimit: netInt(set.turnLimit, 0, 0, 600), playerCount: netInt(set.playerCount, 0, 0, NET_MAX_PLAYERS), challenge: !!set.challenge
+    startTokens: netInt(set.startTokens, 0, 0, 50), turnLimit: netInt(set.turnLimit, 0, 0, 600), playerCount: netInt(set.playerCount, 0, 0, NET_MAX_PLAYERS), challenge: !!set.challenge,
+    challengeMode: ["manual", "5", "10", "limit"].includes(set.challengeMode) ? set.challengeMode : "manual"
   };
   const seatsIn = s.net && Array.isArray(s.net.seats) ? s.net.seats.slice(0, NET_MAX_PLAYERS) : [];
   const seats = seatsIn.map(x => ({ name: netCleanName(x && x.name), connected: !!(x && x.connected) })).filter(x => x.name);
@@ -5552,7 +5789,8 @@ function netGuestApplyState(msg){
   const typing = prev.online && prev.phase === "revealed_pending" && clean.phase === "revealed_pending" && netMyTurn();
   state = Object.assign({}, keep, clean, {
     screen, deck: [], discard: [], online: true, hasSave: false, activeSlot: null, activeSaveName: "",
-    turnDeadline: typeof msg.left === "number" ? Date.now() + Math.max(0, Math.min(msg.left, 3600000)) : null
+    turnDeadline: typeof msg.left === "number" ? Date.now() + Math.max(0, Math.min(msg.left, 3600000)) : null,
+    chDeadline: typeof msg.chLeft === "number" ? Date.now() + Math.max(0, Math.min(msg.chLeft, 3600000)) : null
   });
   if(typing) state.guess = prev.guess;
   NET.status = "connected";
@@ -5727,6 +5965,7 @@ async function netHostHandle(entry, d){
     case "ping": netSend(entry.conn, { t: "pong" }); break;
     case "act": netHostAct(entry, d); break;
     case "guess": netHostGuess(entry, d); break;
+    case "ready": netHostReady(entry, d); break;
     case "bye": try{ entry.conn.close(); }catch(e){} break;
   }
 }
@@ -5755,6 +5994,7 @@ async function netHostAuth(entry, d){
     NET.seats.push({ name, connected: false });
     seat = NET.seats.length - 1;
   }
+  { const sx = NET.seats.find(q => netKey(q.name) === key); if(sx) sx.ready = false; }
   entry.authed = true; entry.key = key; clearTimeout(entry.authTimer);
   NET.pending.delete(entry);
   NET.entries.set(key, entry);
@@ -5787,11 +6027,11 @@ function netSeatsChanged(){
 }
 function netLobbyInfo(){
   const s = NET.resume ? state.settings : (NET.config && NET.config.settings) || {};
-  return { room: NET.roomLabel, mode: s.mode, difficulty: s.difficulty, target: s.target, turnLimit: s.turnLimit || 0, tokens: !!s.tokens, resume: NET.resume };
+  return { room: NET.roomLabel, mode: s.mode, difficulty: s.difficulty, target: s.target, turnLimit: s.turnLimit || 0, tokens: !!s.tokens, resume: NET.resume, ordered: netOrderValid(), start: netOrderValid() ? NET.orderStart : 0 };
 }
 function netBroadcastLobby(){
   if(NET.role !== "host" || NET.started) return;
-  netBroadcast({ t: "lobby", seats: NET.seats.map(x => ({ name: x.name, connected: !!x.connected })), info: netLobbyInfo() });
+  netBroadcast({ t: "lobby", seats: NET.seats.map(x => ({ name: x.name, connected: !!x.connected, ready: !!x.ready && !!x.connected })), info: netLobbyInfo() });
 }
 function netHostAct(entry, d){
   if(!state.online || !NET.started || state.screen !== "game") return;
@@ -5827,18 +6067,27 @@ async function netHostStartGame(){
   if(NET.role !== "host") return;
   if(NET.resume){
     NET.started = true; NET.lastSig = "";
-    state.online = true; state.net.seats = NET.seats; state.turnDeadline = null; state.screen = "game";
+    state.online = true; state.net.seats = NET.seats; state.turnDeadline = null; state.chDeadline = null; state.screen = "game";
     render();
     if(state.phase === "placing" && state.current && state.current.id && !useFallbackEmbed) requestSpotifyPlay(state.current);
     return;
   }
   if(NET.seats.filter(s => s.connected).length < 2){ NET.error = "Es werden mindestens 2 Spieler benötigt."; return render(); }
+  if(NET.seats.some((x, i) => i > 0 && x.connected && !x.ready)){ NET.error = "Nicht alle Spieler sind bereit."; return render(); }
+  const startSeat = netOrderValid() ? NET.seats[NET.orderStart] : null;
   NET.seats = NET.seats.filter(s => s.connected);
   const cfg = NET.config, names = NET.seats.map(s => s.name);
   const settings = JSON.parse(JSON.stringify(cfg.settings));
   if(settings.mode === "multiplayer"){ settings.playerCount = names.length; newGame(settings, names); }
   else newGame(settings);
   state.online = true; state.net = { seats: NET.seats, turn: 0 }; state.turnNo = state.turnNo || 1;
+  { // ausgewürfelte Startposition: Zugreihenfolge läuft reihum ab dem gewürfelten Spieler
+    const st = startSeat ? NET.seats.indexOf(startSeat) : 0;
+    if(st > 0){
+      if(isMulti()){ syncActiveToPlayer(); state.currentPlayer = st; loadActiveFromPlayer(); }
+      else state.net.turn = st;
+    }
+  }
   state.activeSlot = cfg.slot; state.activeSaveName = cfg.room;
   NET.started = true; NET.lastSig = "";
   const snap = JSON.parse(JSON.stringify(state)); snap.savedAt = Date.now(); snap.name = cfg.room;
@@ -5998,9 +6247,9 @@ function netGuestConnect(first){
         case "kick": NET.notice = String(d.reason || "Du wurdest aus dem Raum entfernt.").slice(0, 200); netLeave(); break;
         case "closed": NET.notice = "Der Host hat den Raum geschlossen."; netLeave(); break;
         case "lobby": {
-          const seats = Array.isArray(d.seats) ? d.seats.slice(0, NET_MAX_PLAYERS).map(x => ({ name: netCleanName(x && x.name), connected: !!(x && x.connected) })).filter(x => x.name) : [];
+          const seats = Array.isArray(d.seats) ? d.seats.slice(0, NET_MAX_PLAYERS).map(x => ({ name: netCleanName(x && x.name), connected: !!(x && x.connected), ready: !!(x && x.ready) })).filter(x => x.name) : [];
           const i = d.info || {};
-          NET.lobby = { seats, info: { room: String(i.room || "").slice(0, 60), mode: i.mode, difficulty: i.difficulty, target: netInt(i.target, 10, 1, 50), turnLimit: netInt(i.turnLimit, 0, 0, 600), tokens: !!i.tokens, resume: !!i.resume } };
+          NET.lobby = { seats, info: { room: String(i.room || "").slice(0, 60), mode: i.mode, difficulty: i.difficulty, target: netInt(i.target, 10, 1, 50), turnLimit: netInt(i.turnLimit, 0, 0, 600), tokens: !!i.tokens, resume: !!i.resume, ordered: !!i.ordered, start: netInt(i.start, 0, 0, NET_MAX_PLAYERS) } };
           if(!state.online){ if(state.screen === "join" || state.screen === "online") state.screen = "lobby"; netUiUpdate(); }
           break;
         }
@@ -6097,10 +6346,10 @@ async function netHostFromWizard(){
   const w = state.wizard;
   const settings = w.mode === "coop" ? {
     tokens: true, target: w.target, maxTokens: w.coopTokens, startTokens: w.coopTokens, mode: w.mode, difficulty: w.difficulty,
-    turnLimit: w.timer ? w.turnLimit : 0, challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false, ...songFilterFromWizard(w)
+    turnLimit: w.timer ? w.turnLimit : 0, challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false, challengeMode: wizardChallengeMode(w), ...songFilterFromWizard(w)
   } : {
     tokens: w.tokens, target: w.target, maxTokens: w.maxTokens, startTokens: w.startTokens, mode: w.mode, difficulty: w.difficulty,
-    turnLimit: w.timer ? w.turnLimit : 0, challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false, ...songFilterFromWizard(w)
+    turnLimit: w.timer ? w.turnLimit : 0, challenge: w.mode === "multiplayer" && !!w.tokens && w.challenge !== false, challengeMode: wizardChallengeMode(w), ...songFilterFromWizard(w)
   };
   const room = (w.name || "").trim(), hostName = netCleanName(w.hostName), pw = w.password;
   try{ localStorage.setItem("chronohit_netname", hostName); }catch(e){}
@@ -6146,14 +6395,16 @@ function renderLobby(){
   const host = NET.role === "host";
   const seats = host ? NET.seats : NET.lobby.seats;
   const info = host ? netLobbyInfo() : (NET.lobby.info || {});
-  const rows = seats.map((x, i) => `
+  const nSeats = seats.length, st = info.ordered && nSeats ? (info.start || 0) % nSeats : 0;
+  const rows = seats.map((_, k) => (k + st) % nSeats).map((i, k) => { const x = seats[i]; return `
     <div class="lobby-row">
       <span class="net-dot ${x.connected ? '' : 'off'}"></span>
-      <span class="lobby-name">${esc(x.name)}${i === 0 ? ' <small>(Host)</small>' : ''}${netSameName(x.name, NET.myName) ? ' <small>(du)</small>' : ''}</span>
+      <span class="lobby-name">${info.ordered ? '<b>' + (k + 1) + '.</b> ' : ''}${esc(x.name)}${i === 0 ? ' <small>(Host)</small>' : ''}${netSameName(x.name, NET.myName) ? ' <small>(du)</small>' : ''}</span>
+      ${!info.resume ? `<span class="lobby-ready" style="font-size:calc(13px * var(--font-scale)); color:${i === 0 || (x.connected && x.ready) ? 'var(--correct, #3ecf8e)' : 'var(--muted)'};">${i === 0 ? '✓ Bereit' : (x.connected && x.ready ? '✓ Bereit' : 'Wartet …')}</span>` : ``}
       ${host && !NET.started && !NET.resume && i > 0 ? `<button class="btn-ghost btn-small" onclick="netKick(${i})">Entfernen</button>` : ``}
-    </div>`).join("");
+    </div>`; }).join("");
   const connected = seats.filter(x => x.connected).length;
-  const canStart = host && NET.status === "open" && (NET.resume ? true : connected >= 2);
+  const canStart = host && NET.status === "open" && (NET.resume ? true : (connected >= 2 && seats.every((x, i) => i === 0 || !x.connected || x.ready)));
   const statusText = NET.status === "opening" ? "Raum wird geöffnet … (Schlüssel wird berechnet)"
     : NET.status === "connecting" || NET.status === "reconnecting" ? "Verbinde …"
     : NET.status === "lost" ? "Verbindung verloren – versuche es erneut …" : "";
@@ -6178,6 +6429,7 @@ function renderLobby(){
       ${!host && NET.status === "connected" ? `<div class="planned-notice" style="margin-top:12px;">${NET.started ? 'Das Spiel läuft – Spielstand wird geladen …' : 'Warte darauf, dass der Host das Spiel startet …'}</div>` : ``}
     </div>
     <div class="menu-actions">
+      ${lobbyExtraButtons(host, seats, info)}
       ${host ? `<button class="btn-primary" onclick="netHostStartGame()" ${canStart ? '' : 'disabled'}>${NET.resume ? 'Spiel fortsetzen' : 'Spiel starten'}</button>` : ``}
       <button class="btn-ghost" onclick="netLobbyClose()">${host ? 'Raum schließen' : 'Verlassen'}</button>
     </div>`;
@@ -6219,6 +6471,8 @@ function netWatchCaption(){
   loadTheme();
   applyPrefs();
   setInterval(turnTick, 250);
+  setInterval(chTick, 250);
+  setInterval(autoSaveIntervalTick, 1000);
   slotsCache = await loadAllSlots();
   const saved = await loadSave();
   if(saved){
