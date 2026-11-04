@@ -987,6 +987,21 @@
   .ach-cat[open] > summary::after{ transform:rotate(90deg); }
   .ach-cat[open] > summary{ margin-bottom:10px; }
   html.reduce-motion .ach-cat > summary::after{ transition:none; }
+  .eco-bar{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+  .alb-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:8px; }
+  .alb-card{ border-radius:10px; padding:8px; border:2px solid var(--muted); min-height:92px; display:flex; flex-direction:column; gap:2px; font-size:calc(13px * var(--font-scale)); }
+  .alb-card.r0{ opacity:.55; border-style:dashed; } .alb-card.r1{ border-color:#cd7f32; } .alb-card.r2{ border-color:#b8c0c8; } .alb-card.r3{ border-color:#e8b923; box-shadow:0 0 10px rgba(232,185,35,.35); }
+  .alb-top{ display:flex; justify-content:space-between; font-size:.85em; opacity:.8; } .alb-t{ font-weight:700; line-height:1.15; } .alb-a{ opacity:.8; } .alb-n{ margin-top:auto; font-size:.8em; opacity:.7; }
+  .wr-wrap{ max-width:560px; margin:0 auto; } .wr-dots{ display:flex; gap:4px; margin-bottom:10px; } .wr-dots span{ flex:1; height:4px; border-radius:2px; background:var(--muted); opacity:.35; } .wr-dots span.on{ background:var(--accent); opacity:1; }
+  .wr-slide{ text-align:center; padding:28px 12px; border-radius:16px; min-height:300px; display:flex; flex-direction:column; justify-content:center; gap:8px; cursor:pointer; background:linear-gradient(160deg, rgba(120,80,200,.25), rgba(224,160,48,.18)); }
+  .wr-e{ font-size:calc(54px * var(--font-scale)); } .wr-t{ font-size:calc(18px * var(--font-scale)); opacity:.85; } .wr-b{ font-size:calc(46px * var(--font-scale)); font-weight:800; color:var(--accent); line-height:1.1; } .wr-s{ font-size:calc(15px * var(--font-scale)); opacity:.85; }
+  .bingo-fab{ position:fixed; right:12px; bottom:12px; z-index:60; border-radius:999px; padding:10px 14px; border:2px solid var(--accent); background:var(--bg, #222); color:var(--text, #fff); font-weight:700; cursor:pointer; }
+  .bingo-pan{ position:fixed; right:12px; bottom:64px; z-index:60; width:min(92vw, 380px); max-height:70vh; overflow:auto; padding:12px; border-radius:14px; border:2px solid var(--accent); background:var(--bg, #222); color:var(--text, #fff); }
+  .bingo-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; } .bingo-cell{ border:1px solid var(--muted); border-radius:8px; padding:6px 4px; text-align:center; font-size:12px; min-height:52px; display:flex; flex-direction:column; justify-content:center; } .bingo-cell.on{ background:var(--accent); color:#111; font-weight:700; } .bingo-cell small{ font-size:10px; opacity:.8; }
+  .tour-banner{ border:2px solid var(--accent); } .tour-row{ display:flex; gap:8px; justify-content:space-between; flex-wrap:wrap; } .tour-row.next{ outline:2px solid var(--accent); border-radius:8px; } .tour-row .tw{ font-weight:800; color:var(--accent); }
+  .seed-chip{ display:flex; gap:8px; align-items:center; justify-content:center; margin:6px 0; font-size:calc(13px * var(--font-scale)); }
+  html.tv-mode #app, html.tv-mode .app{ max-width:min(1500px, 96vw) !important; }
+
   .ach-tile{ display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px 6px; border-radius:12px; border:1px solid rgba(128,128,128,.3); background:transparent; color:inherit; font:inherit; cursor:pointer; }
   .ach-tile:hover{ border-color:var(--accent); }
   .ach-tile.locked .ach-name{ color:var(--muted); }
@@ -3115,7 +3130,7 @@ function newGame(customSettings, playerNames){
   pauseSpotifyPlayback();
   const settings = customSettings || state.settings;
   const pool = filteredPool(settings);
-  let deck = shuffle(pool);
+  let deck = settings.seed ? seededShuffle(pool, settings.seed) : shuffle(pool);
   const startTok = settings.tokens ? (typeof settings.startTokens === "number" ? settings.startTokens : 2) : 0;
   const multi = settings.mode === "multiplayer" && Array.isArray(playerNames) && playerNames.length > 0;
   let players = [];
@@ -4237,8 +4252,9 @@ function renderExperimentalCard(){
   return `<div class="menu-card"><h3>Experimentelles</h3>
     <div class="setting-row"><div><div class="label">Spielziel bis zu 100 Karten</div><div class="hint">Erhöht das Maximum für das Spielziel (Karten bis zum Sieg) von 25 auf 100. Ab 25 geht es in 5er-Schritten. Solche Runden dauern sehr lange und brauchen viele Songs im Stapel.</div></div>${prefSwitchHtml('bigTarget')}</div>
     <div class="setting-row"><div><div class="label">Mehrspieler bis zu 100 Leute</div><div class="hint">Erhöht die Spielerzahl von 10 auf 100: im lokalen Mehrspieler-Spiel und in Online-Räumen, die du hostest. Bei vielen Spielern kann das Spiel je nach Gerät und Verbindung des Hosts langsam werden.</div></div>${prefSwitchHtml("bigRooms")}</div>
-    <div class="setting-row"><div><div class="label">Sprachchat (online)</div><div class="hint">Zeigt in Online-Räumen unten links einen Button „Sprachchat beitreten“. Dabei sprechen alle Teilnehmenden direkt miteinander (Peer-to-Peer, ohne Server). Das Mikrofon wird erst nach deiner Freigabe aktiv. Ohne Relay (siehe unten) sehen sich die Teilnehmenden dabei gegenseitig ihre IP-Adressen, und bei mehr als 6 bis 8 Sprechenden wird es instabil.</div></div>${prefSwitchHtml("voiceChat")}</div>
     <div class="setting-row"><div><div class="label">IP-Adressen verbergen (TURN-Relay)</div><div class="hint">Leitet alle Online-Verbindungen (Spiel und Sprachchat) über einen TURN-Server, sodass sich die Spielenden nicht direkt sehen. Dafür brauchst du die Adresse eines TURN-Servers (zum Beispiel ein eigener coturn oder ein Anbieter), alle Teilnehmenden müssen dieselbe Einstellung nutzen. Ganz unsichtbar bist du trotzdem nicht: der TURN-Betreiber und der PeerJS-Vermittlungsserver sehen deine IP. Ist der Server nicht erreichbar, scheitert die Verbindung.</div></div>${prefSwitchHtml("relayOnly")}</div>
+    <div class="setting-row"><div><div class="label">🎲 Bingo (experimentell)</div><div class="hint">Zeigt im Hauptmenü eine Bingo-Runde: 16 Felder (Jahrzehnte, Genres, Kategorien), die du mit richtig gelegten Karten abhakst.</div></div>${prefSwitchHtml("bingo")}</div>
+    <div class="setting-row"><div><div class="label">📺 TV-Anzeige (große Darstellung)</div><div class="hint">Vergrößert die ganze Oberfläche für den Fernseher.</div></div>${prefSwitchHtml("tv")}</div>
     ${prefs.relayOnly ? `<div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:6px;">
       <input class="pl-search" placeholder="TURN-Adresse, z. B. turn:server.example:3478" value="${esc(prefs.turnUrl || "")}" oninput="prefs.turnUrl=this.value; savePrefs()" style="flex:none;width:280px;max-width:100%;">
       <input class="pl-search" placeholder="Benutzername" value="${esc(prefs.turnUser || "")}" oninput="prefs.turnUser=this.value; savePrefs()" style="flex:none;width:200px;max-width:100%;">
@@ -4369,6 +4385,7 @@ function renderQuickMenuContent(){
       <div class="qm-title">Darstellung</div>
       <div class="settings-grid" style="gap:14px;">
         <div class="setting-row"><div class="label">Animationen reduzieren</div>${prefSwitchHtml('reduceMotion')}</div>
+        <div class="setting-row"><div><div class="label">Windows-10-Emoji-Fix</div><div class="hint">Ersetzt neuere Emojis, die Windows 10 nicht darstellen kann (z. B. Grabstein, Discokugel, Leiter), durch ältere Ersatz-Emojis. Nur einschalten, wenn bei dir Kästchen statt Emojis erscheinen.</div></div>${prefSwitchHtml('win10Emoji')}</div>
         <div class="setting-row"><div class="label">Hoher Kontrast</div>${prefSwitchHtml('highContrast')}</div>
       </div>
     </div>
@@ -4413,7 +4430,8 @@ function renderPlay(){
       </div>
       <button class="btn-ghost" onclick="openLoadGame()">Spiel laden</button>
       <div class="menu-split"><button class="btn-primary main" onclick="startDaily()">📅 Tägliche Challenge${dailyBadge()}</button><button class="btn-ghost side" onclick="dailyCopyToday()" aria-label="Heutiges Ergebnis kopieren" title="Heutiges Ergebnis kopieren">📋</button></div>
-      <button class="btn-ghost" onclick="startLearn()">🎓 Lernrunde${learnBadge()}</button>
+      <div class="menu-row"><button class="btn-ghost" onclick="startLearn()">🎓 Lernrunde${learnBadge()}</button><button class="btn-ghost" onclick="openRadar()">🎯 Schwächen-Radar</button></div>
+      <div class="menu-row"><button class="btn-ghost" onclick="openTournament()">🏆 Turnier</button>${prefs.bingo ? `<button class="btn-ghost" onclick="startBingo()">🎲 Bingo (experimentell)</button>` : ``}${wrappedOpen() ? `<button class="btn-ghost" onclick="openWrapped()">🎁 Wrapped ${wrappedYear()}</button>` : ``}</div>
       <button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button>
     </div></div>`;
 }
@@ -4692,7 +4710,7 @@ function netHostVoice(entry, d){
 }
 function vcUi(){
   let el = document.getElementById("vc-ui");
-  const show = prefs.voiceChat && NET.peer && (NET.role === "host" || NET.role === "guest") && !NET.spec;
+  const show = NET.peer && (NET.role === "host" || NET.role === "guest") && !NET.spec;
   if(!show){ if(el) el.remove(); if(VC.on) vcLeave(true); return; }
   if(!el){ el = document.createElement("div"); el.id = "vc-ui"; el.style.cssText = "position:fixed;left:12px;bottom:12px;z-index:45;display:flex;gap:6px;flex-wrap:wrap;"; document.body.appendChild(el); }
   el.innerHTML = VC.on ? `<button class="btn-ghost btn-small" onclick="vcMute()">${VC.muted ? "🔇 Stumm" : "🎤 Mikro an"}</button><button class="btn-ghost btn-small" onclick="vcLeave()">Sprachchat verlassen</button>` : `<button class="btn-ghost btn-small" onclick="vcJoin()">🎙 Sprachchat beitreten</button>`;
@@ -4736,7 +4754,7 @@ function startDaily(){
 }
 function dailyBadge(){
   const D = dailyLoad(), k = dateKey(), r = D.results[k], y = dateKey(new Date(Date.now() - 864e5));
-  return (r ? " · heute " + r.score + "/10" : (dailyRunLoad() ? " · fortsetzen" : "")) + (D.streak && (D.last === k || D.last === y) ? " · 🔥 " + D.streak : "");
+  return (r ? " · heute " + r.score + "/10" : (dailyRunLoad() ? " · fortsetzen" : "")) + (D.streak && dailyLive(D) ? " · 🔥 " + D.streak : "");
 }
 function dailySeq(){
   const e = (state.chronicle || []).filter(x => ["ok", "wrong", "timeout"].includes(x.k)).slice(-10).map(x => x.k === "ok" ? "🟩" : "🟥").join("");
@@ -4793,7 +4811,7 @@ function xpAward(){
     state.dailyInfo = { score, seq, first };
     if(first){
       D.results[key] = { score, seq }; try{ localStorage.removeItem("chronohit_daily_run"); }catch(e){}
-      D.streak = D.last === dateKey(new Date(new Date(key + "T12:00:00").getTime() - 864e5)) ? (D.streak || 0) + 1 : 1; D.last = key; dailySave(D);
+      D.streak = dailyShieldStep(D, key) ? (D.streak || 0) + 1 : 1; D.last = key; dailySave(D);
       parts.push(["Tägliche Challenge", 100]); parts.push(["Serie " + D.streak + " Tag(e)", Math.min(D.streak, 7) * 10]);
     }
   }
@@ -5049,13 +5067,13 @@ function statsCalHtml(){
     const k = c.y + "-" + String(c.m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0"), pl = L.days[k] && L.days[k].n > 0, ch = D.results[k];
     cells += `<div class="cal-d ${pl ? "on" : ""}" title="${k}${pl ? ": " + L.days[k].n + " Karten" : ""}${ch ? ", Challenge " + ch.score + "/10" : ""}">${d}${ch ? '<span class="cal-s">⭐</span>' : ""}</div>`;
   }
-  const y = dateKey(new Date(Date.now() - 864e5)), live = D.last === dateKey() || D.last === y ? (D.streak || 0) : 0;
+  const y = dateKey(new Date(Date.now() - 864e5)), live = dailyLive(D) ? (D.streak || 0) : 0;
   return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><button class="btn-ghost btn-small" onclick="calMove(-1)" aria-label="Vorheriger Monat">‹</button><b>${esc(first.toLocaleDateString("de-DE", { month:"long", year:"numeric" }))}</b><button class="btn-ghost btn-small" onclick="calMove(1)" aria-label="Nächster Monat">›</button></div><div class="cal-grid">${cells}</div><div class="stats-note">Gefüllt = an dem Tag gespielt, ⭐ = Tägliche Challenge gespielt. Aktuelle Challenge-Serie: <b>${live}</b> Tag(e).</div>`;
 }
 function calMove(n){ const c = PLS.cal, d = new Date(c.y, c.m + n, 1); c.y = d.getFullYear(); c.m = d.getMonth(); const el = document.getElementById("stats-cal"); if(el) el.innerHTML = statsCalHtml(); }
 /* Lernrunde: Songs mit vielen Fehlern kommen häufiger */
 function learnSelect(){
-  const L = cardsLoad(), pool = SONGS.filter(x => x.id);
+  const L = cardsLoad(), pool = SONGS.filter(x => x.id && (!LEARN_FILTER || LEARN_FILTER(x)));
   const wt = x => { const r = L.songs[x.id]; if(!r || !r.n) return 1; return 1 + 9 * (r.w / r.n) * Math.min(1, r.n / 3); };
   const first = pool[Math.floor(Math.random() * pool.length)], out = [first], rest = pool.filter(x => x !== first);
   while(out.length < 11 && rest.length){
@@ -5254,7 +5272,7 @@ function qgFinish(){ if(state.qgDone) return; state.qgDone = true; state.statsRe
 /* ============ ERRUNGENSCHAFTEN & ABZEICHEN ============ */
 const ACH_LS = "chronohit_ach_v1";
 const ACH_XP = { 1:25, 2:50, 3:100 };   // XP pro neu freigeschaltetem Abzeichen (Bronze/Silber/Gold); beim nachträglichen Freischalten gibt es keine XP
-const ACH_CATS = [["streak", "🔥 Serien"], ["collect", "🃏 Sammeln"], ["win", "🏆 Siege"], ["guess", "🎧 Raten"], ["time", "⏱️ Zeit & Tempo"], ["epochs", "🗓️ Jahre & Epochen"], ["special", "🌟 Besonderes"], ["mode", "🎮 Spielarten"], ["hard", "💪 Schwierigkeit & Handicaps"], ["tokens", "💰 Token & Shop"], ["music", "🎼 Musikwissen"], ["quiz", "🎤 Quiz-Modi"], ["online", "🌐 Online & Gemeinsam"], ["loyal", "📆 Treue & Kalender"], ["daily", "📅 Daily & Level"], ["stats", "📈 Statistik & Meilensteine"], ["fun", "🤪 Skurriles"], ["season", "🍂 Saison"], ["complete", "🏛️ Komplett-Sammlungen"], ["secret", "🔒 Geheim"]];
+const ACH_CATS = [["streak", "🔥 Serien"], ["collect", "🃏 Sammeln"], ["win", "🏆 Siege"], ["guess", "🎧 Raten"], ["time", "⏱️ Zeit & Tempo"], ["epochs", "🗓️ Jahre & Epochen"], ["special", "🌟 Besonderes"], ["mode", "🎮 Spielarten"], ["hard", "💪 Schwierigkeit & Handicaps"], ["tokens", "💰 Token & Shop"], ["music", "🎼 Musikwissen"], ["quiz", "🎤 Quiz-Modi"], ["online", "🌐 Online & Gemeinsam"], ["loyal", "📆 Treue & Kalender"], ["daily", "📅 Daily & Wochen-Challenges"], ["level", "⭐ Level & XP"], ["stats", "📈 Statistik & Meilensteine"], ["fun", "🤪 Skurriles"], ["season", "🍂 Saison"], ["complete", "🏛️ Komplett-Sammlungen"], ["secret", "🔒 Geheim"]];
 const ACH_DEFS = [
   { id:"streak5", cat:"streak", tier:1, icon:"🔥", name:"Auf Kurs", desc:"5 Karten in Folge richtig legen.", prog:A => [A.c.best || 0, 5] },
   { id:"streak10", cat:"streak", tier:2, icon:"🏅", name:"Reihenmeister", desc:"10 Karten in Folge richtig legen.", prog:A => [A.c.best || 0, 10] },
@@ -5347,7 +5365,7 @@ function achGroups(){
   add("yexact10", "guess", 2, "🧭", "Zeitgefühl", "10-mal das Jahr exakt richtig tippen.", { prog:A => [A.c.yexact || 0, 10] });
   add("yexact50", "guess", 3, "🔮", "Jahres-Orakel", "50-mal das Jahr exakt richtig tippen.", { prog:A => [A.c.yexact || 0, 50] });
   add("titles100", "guess", 2, "🔤", "Wortgewandt", "100-mal den Titel richtig raten.", { prog:A => [A.c.tOk || 0, 100] });
-  add("artists100", "guess", 2, "🧑‍🎤", "Interpreten-Kenner", "100-mal den Interpreten richtig raten.", { prog:A => [A.c.aOk || 0, 100] });
+  add("artists100", "guess", 2, "🎟️", "Interpreten-Kenner", "100-mal den Interpreten richtig raten.", { prog:A => [A.c.aOk || 0, 100] });
   add("both100", "guess", 3, "🎼", "Doppeltreffer-Hunderter", "100-mal Titel und Interpret in einer Runde richtig raten.", { prog:A => [A.c.guess || 0, 100] });
   add("triple", "guess", 2, "🔱", "Dreifach-Treffer", "Titel, Interpret und das genaue Jahr in einer Runde richtig raten.");
   add("ratefuchs", "guess", 2, "🧩", "Ratefuchs", "10-mal in Folge Titel und Interpret richtig raten.");
@@ -5459,7 +5477,7 @@ function achGroups(){
 /* --- Noch mehr Abzeichen: Zähler-Abzeichen, Quiz, Komplett-Sammlungen --- */
 const ACH_CTR = [];
 function achDailyBest(){
-  try{ const D = dailyLoad(), keys = Object.keys(D.results || {}).sort(); let best = 0, run = 0, prev = null;
+  try{ const D = dailyLoad(), keys = [...new Set(Object.keys(D.results || {}).concat(D.shielded || []))].sort(); let best = 0, run = 0, prev = null;
     keys.forEach(k => { const t = new Date(k + "T12:00:00").getTime(); run = (prev !== null && Math.round((t - prev) / 864e5) === 1) ? run + 1 : 1; prev = t; best = Math.max(best, run); });
     return Math.max(best, D.streak || 0); }catch(e){ return 0; }
 }
@@ -5665,9 +5683,9 @@ ACH_DEFS.forEach(d => { if(d.coll && !d.prog) d.prog = A => [achCount(A, d.coll[
 (function(){
   const dummy = { u:{}, c:{}, s:{}, g:{}, f:[], w:null };
   const bases = new Set(ACH_DEFS.filter(d => /_v\d+$/.test(d.id)).map(d => d.id.replace(/_v\d+$/, "")));
-  const CAT_FIX = { cards5000:"collect", cards10000:"collect", weekly25:"special", weekly50:"special", level50:"daily", level75:"daily", level100:"daily", nightshift:"time" };
+  const CAT_FIX = { cards5000:"collect", cards10000:"collect", nightshift:"time", dailyvet:"daily", monthstreak:"daily", weekly5:"daily", weekly10:"daily", weekly25:"daily", weekly50:"daily", weekly75:"daily", weekly100:"daily", weekfull:"daily", level5:"level", level10:"level", level25:"level", level50:"level", level75:"level", level100:"level", lv15:"level", lv20:"level", lv30:"level", lv40:"level", lv60:"level", lv90:"level", xp10k:"level", xp25k:"level", xp50k:"level", xp100k:"level", xp250k:"level", diligent:"level" };
   ACH_DEFS.forEach(d => { if(CAT_FIX[d.id]) d.cat = CAT_FIX[d.id]; });
-  const CH = { songs50:"songs", songs100:"songs", songs200:"songs", songs300:"songs", songs400:"songs", songs500:"songs", songs600:"songs", songs800:"songs" };
+  const CH = { daily7:"# Tage in Folge die Daily Challenge abschließen.", songs50:"songs", songs100:"songs", songs200:"songs", songs300:"songs", songs400:"songs", songs500:"songs", songs600:"songs", songs800:"songs" };
   const GOAL_FIX = { reflex:6 };
   ACH_DEFS.forEach((d, i) => {
     let key, goal = 0; const vm = d.id.match(/^(.*)_v(\d+)$/);
@@ -5678,6 +5696,7 @@ ACH_DEFS.forEach(d => { if(d.coll && !d.prog) d.prog = A => [achCount(A, d.coll[
     d.__k = key; d.__g = goal; d.__i = i;
   });
   const first = {}; ACH_DEFS.forEach(d => { if(!(d.__k in first)) first[d.__k] = d.__i; });
+  ["weekly5", "weekfull", "diligent"].forEach((id, n) => { const f = ACH_DEFS.find(x => x.id === id); if(f) first[f.__k] = 1e6 + n; });   // Wochen-Challenges hinter die Daily-Abzeichen, „Fleißig“ hinter die XP-Reihe
   ACH_DEFS.sort((a, b) => first[a.__k] - first[b.__k] || a.__g - b.__g || a.__i - b.__i);
 })();
 const ACH_BY = {}; ACH_DEFS.forEach(d => { ACH_BY[d.id] = d; });
@@ -5688,7 +5707,404 @@ function achLoad(){
   catch(e){ return { u:{}, c:{}, f:[], s:{}, g:{}, w:null }; }
 }
 let ACH_LAST = "";
-function achSave(A){ try{ achCtrCheck(A); }catch(e){} try{ const j = JSON.stringify(A); if(j !== ACH_LAST){ ACH_LAST = j; localStorage.setItem(ACH_LS, j); } }catch(e){} }
+/* ============ FEATURE-PAKET: Seeds, Währung & Laden, Streak-Schild ============ */
+/* ---- Seed-Codes: gleicher Code + gleiche Filter + gleiche Songliste = gleiche Kartenreihenfolge ---- */
+function seedHash(str){ let h = 1779033703 ^ str.length; for(let i = 0; i < str.length; i++){ h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; }
+  return () => { h = Math.imul(h ^ h >>> 16, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909); return (h ^= h >>> 16) >>> 0; }; }
+function seedRng(str){ const s = seedHash(String(str).trim().toUpperCase()); let a = s(), b = s(), c = s(), d = s();
+  return () => { a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0; let t = (a + b) | 0; a = b ^ b >>> 9; b = c + (c << 3) | 0; c = (c << 21 | c >>> 11); d = d + 1 | 0; t = t + d | 0; c = c + t | 0; return (t >>> 0) / 4294967296; }; }
+function seededShuffle(arr, seed){ const rnd = seedRng(seed), a = arr.slice().sort((x, y) => String(x.id || x.t) < String(y.id || y.t) ? -1 : 1);
+  for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function seedNew(){ const c = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", b = new Uint8Array(6); crypto.getRandomValues(b); let s = ""; b.forEach(x => { s += c[x % c.length]; }); return s.slice(0, 3) + "-" + s.slice(3); }
+function wizardSeed(v){ state.wizard.seed = String(v || "").toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 12); }
+function wizardSeedRoll(){ state.wizard.seed = seedNew(); render(); }
+function wizardSeedClear(){ state.wizard.seed = ""; render(); }
+function wizardSeedHtml(){
+  const w = state.wizard;
+  return `<div class="menu-card"><h3>🌱 Seed-Code (optional)</h3>
+    <p class="step-hint">Mit demselben Code, denselben Songfiltern und derselben Songlisten-Version bekommen alle exakt dieselbe Kartenreihenfolge – ideal für Challenges mit Freunden („schaffst du den Seed besser?“). Spezialkarten und Events bleiben zufällig. Leer lassen = normaler Zufall.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <input class="guess-input" style="max-width:220px;text-transform:uppercase;" type="text" maxlength="12" autocomplete="off" spellcheck="false" placeholder="z. B. K7M-4QX" value="${esc(w.seed || "")}" oninput="wizardSeed(this.value)" onchange="render()">
+      <button class="btn-ghost btn-small" onclick="wizardSeedRoll()">🎲 Zufälliger Code</button>
+      <button class="btn-ghost btn-small" onclick="wizardSeedClear()">Leeren</button>
+    </div></div>`;
+}
+function seedCopy(){ const s = state.settings && state.settings.seed; if(!s) return; try{ navigator.clipboard.writeText(s); toast("Seed " + s + " kopiert"); }catch(e){ toast("Seed: " + s); } }
+
+/* ---- Währung: Plektren (nur durch Spielen verdienbar, kein Echtgeld) ---- */
+const ECO = { name:"Plektren", one:"Plektrum", icon:"🎸" };   // Name/Icon hier zentral änderbar
+const ECO_SHIELD = { price:100, max:3 };
+const ECO_BONUS = { songsall:1000, songsall_v2:1000, hitster_all:400, hitster_summer_all:400, disc_all:300, perfect30:200, perfect20:120, qfrow5:150, qf100:150, streak100:200, streak75:150, cards25000:500, games1000:300, dstreak100:250, days365:300, xp250k:400, lv90:250, yc30:200, wins250:200, tokEarn1000:150 };
+function ecoLoad(){ let E = {}; try{ E = JSON.parse(localStorage.getItem("chronohit_eco") || "{}") || {}; }catch(e){}
+  E.bal = E.bal || 0; E.earned = E.earned || 0; E.spent = E.spent || 0; E.paid = E.paid || {}; E.items = E.items || {}; return E; }
+function ecoSave(E){ try{ localStorage.setItem("chronohit_eco", JSON.stringify(E)); }catch(e){} }
+function ecoReward(d){ if(ECO_BONUS[d.id]) return ECO_BONUS[d.id]; let r = ({ 1:10, 2:25, 3:60 })[d.tier] || 10; if(d.cat === "secret" || d.cat === "complete") r = Math.round(r * 1.5); return r; }
+function ecoAdd(n){ const E = ecoLoad(); E.bal += n; E.earned += n; ecoSave(E); return E; }
+function achPay(A, silent){   // zahlt für alle freigeschalteten, noch nicht bezahlten Abzeichen (beim ersten Mal rückwirkend und still)
+  const E = ecoLoad(), first = !E.init; let gain = 0;
+  Object.keys(A.u || {}).forEach(id => { if(E.paid[id]) return; const d = ACH_BY[id]; if(!d) return; E.paid[id] = 1; gain += ecoReward(d); });
+  if(gain){ E.bal += gain; E.earned += gain; }
+  if(gain || first){ E.init = 1; ecoSave(E); }
+  if(gain && !first && !silent){ try{ toast(ECO.icon + " +" + gain + " " + ECO.name); }catch(e){} }
+  return gain;
+}
+function ecoBarHtml(){ const E = ecoLoad(); return `<div class="menu-card eco-bar"><div><b>${ECO.icon} ${E.bal} ${ECO.name}</b><br><small style="color:var(--muted);">Jedes neue Abzeichen bringt ${ECO.name} – je schwerer, desto mehr. Nur im Spiel verdienbar.</small></div><button class="btn-ghost btn-small" onclick="openShop()">🛒 Zum Laden</button></div>`; }
+function openShop(){ state.screen = "shop"; render(); }
+function ecoBuyShield(){
+  const E = ecoLoad(), have = E.items.shield || 0;
+  if(have >= ECO_SHIELD.max) return toast("Du hast schon die maximale Anzahl Schilde.");
+  if(E.bal < ECO_SHIELD.price) return toast("Nicht genug " + ECO.name + ".");
+  E.bal -= ECO_SHIELD.price; E.spent += ECO_SHIELD.price; E.items.shield = have + 1; ecoSave(E); toast("🛡️ Streak-Schild gekauft"); render();
+}
+function renderShop(){
+  const E = ecoLoad(), have = E.items.shield || 0, can = E.bal >= ECO_SHIELD.price && have < ECO_SHIELD.max;
+  app.innerHTML = `
+    <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Laden</h1></div>
+    <div class="menu-card eco-bar"><div><b style="font-size:calc(22px * var(--font-scale));">${ECO.icon} ${E.bal} ${ECO.name}</b><br><small style="color:var(--muted);">Insgesamt verdient: ${E.earned} · ausgegeben: ${E.spent}</small></div></div>
+    <div class="menu-card"><h3>🛡️ Streak-Schild</h3>
+      <p>Rettet deine Daily-Serie, wenn du <b>genau einen Tag</b> verpasst hast: Beim nächsten Abschluss der Daily Challenge wird das Schild automatisch verbraucht und die Serie läuft weiter.</p>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;"><span>Im Besitz: <b>${have}</b> / ${ECO_SHIELD.max}</span>
+        <button class="btn-primary" onclick="ecoBuyShield()" ${can ? "" : "disabled"}>Kaufen · ${ECO_SHIELD.price} ${ECO.icon}</button></div></div>
+    <div class="menu-card"><h3>So verdienst du ${ECO.name}</h3>
+      <p style="margin:0;">Für jedes freigeschaltete Abzeichen: Bronze 10, Silber 25, Gold 60 (geheime und Komplett-Abzeichen ×1,5, besonders harte Abzeichen deutlich mehr). Bereits erreichte Abzeichen wurden dir rückwirkend gutgeschrieben. ${ECO.name} gibt es nicht für echtes Geld und lassen sich nicht kaufen.</p></div>
+    <div class="menu-actions"><button class="btn-ghost" onclick="openAch()">🏅 Zu den Errungenschaften</button></div>`;
+}
+/* ---- Streak-Schild (Daily) ---- */
+function dailyLive(D){
+  const k = dateKey(), y = dateKey(new Date(Date.now() - 864e5)), y2 = dateKey(new Date(Date.now() - 2 * 864e5));
+  return D.last === k || D.last === y || (D.last === y2 && (ecoLoad().items.shield || 0) > 0);
+}
+function dailyShieldStep(D, key){   // true = Serie läuft weiter (ggf. mit Schild)
+  const t = new Date(key + "T12:00:00").getTime(), y1 = dateKey(new Date(t - 864e5)), y2 = dateKey(new Date(t - 2 * 864e5));
+  if(D.last === y1) return true;
+  if(D.last === y2 && (D.streak || 0) > 0){
+    const E = ecoLoad();
+    if((E.items.shield || 0) > 0){ E.items.shield--; ecoSave(E); D.shielded = (D.shielded || []).concat(y1); try{ toast("🛡️ Dein Streak-Schild hat die Serie gerettet!"); }catch(e){} return true; }
+  }
+  return false;
+}
+
+
+/* ---- Windows-10-Emoji-Fix: ersetzt neuere Emojis (Emoji 12+) durch ältere, die Windows 10 anzeigen kann (Standard aus) ---- */
+const W10_MAP = { "🪩":"🕺", "🪙":"💰", "🪦":"⚰️", "🪜":"🔰", "🫂":"🤝", "🪬":"🧿", "🪐":"🌕", "🦻":"👂", "🦾":"💪", "🟥":"❌", "🟩":"✅", "🧑\u200d🎤":"🎤" };
+const W10_RE = new RegExp(Object.keys(W10_MAP).join("|"), "g");
+function w10Text(s){ return String(s).replace(W10_RE, m => W10_MAP[m]); }
+function w10Node(n){
+  if(!n) return;
+  if(n.nodeType === 3){ if(W10_RE.test(n.nodeValue)){ W10_RE.lastIndex = 0; n.nodeValue = w10Text(n.nodeValue); } W10_RE.lastIndex = 0; return; }
+  if(n.nodeType !== 1) return;
+  const tw = document.createTreeWalker(n, NodeFilter.SHOW_TEXT); let t; while((t = tw.nextNode())){ W10_RE.lastIndex = 0; if(W10_RE.test(t.nodeValue)){ W10_RE.lastIndex = 0; t.nodeValue = w10Text(t.nodeValue); } W10_RE.lastIndex = 0; }
+}
+let W10_OBS = null;
+function w10Sync(){
+  if(prefs.win10Emoji){
+    if(!W10_OBS){ W10_OBS = new MutationObserver(ms => { ms.forEach(m => { if(m.type === "characterData") w10Node(m.target); else m.addedNodes.forEach(w10Node); }); });
+      W10_OBS.observe(document.body, { childList:true, subtree:true, characterData:true }); }
+    w10Node(document.body);
+  } else if(W10_OBS){ W10_OBS.disconnect(); W10_OBS = null; }
+}
+/* ============ SAMMELALBUM ============ */
+const ALB = { dec:"all", rar:"all", q:"", page:0 }, ALB_PAGE = 48;
+const ALB_NAMES = ["Unbekannt", "Bronze", "Silber", "Gold"], ALB_ICO = ["🔒", "🥉", "🥈", "🥇"];
+function albRarity(c){ return c <= 0 ? 0 : c < 3 ? 1 : c < 6 ? 2 : 3; }
+function albData(){   // rückwirkend: aus Kartenprotokoll (richtig = n − w) und Quiz-Sammlung (zählt mindestens 1×)
+  const L = cardsLoad(), set = achColl(achLoad());
+  return SONGS.filter(x => x.id).map(x => { const r = L.songs[x.id]; let c = r ? Math.max(0, r.n - r.w) : 0; if(!c && set.has(x.id)) c = 1; return { x, c, w: r ? r.w : 0, rar: albRarity(c) }; })
+    .sort((a, b) => a.x.y - b.x.y || String(a.x.t).localeCompare(String(b.x.t), "de"));
+}
+function albFiltered(all){
+  const q = normText(ALB.q || "");
+  return all.filter(s => (ALB.dec === "all" || String(decadeOf(s.x.y)) === ALB.dec) && (ALB.rar === "all" || (ALB.rar === "0" ? s.rar === 0 : s.rar === +ALB.rar))
+    && (!q || s.rar > 0 && (normText(s.x.t).includes(q) || normText(s.x.a).includes(q))));
+}
+function albCardHtml(s){
+  const x = s.x;
+  if(!s.rar){ const st = (STYLE_DEFS.find(d => d.key === (x.s || [])[0]) || {}).label || "";
+    return `<div class="alb-card r0"><div class="alb-top"><span>${decadeLabel(decadeOf(x.y))}</span><span>🔒</span></div><div class="alb-t">???</div><div class="alb-a">${esc(st)}</div></div>`; }
+  return `<div class="alb-card r${s.rar}" title="${esc(x.t)} – ${esc(x.a)} (${x.y}) · ${s.c}× richtig, ${s.w}× falsch"><div class="alb-top"><span>${x.y}</span><span>${ALB_ICO[s.rar]}</span></div><div class="alb-t">${esc(x.t)}</div><div class="alb-a">${esc(x.a)}</div><div class="alb-n">${s.c}× richtig</div></div>`;
+}
+function albGridHtml(){
+  const list = albFiltered(albData()), pages = Math.max(1, Math.ceil(list.length / ALB_PAGE));
+  ALB.page = Math.max(0, Math.min(ALB.page, pages - 1));
+  const part = list.slice(ALB.page * ALB_PAGE, (ALB.page + 1) * ALB_PAGE);
+  return `<div class="stats-note" style="margin:6px 0;">${list.length} Karten${ALB.q ? " (Suche nur in gesammelten Karten)" : ""}</div>
+    <div class="alb-grid">${part.map(albCardHtml).join("") || "<p>Nichts gefunden.</p>"}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;"><button class="btn-ghost btn-small" onclick="albPage(-1)" ${ALB.page <= 0 ? "disabled" : ""}>‹</button><span>Seite ${ALB.page + 1} / ${pages}</span><button class="btn-ghost btn-small" onclick="albPage(1)" ${ALB.page >= pages - 1 ? "disabled" : ""}>›</button></div>`;
+}
+function albRefresh(){ const el = document.getElementById("alb-grid"); if(el) el.innerHTML = albGridHtml(); }
+function albPage(n){ ALB.page += n; albRefresh(); }
+function albSet(k, v){ ALB[k] = v; ALB.page = 0; render(); }
+function openAlbum(){ state.screen = "album"; render(); }
+function renderAlbum(){
+  const all = albData(), cnt = [0, 0, 0, 0]; all.forEach(s => cnt[s.rar]++);
+  const have = all.length - cnt[0], decs = [...new Set(all.map(s => String(decadeOf(s.x.y))))].sort();
+  const chip = (k, v, label) => `<button class="chip ${ALB[k] === v ? "on" : ""}" onclick="albSet('${k}','${v}')">${label}</button>`;
+  app.innerHTML = `
+    <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Sammelalbum</h1></div>
+    <div class="menu-card"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;"><b>${have} / ${all.length} Karten gesammelt</b><span>🥉 ${cnt[1]} · 🥈 ${cnt[2]} · 🥇 ${cnt[3]}</span></div>
+      <div class="ach-bar" style="margin:8px 0;"><div style="width:${Math.round(have / Math.max(1, all.length) * 100)}%"></div></div>
+      <div class="stats-note">Bronze: 1–2× richtig · Silber: 3–5× · Gold: ab 6×. Der Stand wurde aus deinem Kartenprotokoll und deiner Quiz-Sammlung rekonstruiert; ein richtiger Quiz-Treffer zählt dabei als 1× richtig.</div></div>
+    <div class="menu-card">
+      <input class="guess-input" type="text" placeholder="Gesammelte Karten durchsuchen …" value="${esc(ALB.q)}" oninput="ALB.q=this.value;ALB.page=0;albRefresh()" style="margin-bottom:8px;">
+      <div class="chip-row" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">${chip("dec", "all", "Alle Zeiten")}${decs.map(d => chip("dec", d, decadeLabel(+d))).join("")}</div>
+      <div class="chip-row" style="display:flex;gap:6px;flex-wrap:wrap;">${chip("rar", "all", "Alle")}${chip("rar", "0", "🔒 Fehlend")}${chip("rar", "1", "🥉")}${chip("rar", "2", "🥈")}${chip("rar", "3", "🥇")}</div>
+      <div id="alb-grid">${albGridHtml()}</div></div>
+    <div class="menu-actions"><button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button></div>`;
+}
+
+/* ============ SCHWÄCHEN-RADAR (+ gezieltes Training in der Lernrunde) ============ */
+let LEARN_FILTER = null;
+const RAD = { kind:"dec" };
+const RAD_THEMES = ["film", "ballad", "party", "love", "summer", "nature", "numbers", "feat"];
+function radGroups(kind){
+  if(kind === "dec") return Object.keys(ACH_DEC).map(k => ({ key:k, label:decadeLabel(+k) }));
+  if(kind === "genre") return STYLE_DEFS.filter(d => d.key !== "klassik").map(d => ({ key:d.key, label:d.label.split("/")[0] }));
+  return RAD_THEMES.map(k => ({ key:k, label:(THEME_DEFS.find(d => d.key === k) || { label:k }).label }));
+}
+function radTest(kind, key){ return kind === "dec" ? (x => String(decadeOf(x.y)) === String(key)) : kind === "genre" ? (x => (x.s || []).includes(key)) : (x => songThemes(x).includes(key)); }
+function radData(kind){
+  const L = cardsLoad(), groups = radGroups(kind);
+  return groups.map(g => { const t = radTest(kind, g.key); let n = 0, ok = 0, songs = 0; SONGS.forEach(x => { if(!x.id || !t(x)) return; songs++; const r = L.songs[x.id]; if(r && r.n){ n += r.n; ok += r.n - r.w; } });
+    return { ...g, n, ok, songs, acc:n >= 5 ? ok / n : null }; });
+}
+function radSvg(data){
+  const n = data.length, cx = 170, cy = 165, R = 100, pt = (i, v) => { const a = -Math.PI / 2 + 2 * Math.PI * i / n; return [cx + Math.cos(a) * R * v, cy + Math.sin(a) * R * v]; };
+  const ring = f => data.map((_, i) => pt(i, f).map(v => v.toFixed(1)).join(",")).join(" ");
+  const poly = data.map((d, i) => pt(i, d.acc == null ? 0 : d.acc).map(v => v.toFixed(1)).join(",")).join(" ");
+  return `<svg viewBox="0 0 340 330" style="width:100%;max-width:420px;display:block;margin:0 auto;" role="img" aria-label="Radar der Trefferquote">
+    ${[.25, .5, .75, 1].map(f => `<polygon points="${ring(f)}" fill="none" stroke="var(--muted)" stroke-opacity=".35"/>`).join("")}
+    ${data.map((_, i) => { const p = pt(i, 1); return `<line x1="${cx}" y1="${cy}" x2="${p[0].toFixed(1)}" y2="${p[1].toFixed(1)}" stroke="var(--muted)" stroke-opacity=".3"/>`; }).join("")}
+    <polygon points="${poly}" fill="var(--accent)" fill-opacity=".35" stroke="var(--accent)" stroke-width="2"/>
+    ${data.map((d, i) => { const p = pt(i, d.acc == null ? 0 : d.acc), l = pt(i, 1.22); return `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="${d.acc == null ? "var(--muted)" : "var(--accent)"}"/><text x="${l[0].toFixed(1)}" y="${l[1].toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="var(--text)">${esc(d.label)}</text>`; }).join("")}
+  </svg>`;
+}
+function openRadar(){ state.screen = "radar"; render(); }
+function radSet(k){ RAD.kind = k; render(); }
+function radarTrain(kind, key){
+  if(learnRunLoad() && !confirm("Deine angefangene Lernrunde wird dafür beendet. Fortfahren?")) return;
+  try{ localStorage.removeItem("chronohit_learn_run"); }catch(e){}
+  LEARN_FILTER = radTest(kind, key); try{ startLearn(); }finally{ LEARN_FILTER = null; }
+}
+function renderRadar(){
+  const data = radData(RAD.kind), tab = (k, l) => `<button class="chip ${RAD.kind === k ? "on" : ""}" onclick="radSet('${k}')">${l}</button>`;
+  const weak = data.filter(d => d.acc != null).sort((a, b) => a.acc - b.acc).slice(0, 5), few = data.filter(d => d.acc == null);
+  app.innerHTML = `
+    <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Schwächen-Radar</h1></div>
+    <div class="menu-card"><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">${tab("dec", "Jahrzehnte")}${tab("genre", "Genres")}${tab("theme", "Kategorien")}</div>
+      ${radSvg(data)}
+      <div class="stats-note">Je weiter außen, desto höher deine Trefferquote (richtige ÷ aufgedeckte Karten aus allen klassischen Spielen). Gruppen mit weniger als 5 aufgedeckten Karten zeigen den Mittelpunkt (zu wenig Daten).</div></div>
+    <div class="menu-card"><h3>Deine Schwächen</h3>
+      ${weak.length ? weak.map(d => `<div class="stats-row"><span>${esc(d.label)} <small style="color:var(--muted);">(${d.n} Karten)</small></span><b>${Math.round(d.acc * 100)} %</b><button class="btn-ghost btn-small" onclick="radarTrain('${RAD.kind}','${d.key}')">🎓 Trainieren</button></div>`).join("") : `<p>Noch zu wenig Daten – spiele ein paar klassische Runden.</p>`}
+      ${few.length ? `<div class="stats-note">Zu wenig Daten: ${few.map(d => esc(d.label)).join(", ")}</div>` : ``}
+      <div class="stats-note">„Trainieren“ startet eine Lernrunde nur mit Songs dieser Gruppe – Songs, die du oft falsch hattest, kommen häufiger.</div></div>
+    <div class="menu-actions"><button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button></div>`;
+}
+
+/* ============ WRAPPED (Jahresrückblick als Story) ============ */
+const WR = { year:"", i:0 };
+function wrappedOpen(){ const m = new Date().getMonth(); return m === 11 || m === 0; }
+function RECAP_YEAR_FOR_WRAPPED(){ return wrappedYear(); }
+function wrappedYear(){ const d = new Date(); return String(d.getMonth() === 0 ? d.getFullYear() - 1 : d.getFullYear()); }
+function openWrapped(y){ WR.year = String(y || wrappedYear()); WR.i = 0; state.screen = "wrapped"; render(); }
+function wrNext(n){ WR.i = Math.max(0, Math.min(WR.slides.length - 1, WR.i + n)); render(); }
+function wrappedStats(year){
+  const ys = (stats.years || {})[year]; if(!ys) return null;
+  const cards = ys.correct + ys.wrong; if(!cards) return null;
+  const g = ys.games, played = g.solo.played + g.coop.played + g.multiplayer.played, dayKeys = Object.keys(ys.days || {});
+  const perMonth = Array(12).fill(0); dayKeys.forEach(k => { perMonth[parseInt(k.slice(5, 7), 10) - 1] += ys.days[k]; });
+  const maxM = Math.max(...perMonth), decs = Object.entries(ys.dec || {});
+  const fav = decs.slice().sort((a, b) => b[1].n - a[1].n)[0], strong = decs.filter(d => d[1].n >= 5).sort((a, b) => b[1].ok / b[1].n - a[1].ok / a[1].n)[0];
+  let ach = []; try{ const A = achLoad(); ach = Object.entries(A.u || {}).filter(([id, t]) => typeof t === "number" && String(new Date(t).getFullYear()) === String(year) && ACH_BY[id]).map(([id]) => ACH_BY[id]); }catch(e){}
+  return { ys, cards, played, days:dayKeys.length, perMonth, maxM, bestMonth:perMonth.indexOf(maxM), fav, strong, ach, acc:Math.round(ys.correct / cards * 100) };
+}
+function wrappedTitle(s){
+  if(s.ys.bestStreak >= 30) return "Der Seriengewinner";
+  if(s.days >= 100) return "Der Stammgast";
+  if(s.acc >= 85 && s.cards >= 100) return "Das Musik-Orakel";
+  if(s.ys.ruf && s.ys.ruf.won >= 5) return "Der Einspruchskönig";
+  if(s.fav) return "Der " + (+s.fav[0] >= 2000 ? s.fav[0] : String(s.fav[0]).slice(2)) + "er-Fan";
+  return "Der Entdecker";
+}
+function wrappedBuild(year){
+  const s = wrappedStats(year);
+  if(!s) return [{ e:"🎁", t:"Noch keine Daten", b:"", s:"Für " + year + " gibt es noch keinen Rückblick. Spiele ein paar Runden – dann erscheint dein Wrapped hier." }];
+  const dl = d => (+d >= 2000 ? d : String(d).slice(2)) + "er", bars = s.perMonth.map((n, i) => `<i title="${MONTHS_DE[i]}: ${n}" style="display:inline-block;width:6.5%;margin:0 .6%;height:${Math.max(n ? 4 : 1, Math.round(n / Math.max(1, s.maxM) * 60))}px;background:${i === s.bestMonth ? "var(--accent)" : "var(--muted)"};opacity:${n ? 1 : .3};vertical-align:bottom;border-radius:3px 3px 0 0;"></i>`).join("");
+  const top = s.ach.slice().sort((a, b) => b.tier - a.tier).slice(0, 3);
+  return [
+    { e:"🎁", t:"Dein Chronohit-Jahr", b:year, s:wrappedOpen() ? "Tippe auf „Weiter“, um dein Jahr zu sehen." : "Vorschau – dein Jahr bis jetzt." },
+    { e:"🎮", t:"So viel hast du gespielt", b:String(s.played), s:"Spiele · " + s.cards + " aufgedeckte Karten an " + s.days + " Tagen" },
+    { e:"🎯", t:"Deine Treffsicherheit", b:s.acc + " %", s:s.ys.correct + " richtig · " + s.ys.wrong + " falsch · längste Serie " + s.ys.bestStreak },
+    { e:"📅", t:"Dein aktivster Monat", b:MONTHS_DE[s.bestMonth], s:s.maxM + " Karten", x:`<div style="height:64px;margin-top:10px;">${bars}</div>` },
+    s.fav ? { e:"📻", t:"Dein Lieblings-Jahrzehnt", b:dl(s.fav[0]), s:s.fav[1].n + " Karten, " + Math.round(s.fav[1].ok / s.fav[1].n * 100) + " % richtig" + (s.strong ? " · am stärksten: " + dl(s.strong[0]) + " (" + Math.round(s.strong[1].ok / s.strong[1].n * 100) + " %)" : "") } : null,
+    { e:"🏅", t:"Neue Abzeichen", b:String(s.ach.length), s:top.length ? "Highlights: " + top.map(d => d.icon + " " + d.name).join(" · ") : "In diesem Jahr kamen noch keine dazu." },
+    { e:"✨", t:"Dein Titel", b:wrappedTitle(s), s:"Danke fürs Mitspielen!", share:true }
+  ].filter(Boolean);
+}
+function wrappedImage(){
+  const sl = WR.slides, c = document.createElement("canvas"); c.width = 1080; c.height = 1350; const g = c.getContext("2d");
+  const cs = getComputedStyle(document.documentElement), acc = (cs.getPropertyValue("--accent") || "#e0a030").trim() || "#e0a030";
+  const grd = g.createLinearGradient(0, 0, 1080, 1350); grd.addColorStop(0, "#1b1b2f"); grd.addColorStop(1, "#3b1f4b"); g.fillStyle = grd; g.fillRect(0, 0, 1080, 1350);
+  g.fillStyle = acc; g.font = "bold 72px sans-serif"; g.textAlign = "center"; g.fillText("Chronohit Wrapped " + WR.year, 540, 140);
+  let y = 290; sl.slice(1, -1).forEach(s => { g.fillStyle = "#ffffffcc"; g.font = "40px sans-serif"; g.fillText(s.e + " " + s.t, 540, y); g.fillStyle = "#fff"; g.font = "bold 88px sans-serif"; g.fillText(String(s.b).slice(0, 14), 540, y + 95); y += 190; });
+  const last = sl[sl.length - 1]; g.fillStyle = acc; g.font = "bold 76px sans-serif"; g.fillText(last.b, 540, 1270);
+  return c;
+}
+function wrappedShare(){
+  const c = wrappedImage();
+  c.toBlob(async blob => { if(!blob) return;
+    const f = new File([blob], "chronohit-wrapped-" + WR.year + ".png", { type:"image/png" });
+    try{ if(navigator.canShare && navigator.canShare({ files:[f] })){ await navigator.share({ files:[f], title:"Mein Chronohit Wrapped " + WR.year }); return; } }catch(e){}
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); toast("Bild gespeichert");
+  });
+}
+function renderWrapped(){
+  WR.slides = wrappedBuild(WR.year); WR.i = Math.max(0, Math.min(WR.i, WR.slides.length - 1));
+  const s = WR.slides[WR.i], last = WR.i === WR.slides.length - 1;
+  app.innerHTML = `
+    <div class="wr-wrap"><div class="wr-dots">${WR.slides.map((_, i) => `<span class="${i === WR.i ? "on" : ""}"></span>`).join("")}</div>
+      <div class="wr-slide" onclick="wrNext(1)"><div class="wr-e">${s.e}</div><div class="wr-t">${esc(s.t)}</div><div class="wr-b">${esc(s.b)}</div><div class="wr-s">${esc(s.s)}</div>${s.x || ""}</div>
+      <div class="menu-actions" style="flex-direction:row;gap:8px;"><button class="btn-ghost" onclick="wrNext(-1)" ${WR.i === 0 ? "disabled" : ""}>‹ Zurück</button>${last ? `<button class="btn-primary" onclick="wrappedShare()">📤 Als Bild teilen</button>` : `<button class="btn-primary" onclick="wrNext(1)">Weiter ›</button>`}</div>
+      <div class="menu-actions"><button class="btn-ghost" onclick="openRecap()">Zum Jahresrückblick</button></div>
+    </div>`;
+}
+
+/* ============ BINGO (experimentell) ============ */
+const BINGO_LINES = [[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15],[0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15],[0,5,10,15],[3,6,9,12]];
+function bingoConds(){
+  const out = [];
+  Object.keys(ACH_DEC).forEach(k => out.push({ k:"d" + k, label:decadeLabel(+k), t:x => String(decadeOf(x.y)) === k }));
+  ["pop", "rock", "indie", "hiphop", "rnb", "dance", "funk", "latin", "reggae", "schlager"].forEach(k => out.push({ k:"s" + k, label:(STYLE_DEFS.find(d => d.key === k) || { label:k }).label.split("/")[0], t:x => (x.s || []).includes(k) }));
+  ["film", "ballad", "party", "love", "summer", "nature", "numbers", "feat"].forEach(k => out.push({ k:"c" + k, label:(THEME_DEFS.find(d => d.key === k) || { label:k }).label, t:x => songThemes(x).includes(k) }));
+  out.push({ k:"lde", label:"Deutsch", t:x => songLangs(x).includes("de") }, { k:"les", label:"Spanisch", t:x => songLangs(x).includes("es") });
+  return out.map(c => ({ ...c, n:SONGS.filter(x => x.id && c.t(x)).length })).filter(c => c.n >= 12);
+}
+function bingoNew(){
+  const pool = bingoConds(), cells = [];
+  for(let i = pool.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  pool.slice(0, 16).forEach(c => cells.push({ k:c.k, label:c.label, done:"" }));
+  return { cells, lines:[], full:false, open:false };
+}
+function bingoOnResult(song){
+  const b = state.bingo; if(!b || !song) return;
+  const conds = bingoConds(), by = Object.fromEntries(conds.map(c => [c.k, c]));
+  const cand = b.cells.map((c, i) => ({ c, i })).filter(o => !o.c.done && by[o.c.k] && by[o.c.k].t(song));
+  if(!cand.length) return;
+  cand.sort((a, z) => by[a.c.k].n - by[z.c.k].n);   // seltenste Bedingung zuerst
+  const cell = cand[0].c; cell.done = song.t;
+  let gain = 0; const msg = [];
+  BINGO_LINES.forEach((ln, li) => { if(!b.lines.includes(li) && ln.every(i => b.cells[i].done)){ b.lines.push(li); gain += 10; msg.push("BINGO!"); } });
+  if(!b.full && b.cells.every(c => c.done)){ b.full = true; gain += 50; msg.push("Volles Brett!"); }
+  try{ toast("🎲 " + cell.label + " ✓" + (msg.length ? " – " + msg.join(" ") + " +" + gain + " " + ECO.icon : "")); }catch(e){}
+  if(gain) ecoAdd(gain);
+  saveState();
+}
+function bingoToggle(){ if(state.bingo){ state.bingo.open = !state.bingo.open; bingoUi(); } }
+function bingoUi(){
+  let fab = document.getElementById("bingo-fab"), pan = document.getElementById("bingo-pan");
+  const b = state.bingo, show = b && state.screen === "game";
+  if(!show){ if(fab) fab.remove(); if(pan) pan.remove(); return; }
+  const done = b.cells.filter(c => c.done).length;
+  if(!fab){ fab = document.createElement("button"); fab.id = "bingo-fab"; fab.className = "bingo-fab"; fab.onclick = bingoToggle; document.body.appendChild(fab); }
+  fab.textContent = "🎲 " + done + "/16";
+  if(!b.open){ if(pan) pan.remove(); return; }
+  if(!pan){ pan = document.createElement("div"); pan.id = "bingo-pan"; pan.className = "bingo-pan"; document.body.appendChild(pan); }
+  pan.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><b>Bingo (experimentell)</b><button class="btn-ghost btn-small" onclick="bingoToggle()">Schließen</button></div>
+    <div class="bingo-grid">${b.cells.map(c => `<div class="bingo-cell ${c.done ? "on" : ""}">${esc(c.label)}${c.done ? `<small>${esc(c.done)}</small>` : ""}</div>`).join("")}</div>
+    <div class="stats-note">Lege Karten richtig – passt der Song zu einem Feld, wird es abgehakt (das seltenste passende Feld zuerst). Eine Reihe bringt 10 ${ECO.icon}, das volle Brett 50 ${ECO.icon}.</div>`;
+}
+function startBingo(){
+  const base = { tokens:false, target:20, maxTokens:5, startTokens:2, mode:"solo", difficulty:"normal", turnLimit:0, challenge:false, challengeMode:"manual", yearTol:0, genres:Object.fromEntries(LIB.langs.map(l => [l.key, true])) };
+  newGame(base, null); state.bingo = bingoNew(); saveState(); render();
+}
+
+/* ============ TURNIER (K.o.-System, lokal an einem Gerät) ============ */
+const TOURF = { names:["", "", "", ""], target:7 };
+let TOUR = null;
+function tourLoad(){ try{ const t = JSON.parse(localStorage.getItem("chronohit_tour") || "null"); if(t && t.rounds) TOUR = t; }catch(e){} }
+function tourSave(){ try{ if(TOUR) localStorage.setItem("chronohit_tour", JSON.stringify(TOUR)); else localStorage.removeItem("chronohit_tour"); }catch(e){} }
+function tourBuild(names, target){
+  const n = names.length; let size = 2; while(size < n) size *= 2;
+  const pl = shuffle(names), r1 = [];
+  for(let i = 0; i < size / 2; i++){ const a = pl[i], bi = size - 1 - i; r1.push({ a, b:bi < n ? pl[bi] : null, w:null }); }
+  const rounds = [r1]; for(let s = size / 4; s >= 1; s /= 2) rounds.push(Array.from({ length:s }, () => ({ a:null, b:null, w:null })));
+  const T = { rounds, target, champion:null, created:Date.now() };
+  T.rounds.forEach((_, ri) => T.rounds[ri].forEach((m, mi) => { if(ri === 0 && m.a && !m.b) tourWin(T, ri, mi, m.a); }));
+  return T;
+}
+function tourWin(T, r, i, name){
+  const m = T.rounds[r][i]; m.w = name;
+  if(r + 1 < T.rounds.length){ const nx = T.rounds[r + 1][i >> 1]; if(i % 2 === 0) nx.a = name; else nx.b = name; } else T.champion = name;
+}
+function tourNext(){ if(!TOUR) return null; for(let r = 0; r < TOUR.rounds.length; r++) for(let i = 0; i < TOUR.rounds[r].length; i++){ const m = TOUR.rounds[r][i]; if(m.a && m.b && !m.w) return { r, i, m }; } return null; }
+function openTournament(){ tourLoad(); state.screen = "tournament"; render(); }
+function tourSetName(i, v){ TOURF.names[i] = v; }
+function tourAdd(n){ const k = Math.max(2, Math.min(8, TOURF.names.length + n)); while(TOURF.names.length < k) TOURF.names.push(""); TOURF.names.length = k; render(); }
+function tourTarget(v){ TOURF.target = Math.max(3, Math.min(20, parseInt(v, 10) || 7)); }
+function tourStart(){
+  const names = TOURF.names.map((x, i) => (x || "").trim() || "Spieler " + (i + 1));
+  if(new Set(names.map(x => x.toLowerCase())).size !== names.length) return toast("Jeder Name darf nur einmal vorkommen.");
+  TOUR = tourBuild(names, TOURF.target); tourSave(); render();
+}
+function tourReset(){ if(!confirm("Turnier beenden und verwerfen?")) return; TOUR = null; tourSave(); render(); }
+function tourPlay(){
+  const nx = tourNext(); if(!nx) return;
+  const base = { tokens:false, target:TOUR.target, maxTokens:5, startTokens:2, mode:"multiplayer", difficulty:"normal", turnLimit:0, challenge:false, challengeMode:"manual", yearTol:0, genres:Object.fromEntries(LIB.langs.map(l => [l.key, true])) };
+  newGame(base, [nx.m.a, nx.m.b]); state.tourMatch = { r:nx.r, i:nx.i }; saveState(); render();
+}
+function tourReport(){   // am Spielende: Sieger eintragen
+  const tm = state.tourMatch; if(!tm || state.tourDone || !TOUR) return;
+  const ws = state.winners || [];
+  if(ws.length !== 1) return;   // Unentschieden → Stechen
+  const name = state.players[ws[0]].name; state.tourDone = name; tourWin(TOUR, tm.r, tm.i, name); tourSave();
+}
+function tourBack(){ state.tourMatch = null; state.hasSave = false; state.screen = "tournament"; tourLoad(); render(); }
+function tourBannerHtml(){
+  const tm = state.tourMatch; if(!tm || !TOUR) return "";
+  const ws = state.winners || [];
+  if(state.tourDone) return `<div class="menu-card tour-banner"><b>🏆 Turnier:</b> ${esc(state.tourDone)} zieht ${TOUR.champion ? "als <b>Turniersieger</b> ein!" : "in die nächste Runde ein."} <button class="btn-primary btn-small" onclick="tourBack()">Weiter im Turnier</button></div>`;
+  return `<div class="menu-card tour-banner"><b>🏆 Turnier:</b> Unentschieden – es braucht ein Stechen. <button class="btn-primary btn-small" onclick="tourRematch()">Stechen starten</button></div>`;
+}
+function tourRematch(){ const tm = state.tourMatch, m = TOUR && TOUR.rounds[tm.r][tm.i]; if(!m) return; state.tourMatch = null; tourPlay(); }
+function renderTournament(){
+  tourLoad();
+  const rn = n => n === TOUR.rounds.length ? "Finale" : n === TOUR.rounds.length - 1 && n > 1 ? "Halbfinale" : "Runde " + n;
+  if(!TOUR){
+    app.innerHTML = `<div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Turnier</h1></div>
+      <div class="menu-card"><h3>K.o.-Turnier (lokal)</h3><p class="step-hint">2 bis 8 Spielende an einem Gerät. Jedes Match ist ein Duell mit dem Zeitleisten-Spiel: Wer zuerst die Zielkarten richtig gelegt hat, kommt weiter. Bei ungerader Zahl gibt es Freilose.</p>
+        ${TOURF.names.map((v, i) => `<input class="guess-input" style="margin-bottom:6px;" type="text" maxlength="20" placeholder="Spieler ${i + 1}" value="${esc(v)}" oninput="tourSetName(${i},this.value)">`).join("")}
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;"><button class="btn-ghost btn-small" onclick="tourAdd(-1)">− Spieler</button><button class="btn-ghost btn-small" onclick="tourAdd(1)">+ Spieler</button></div>
+        <div class="setting-row"><div class="label">Zielkarten pro Match</div><input class="guess-input" style="max-width:90px;" type="number" min="3" max="20" value="${TOURF.target}" onchange="tourTarget(this.value)"></div>
+        <div class="stats-note">Online-Turniere gibt es noch nicht – dieses Turnier läuft an einem Gerät, die Spielenden wechseln sich ab.</div></div>
+      <div class="menu-actions"><button class="btn-primary" onclick="tourStart()">Turnier starten</button><button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button></div>`;
+    return;
+  }
+  const nx = tourNext();
+  app.innerHTML = `<div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Turnier</h1></div>
+    ${TOUR.champion ? `<div class="menu-card tour-banner"><h3 style="margin:0;">🏆 Turniersieger: ${esc(TOUR.champion)}</h3></div>` : ``}
+    ${TOUR.rounds.map((rd, ri) => `<div class="menu-card"><h3>${rn(ri + 1)}</h3>${rd.map(m => `<div class="stats-row tour-row ${nx && nx.m === m ? "next" : ""}"><span class="${m.w && m.w === m.a ? "tw" : ""}">${esc(m.a || "?")}</span><span>gegen</span><span class="${m.w && m.w === m.b ? "tw" : ""}">${m.b ? esc(m.b) : (m.a && ri === 0 ? "Freilos" : "?")}</span>${m.w ? `<b>✓ ${esc(m.w)}</b>` : ``}</div>`).join("")}</div>`).join("")}
+    <div class="menu-actions">${nx ? `<button class="btn-primary" onclick="tourPlay()">▶ Nächstes Match: ${esc(nx.m.a)} gegen ${esc(nx.m.b)}</button>` : ``}
+      <button class="btn-ghost" onclick="tourReset()">${TOUR.champion ? "Neues Turnier" : "Turnier verwerfen"}</button><button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button></div>`;
+}
+
+/* ============ NACH-RENDER-HAKEN, BILDSCHIRM-VERTEILER, TV-ANSICHT ============ */
+const FEAT_SCREENS = { shop:renderShop, album:renderAlbum, radar:renderRadar, wrapped:renderWrapped, tournament:renderTournament };
+function featPostRender(){
+  const g = state.screen === "game" || state.screen === "end";
+  if(g && state.settings && state.settings.seed && !app.querySelector(".seed-chip")){
+    const d = document.createElement("div"); d.className = "seed-chip"; d.innerHTML = `🌱 Seed <b>${esc(state.settings.seed)}</b> <button class="btn-ghost btn-small" onclick="seedCopy()">Kopieren</button>`; app.prepend(d);
+  }
+  if(state.screen === "end" && state.tourMatch){
+    tourLoad(); try{ tourReport(); }catch(e){}
+    if(!app.querySelector(".tour-banner")) app.insertAdjacentHTML("afterbegin", tourBannerHtml());
+  }
+  try{ bingoUi(); }catch(e){}
+  try{ w10Sync(); }catch(e){}
+  const tv = !!prefs.tv || !!(typeof NET !== "undefined" && NET.spec && NET.form && NET.form.tv);
+  document.documentElement.classList.toggle("tv-mode", tv);
+  const fs = String((prefs.fontScale || 1) * (tv ? 1.5 : 1)); if(document.documentElement.style.getPropertyValue("--font-scale") !== fs) document.documentElement.style.setProperty("--font-scale", fs);
+}
+
+function achSave(A){ try{ achCtrCheck(A); }catch(e){} try{ achPay(A); }catch(e){} try{ const j = JSON.stringify(A); if(j !== ACH_LAST){ ACH_LAST = j; localStorage.setItem(ACH_LS, j); } }catch(e){} }
 /* --- Songsammlung: verschiedene Songs, die mindestens einmal richtig gelegt/beantwortet wurden (auch aus dem bisherigen Kartenprotokoll) --- */
 const ACH_COLL = new WeakMap();
 function achColl(A){
@@ -5835,7 +6251,7 @@ function achCatAll(open){ achOpenSave(new Set(open ? ACH_CATS.map(c => c[0]) : [
 function renderAch(){
   const A = achLoad(), n = ACH_DEFS.filter(d => A.u[d.id]).length, tot = ACH_DEFS.length, W = achWeekly(A), cn = achCount(A, "all"), call = achGroups().all;
   const tile = d => { const got = !!A.u[d.id], pg = !got && d.prog ? d.prog(A) : null;
-    return `<button class="ach-tile ${got ? "got" : "locked"}" onclick="achPop('${d.id}')">${achBadge(d, !got)}<span class="ach-name">${(d.secret && !got) ? "???" : esc(d.name)}</span>${pg ? `<span class="ach-prog">${Math.min(pg[0], pg[1])} / ${pg[1]}</span>` : (got && A.f.includes(d.id) ? `<span class="ach-prog">⭐</span>` : ``)}</button>`; };
+    return `<button class="ach-tile ${got ? "got" : "locked"}" onclick="achPop('${d.id}')">${achBadge(d, !got)}<span class="ach-name">${(d.secret && !got) ? "???" : esc(d.name)}</span>${pg ? `<span class="ach-prog">${Math.min(pg[0], pg[1])} / ${pg[1]}</span>` : (got && A.f.includes(d.id) ? `<span class="ach-prog">⭐</span>` : ``)}${got ? `` : `<span class="ach-prog" style="opacity:.8">+${ecoReward(d)} ${ECO.icon}</span>`}</button>`; };
   const wk = W.ch.map(c => `<div class="wk-row ${c.done ? "done" : ""}"><div>${c.done ? "✅ " : ""}${esc(c.text)} <small>(+${c.xp} XP)</small></div><div class="ach-bar"><div style="width:${Math.round(c.n / c.goal * 100)}%"></div></div><small>${c.n} / ${c.goal}</small></div>`).join("");
   app.innerHTML = `
     <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Errungenschaften</h1></div>
@@ -5850,6 +6266,7 @@ function renderAch(){
       <p style="color:var(--muted);font-size:calc(13px * var(--font-scale));margin:6px 0 0;">Jede Woche drei neue Aufgaben. Alle drei geben zusätzlich +50 XP.</p></div>
     <div class="menu-card"><h3>💿 Songsammlung</h3>
       <p style="margin:4px 0;"><b>${cn} / ${call}</b> Songs mindestens einmal richtig gelegt</p>
+      <button class="btn-ghost btn-small" onclick="openAlbum()">📖 Sammelalbum</button>
       <div class="ach-bar"><div style="width:${call ? Math.round(cn / call * 100) : 0}%"></div></div>
       <p style="color:var(--muted);font-size:calc(13px * var(--font-scale));margin:0;">Zählt: Karte richtig platziert, im Interpret-Quiz den Interpreten richtig getroffen oder im Jahr-Schätzen das genaue Jahr.</p></div>
     <div class="menu-actions" style="flex-direction:row;gap:8px;"><button class="btn-ghost" onclick="achCatAll(true)">Alle aufklappen</button><button class="btn-ghost" onclick="achCatAll(false)">Alle zuklappen</button></div>
@@ -5945,6 +6362,7 @@ function achOnResult(A, g, lr, ctx){
       achEv(A, "card", 1); achEv(A, "streakmax", g.run);
       if(song && song.y){
         achEv(A, "dec", 1, decadeOf(song.y)); if(achAddSong(A, song.id)){ achEv(A, "newsong", 1); } achCollectCheck(A);
+        if(state.bingo) try{ bingoOnResult(song); }catch(e){}
         { const mo = new Date().getMonth() + 1, S = ACH_SEASON[mo - 1]; if(S && (S[3] === "s" ? (song.s || []).includes(S[4]) : songThemes(song).includes(S[4]))){ A.c.mt = A.c.mt || {}; A.c.mt[mo] = (A.c.mt[mo] || 0) + 1; } }
         if(song.y < 1960) achUnlock(A, "oldest"); if(song.y >= grp.maxY) achUnlock(A, "newest");
         const idx = tl.findIndex(c => c.id === song.id), L = idx > 0 ? tl[idx - 1] : null, R = idx >= 0 && idx < tl.length - 1 ? tl[idx + 1] : null;
@@ -6130,7 +6548,7 @@ function achBackfill(){
     if(bl >= 15) achUnlock(A, "blitz15", true); if((hs.endless || 0) >= 25) achUnlock(A, "endless25", true); if((hs.sudden || 0) >= 15) achUnlock(A, "sudden15", true);
   }catch(e){}
   try{
-    const D = dailyLoad(), keys = Object.keys(D.results || {}).sort();
+    const D = dailyLoad(), keys = [...new Set(Object.keys(D.results || {}).concat(D.shielded || []))].sort();
     if(keys.length) achUnlock(A, "daily1", true);
     A.c.dailyN = Math.max(A.c.dailyN || 0, keys.length); if(A.c.dailyN >= 50) achUnlock(A, "dailyvet", true);
     if(keys.some(k => (D.results[k].score || 0) >= 10)) achUnlock(A, "daily10", true);
@@ -6143,6 +6561,7 @@ function achBackfill(){
   try{ achCollectCheck(A, true); }catch(e){}
   try{ achLevelCheck(A, true); }catch(e){}
   try{ achCtrCheck(A, true); }catch(e){}
+  try{ achPay(A, true); }catch(e){}
   const n = A.__n || 0; delete A.__n; achSave(A);
   if(n > 0) achToast("Abzeichen freigeschaltet", n + (n === 1 ? " Abzeichen" : " Abzeichen") + " aus deinen bisherigen Spielen.", `<span class="badge-ico tier-3"><span class="bi">🏅</span></span>`, () => openAch());
 }
@@ -6281,8 +6700,8 @@ function renderPlaylist(){
 /* ============ TUTORIAL ============ */
 function topBack(){ state.settingsSub = null; state.tutRules = false; backToMenuInstant(); }
 function topBackBar(){
-  if(!["stats", "recap", "tutorial", "achievements"].includes(state.screen)) return;
-  app.insertAdjacentHTML("afterbegin", `<div class="topback" style="position:sticky;top:8px;z-index:6;height:0;"><button class="btn-ghost btn-small" style="background:var(--panel);" onclick="topBack()">← Hauptmenü</button></div><div style="height:44px;"></div>`);
+  if(!["stats", "recap", "tutorial", "achievements", "shop", "album", "radar", "wrapped", "tournament"].includes(state.screen)) return;
+  app.insertAdjacentHTML("afterbegin", `<div class="topback" style="position:sticky;top:8px;z-index:6;height:0;"><button class="btn-ghost btn-small" style="background:var(--panel);" onclick="topBack()">← Hauptmenü</button>${state.screen === "achievements" ? `<button class="btn-ghost btn-small" style="background:var(--panel);position:absolute;right:0;top:0;" onclick="openShop()">🛒 Laden · ${ecoLoad().bal} ${ECO.icon}</button>` : ``}</div><div style="height:44px;"></div>`);
 }
 let tutPrev = null;
 const TUT_YEARS = [1990, 2008, 1978, 2000, 1985, 2015, 1995, 2011, 1980, 2005, 1992, 2018, 1983, 2013, 1998, 2003];   // feste Übungs-Reihenfolge (immer dieselben Songs)
@@ -6389,7 +6808,7 @@ function tutBubble(){
   } else { b.style.left = "50%"; b.style.bottom = "16px"; b.style.transform = "translateX(-50%)"; }
   if(el) b.style.transform = "none";
 }
-{ const r0 = render; render = function(){ if(state.screen === "online") state.screen = "play"; r0(); try{ topBackBar(); }catch(e){} try{ avEnsure(); }catch(e){} try{ srPass(); }catch(e){} try{ chatUi(); }catch(e){} try{ vcUi(); }catch(e){} try{ tutBubble(); }catch(e){} }; }
+{ const r0 = render; render = function(){ if(state.screen === "online") state.screen = "play"; r0(); try{ topBackBar(); }catch(e){} try{ featPostRender(); }catch(e){} try{ avEnsure(); }catch(e){} try{ srPass(); }catch(e){} try{ chatUi(); }catch(e){} try{ vcUi(); }catch(e){} try{ tutBubble(); }catch(e){} }; }
 function renderTutorial(){
   if(state.tutRules) return renderTutorialRules();
   app.innerHTML = `
@@ -6636,7 +7055,8 @@ function wizardSetGroup(group, value){
   render();
 }
 // Auswahl aus dem Wizard in Settings übersetzen (null = alles)
-function songFilterFromWizard(w){
+function songFilterFromWizard(w){ const __seed = String(w.seed || "").trim().toUpperCase(); const __f = songFilterFromWizard0(w); __f.seed = __seed; return __f; }
+function songFilterFromWizard0(w){
   const pick = m => Object.values(m).every(Boolean) ? null : Object.keys(m).filter(k => m[k]);
   return {
     genres: { ...w.genres },
@@ -6883,7 +7303,7 @@ function renderWizardStep4(n){
         <b>${final}</b> Songs im Stapel
         ${ok ? '' : `<div>Zu wenig für diese Runde — mindestens <b>${need}</b> nötig (Startkarten + Zielkarten). Wähle mehr Optionen aus.</div>`}
       </div>
-    </div>`;
+    </div>${wizardSeedHtml()}`;
 }
 function renderWizardPlayers(n){
   const w = state.wizard;
@@ -7632,6 +8052,7 @@ function render(){
   else if(state.screen === "game") renderGame();
   else if(state.screen === "end") renderEnd();
   else if(state.screen === "timeline") renderTimelineOnly();
+  else if(FEAT_SCREENS[state.screen]) FEAT_SCREENS[state.screen]();
 
   if(state.screen === "end") maybeRecordGameEnd();
   try{ achObserve(); }catch(e){}
@@ -8658,6 +9079,7 @@ function renderRecap(){
     <div class="menu-card"><div class="setting-row"><div class="label">Jahr</div>${yearSel}</div></div>
     ${body}
     <div class="menu-actions">
+      <button class="btn-ghost" onclick="openWrapped(RECAP_YEAR_FOR_WRAPPED())">🎁 Wrapped ansehen</button>
       <button class="btn-ghost" onclick="openStats()">Zu den Statistiken</button>
       <button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button>
     </div>`;
@@ -8840,6 +9262,7 @@ function chronicleQmHtml(){
 
 /* ============ SPIELSTAND-VORSCHAU (Mini-Zeitleiste) ============ */
 function miniTimelineHtml(slot){
+  if(slot && slot.settings && (slot.settings.game === "artist" || slot.settings.game === "year")) return ``;   // Quiz-Spielstände haben keine Zeitleiste
   const lists = [];
   if(slot.settings && slot.settings.mode === "multiplayer" && Array.isArray(slot.players) && slot.players.length > 1)
     slot.players.slice(0, 6).forEach(q => lists.push({ n: q.name || "", tl: q.timeline || [] }));
@@ -9223,7 +9646,7 @@ document.addEventListener("click", e => {
 
 /* ============ DARSTELLUNG & BARRIEREFREIHEIT ============ */
 const PREFS_KEY = "chronohit_prefs";
-const PREF_DEFAULTS = { relayOnly: false, turnUrl: "", turnUser: "", turnPass: "", voiceChat: false, bigRooms: false, autoPlay: false, soundDesign: "theme", reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, colorMode: "off", screenReader: false, leftHand: false, decadeBacks: false, vibrate: false, bigTarget: false, autoTheme: "off", autoLight: "notizbuch", autoDark: "", autoSave: "turn", autoSaveSec: 30, seasonal: "off", fontFamily: "theme", cardSize: "m", density: "normal", autoNextSec: 0, keys: true, sound: true, soundVolume: 0.5, soundGroups: null };
+const PREF_DEFAULTS = { bingo:false, tv:false, win10Emoji:false, relayOnly: false, turnUrl: "", turnUser: "", turnPass: "", voiceChat: false, bigRooms: false, autoPlay: false, soundDesign: "theme", reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, colorMode: "off", screenReader: false, leftHand: false, decadeBacks: false, vibrate: false, bigTarget: false, autoTheme: "off", autoLight: "notizbuch", autoDark: "", autoSave: "turn", autoSaveSec: 30, seasonal: "off", fontFamily: "theme", cardSize: "m", density: "normal", autoNextSec: 0, keys: true, sound: true, soundVolume: 0.5, soundGroups: null };
 let prefs = { ...PREF_DEFAULTS, reduceMotion: false, soundGroups: defaultSoundGroups() };
 function loadPrefs(){
   let saved = {};
@@ -10326,6 +10749,7 @@ function renderJoin(){
             onkeydown="if(event.key==='Enter') netJoin()">
           <button class="btn-ghost btn-small" style="margin-top:8px;" onclick="NET.form.showPw=!NET.form.showPw; render()">${f.showPw ? 'Verbergen' : 'Anzeigen'}</button></div>
         <label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;"><input type="checkbox" ${f.spec ? 'checked' : ''} onchange="NET.form.spec=this.checked" style="margin-top:4px;"><span><b>Nur zuschauen</b><br><span style="color:var(--muted); font-size:calc(13px * var(--font-scale));">Kein Spielplatz: du siehst das Spiel mit, kannst aber nicht mitspielen. Auch nach Spielstart möglich.</span></span></label>
+        <label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;"><input type="checkbox" ${f.tv ? 'checked' : ''} onchange="NET.form.tv=this.checked; if(this.checked) NET.form.spec=true; render()" style="margin-top:4px;"><span><b>📺 TV-Modus</b><br><span style="color:var(--muted);">Zuschauen mit großer Darstellung für den Fernseher (die anderen spielen auf ihren Handys).</span></span></label>
       </div>
       ${NET.error ? `<div class="planned-notice" style="border-color:var(--wrong); margin-top:14px;">${esc(NET.error)}</div>` : ``}
       ${busy ? `<div class="planned-notice" style="margin-top:14px;">Verbinde … (Schlüssel wird berechnet und der Host gesucht)</div>` : ``}
