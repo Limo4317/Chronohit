@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="de">
 <head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1020">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Chronohit</title>
@@ -1311,7 +1313,7 @@
     --bg:#4a3a2a; --bg-2:#3a2d20; --bg-highlight:#5b4733; --panel:#8b8b8b; --panel-2:#a0a0a0;
     --text:#ffffff; --muted:#e0e0e0; --accent:#5fa83a; --accent-ink:#ffffff;
     --correct:#55d14b; --wrong:#e04b3a; --line:#373737; --card-face:#c6c6c6; --ink:#1e1e1e;
-    --heading-font:'MinecraftLocal','Pixelify Sans',monospace; --body-font:'MinecraftLocal','Pixelify Sans',monospace; --radius:0px;
+    --heading-font:'NRCMinecraft','MinecraftLocal','Pixelify Sans',monospace; --body-font:'NRCMinecraft','MinecraftLocal','Pixelify Sans',monospace; --radius:0px;
     --body-bg-image: repeating-linear-gradient(0deg, rgba(0,0,0,.10) 0 8px, transparent 8px 16px), repeating-linear-gradient(90deg, rgba(0,0,0,.10) 0 8px, transparent 8px 16px);
   }
   :root[data-design="minecraft"] *{ border-radius:0 !important; }
@@ -1413,6 +1415,8 @@
   .chat-msg{ background:var(--panel); color:var(--text); border:1px solid var(--accent); border-radius:12px; padding:6px 10px; margin-top:4px; max-width:260px; font-size:.9em; box-shadow:0 4px 12px rgba(0,0,0,.3); }
   .chat-panel{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:8px; margin-bottom:6px; max-height:50vh; overflow:auto; display:flex; flex-direction:column; gap:4px; max-width:280px; }
   .chat-panel button{ text-align:left; }
+  .av{ width:28px; height:28px; border-radius:50%; object-fit:cover; flex:none; border:2px solid var(--correct); }
+  .av.off{ filter:grayscale(1); opacity:.5; border-color:var(--wrong); }
   .qp-row{ display:flex; align-items:center; gap:10px; width:100%; box-sizing:border-box; padding:8px 10px; border:1px solid var(--line); border-radius:var(--radius,12px); background:var(--panel-2); }
   .qp-host{ display:flex; align-items:center; gap:6px; font-size:.85em; cursor:pointer; white-space:nowrap; flex:0 0 auto; }
   .qp-host input{ width:18px; height:18px; accent-color:var(--accent); margin:0; }
@@ -2262,7 +2266,11 @@ async function saveState(){
     if(state.daily.first && state.screen === "game"){ try{ localStorage.setItem("chronohit_daily_run", JSON.stringify(state)); }catch(e){} }
     return;
   }
-  if(state && (state.tutorial || state.quickGame || state.learn)) return;
+  if(state && state.learn){   // eigener Dauer-Speicher für die Lernrunde
+    if(state.screen === "game"){ try{ localStorage.setItem("chronohit_learn_run", JSON.stringify(state)); }catch(e){} }
+    return;
+  }
+  if(state && (state.tutorial || state.quickGame)) return;
   if(state.online && typeof NET !== "undefined" && NET.role === "guest") return;
   const raw = JSON.stringify(state);
   memorySave = raw;
@@ -3518,7 +3526,7 @@ const THEME_INFO = [
   { key:"herbst", label:"Herbst", desc:"Warmes Braun mit Laubfarben. Automatisch im September, Oktober und November.", season:true },
   { key:"winter", label:"Winter", desc:"Eisiges Hellblau mit Schnee-Punkten. Automatisch im Dezember, Januar und Februar.", season:true },
   { key:"gameboy", label:"Gameboy", desc:"Genau vier Grüntöne wie auf dem Original-LCD, Pixelschrift, harte Schatten und feine Rasterlinien." },
-  { key:"minecraft", label:"Pixel-Blöcke", desc:"Klötzchen-Look wie in einem Bauspiel: Erde, Stein und Gras, eckige Rahmen mit Kanten, Pixel-Emojis und Pixelschrift. Für die Original-Schrift: Minecraft.ttf auf dem Gerät installieren oder neben die HTML-Datei legen." },
+  { key:"minecraft", label:"Pixel-Blöcke", desc:"Klötzchen-Look wie in einem Bauspiel: Erde, Stein und Gras, eckige Rahmen mit Kanten, Pixel-Emojis und Pixelschrift." },
   { key:"notizbuch", label:"Notizbuch", desc:"Skizzenstil: Karopapier-Linien mit rotem Rand, Handschrift und leicht schiefen, gezeichneten Rahmen." },
   { key:"ostern", label:"Ostern", desc:"Pastellfarben mit Tulpen, Küken und Ostereiern. Automatisch von Palmsonntag bis Ostermontag.", season:true },
   { key:"valentin", label:"Valentinstag", desc:"Dunkles Rosé mit aufsteigenden Herzen. Automatisch vom 12. bis 14.2.", season:true },
@@ -3558,7 +3566,7 @@ function themeGroupsHtml(){
   const custom = by("custom");
   return `<div class="theme-list">${rest.map(themeSwatchHtml).join("")}</div>${grp("🌱 Jahreszeiten", THEME_SEASONS)}${grp("🎉 Feiertage", THEME_HOLIDAYS)}${custom ? `<div class="theme-list" style="margin-top:10px;">${themeSwatchHtml(custom)}</div>` : ""}`;
 }
-const SETTINGS_SUBS = [["language","🌐 Sprache"],["themes","🎨 Themes"],["display","👁️ Darstellung & Barrierefreiheit"],["save","💾 Speichern"],["play","🎮 Spielen"],["sound","🔊 Sound"],["diag","🔧 Verbindungsdiagnose"],["experimental","🧪 Experimentelles"]];
+const SETTINGS_SUBS = [["language","🌐 Sprache"],["themes","🎨 Themes"],["display","👁️ Darstellung & Barrierefreiheit"],["save","💾 Speichern"],["play","🎮 Spielen"],["sound","🔊 Sound"],["profile","🖼️ Profilbild"],["diag","🔧 Verbindungsdiagnose"],["experimental","🧪 Experimentelles"]];
 function renderAutoThemeCard(){
   const m = prefs.autoTheme || "off", opts = THEME_INFO.map(t => t.key).filter(k => k !== "custom");
   const sel = (key, def) => `<select class="dropdown" onchange="setAutoTheme('${key}', this.value)">${opts.map(k => `<option value="${k}" ${(prefs[key] || def) === k ? "selected" : ""}>${(THEME_INFO.find(t => t.key === k) || {}).label || k}</option>`).join("")}</select>`;
@@ -3631,6 +3639,7 @@ function renderSettings(){
     ${sub === 'play' ? renderPlayCard() : ``}
 
     ${sub === 'sound' ? renderSoundCard() : ``}
+    ${sub === 'profile' ? renderProfileCard() : ``}
     ${sub === 'diag' ? renderDiagCard() : ``}
     ${sub === 'experimental' ? renderExperimentalCard() : ``}
 
@@ -4109,6 +4118,7 @@ function xpLoad(){ try{ return JSON.parse(localStorage.getItem("chronohit_xp") |
 function xpLevel(total){ let lv = 1, need = 100, left = total || 0; while(left >= need){ left -= need; lv++; need = 100 + 40 * (lv - 1); } return { lv, cur:left, need }; }
 function xpAward(){
   if(state.xpDone || state.tutorial) return; state.xpDone = true;
+  if(state.learn){ try{ localStorage.removeItem("chronohit_learn_run"); }catch(e){} }
   const st = state.settings, parts = []; let correct = 0, won = false;
   if(st.mode === "multiplayer" && state.players){
     if(state.online){ const my = state.players[netMyTeam()], mx = Math.max(...state.players.map(q => q.correctCount)); correct = my ? my.correctCount : 0; won = !!my && my.correctCount === mx; }
@@ -4261,7 +4271,7 @@ const PLS = { metric:"rate", cal:null };
 function cardsLoad(){ let L = {}; try{ L = JSON.parse(localStorage.getItem("chronohit_cards") || "{}") || {}; }catch(e){} L.songs = L.songs || {}; L.days = L.days || {}; return L; }
 function cardsSave(L){ try{ localStorage.setItem("chronohit_cards", JSON.stringify(L)); }catch(e){} }
 function cardLog(e){
-  if(state.tutorial || !["ok", "wrong", "timeout"].includes(e.k)) return;
+  if(state.tutorial || state.qg || !["ok", "wrong", "timeout"].includes(e.k)) return;
   const song = SONGS.find(x => x.t === e.t && x.a === e.a && x.y === e.y); if(!song || !song.id) return;
   const L = cardsLoad(), r = L.songs[song.id] || (L.songs[song.id] = { n:0, w:0 }), k = dateKey(), d = L.days[k] || (L.days[k] = { n:0, ok:0, xp:0 });
   r.n++; if(e.k !== "ok") r.w++; d.n++; if(e.k === "ok") d.ok++;
@@ -4346,13 +4356,25 @@ function learnSelect(){
   }
   return out;
 }
-function learnBadge(){ const L = cardsLoad(); const k = Object.values(L.songs).filter(r => r.w > 0).length; return k ? " · " + k + " knifflige Songs" : ""; }
+function learnBadge(){ const L = cardsLoad(), k = Object.values(L.songs).filter(r => r.w > 0).length; return (learnRunLoad() ? " · fortsetzen" : "") + (k ? " · " + k + " knifflige Songs" : ""); }
+function learnRunLoad(){
+  try{ const r = JSON.parse(localStorage.getItem("chronohit_learn_run") || "null"); if(r && r.learn && r.qg == null && r.screen === "game") return r; }catch(e){}
+  try{ localStorage.removeItem("chronohit_learn_run"); }catch(e){}
+  return null;
+}
 function startLearn(){
+  const run = learnRunLoad();
+  if(run){   // angefangene Lernrunde fortsetzen
+    pauseSpotifyPlayback(); state = run;
+    state.pendingSpend = null; state.turnDeadline = null; state.chDeadline = null; state.showExitDialog = false; state.infoOpen = null; state.activeSlot = null;
+    state.screen = "game"; render(); return;
+  }
   const sel = learnSelect();
   const base = { tokens:false, target:10, maxTokens:5, startTokens:2, mode:"solo", difficulty:"normal", turnLimit:0, challenge:false, challengeMode:"manual", yearTol:0, genres:Object.fromEntries(LIB.langs.map(l => [l.key, true])) };
   window.__tutBoot = true; newGame(base, null);
   state.timeline = [{ ...sel[0], __starter:true }]; state.deck = sel.slice(1); state.turnNo = 0; state.current = null; drawNext();
   window.__tutBoot = false; state.learn = true; state.hasSave = false; render();
+  saveState();
 }
 /* ============ SPIELARTEN: JAHR-SCHÄTZEN & INTERPRET-QUIZ ============ */
 const QG_PTS = [3, 2, 1], QG = { playing:false, sentRound:0, round:0 };
@@ -4407,6 +4429,8 @@ function qgReveal(){
     res.push({ i, name:qgName(i), v:a || "–", diff:0, pts:ok ? 1 : 0, ok });
   }
   q.results = res; q.reveal = { t:song.t, a:song.a, y:song.y }; q.phase = "result";
+  res.forEach(r => chronicleAdd({ n:q.round, p:r.name, t:song.t, a:song.a, y:song.y, k:r.pts > 0 ? "ok" : "wrong", c:(q.kind === "year" ? "Tipp " + r.v + (r.diff > 0 ? ", " + r.diff + " daneben" : r.diff === 0 ? ", Volltreffer" : "") : "Antwort: " + r.v) + " · +" + r.pts + " Punkte" }));
+  if(QG.playing){ try{ pauseSpotifyPlayback(); }catch(e){} QG.playing = false; }
   res.forEach(r => { if(MP()){ if(state.players[r.i]) state.players[r.i].correctCount += r.pts; } else state.correctCount = (state.correctCount || 0) + r.pts; });
   if(MP()) state.correctCount = state.players[0].correctCount;
   try{ sfx(res.some(r => r.pts > 0) ? "token" : "turn", 0.7); }catch(e){}
@@ -4487,10 +4511,66 @@ function renderQgEnd(){
     <div class="brand"><div class="mark">RUNDE BEENDET</div></div>
     <div class="menu-card end-card"><div class="end-heading won">${state.qg.kind === "year" ? "Jahr-Schätzen" : "Interpret-Quiz"}</div>
       ${rows.map((r, k) => `<div class="stats-row"><span>${k + 1}. ${esc(r.name)}${r.pts === mx && rows.length > 1 ? " 🏆" : ""}</span><b>${r.pts} Punkte</b></div>`).join("")}
-      <div class="menu-actions" style="margin-top:14px;">${endExtraHtml()}<button class="btn-ghost" onclick="abandonGame()">Hauptmenü</button></div>
-    </div>`;
+      <div class="menu-actions" style="margin-top:14px;">${endExtraHtml()}<button class="btn-ghost" onclick="${state.activeSlot ? 'requestDeleteOnFinish()' : 'abandonGame()'}">Hauptmenü</button></div>
+    </div>
+    ${state.confirmDeleteOnFinish ? renderDeleteOnFinishModal() : ``}`;
 }
 function qgFinish(){ if(state.qgDone) return; state.qgDone = true; state.statsRecorded = true; try{ sfx("win", 0.7); confettiBurst("big"); }catch(e){} }
+/* ============ PROFILBILD (lokal) ============ */
+const AV_RE = /^data:image\/png;base64,[A-Za-z0-9+\/=]{20,14000}$/;
+function avLoad(){ try{ return localStorage.getItem("chronohit_avatar") || ""; }catch(e){ return ""; } }
+function avSet(file){
+  if(!file) return;
+  const rd = new FileReader();
+  rd.onerror = () => toast("Das Bild konnte nicht gelesen werden.");
+  rd.onload = () => {
+    const img = new Image();
+    img.onerror = () => toast("Dieses Bildformat wird nicht unterstützt.");
+    img.onload = () => {
+      try{
+        const R = 64, c = document.createElement("canvas"); c.width = c.height = R; const x = c.getContext("2d");
+        const w = img.naturalWidth || R, h = img.naturalHeight || R, k = Math.max(R / w, R / h);
+        x.drawImage(img, (R - w * k) / 2, (R - h * k) / 2, w * k, h * k);
+        const d = c.toDataURL("image/png"); if(!AV_RE.test(d)){ toast("Das Bild ist zu groß oder zu komplex."); return; }
+        try{ localStorage.setItem("chronohit_avatar", d); }catch(e){}
+        avAnnounce(); render();
+      }catch(e){ toast("Das Bild konnte nicht verarbeitet werden."); }
+    };
+    img.src = rd.result;
+  };
+  rd.readAsDataURL(file);
+}
+function avClear(){ try{ localStorage.removeItem("chronohit_avatar"); }catch(e){} avAnnounce(); render(); }
+function avAnnounce(){
+  if(!NET.role || !NET.peer) return; const d = avLoad();
+  if(NET.role === "host"){ NET.avatars = NET.avatars || {}; const k = netKey((NET.seats[0] && NET.seats[0].name) || ""); if(d) NET.avatars[k] = d; else delete NET.avatars[k]; avBroadcast(); }
+  else if(NET.role === "guest") netSendHost({ t:"ava", d });
+}
+function avBroadcast(){ if(NET.role === "host") netBroadcast({ t:"avatars", m:NET.avatars || {} }); }
+function netHostAvatar(entry, d){
+  NET.avatars = NET.avatars || {};
+  if(d && typeof d.d === "string" && AV_RE.test(d.d)) NET.avatars[entry.key] = d.d; else delete NET.avatars[entry.key];
+  avBroadcast(); netUiUpdate();
+}
+function avCleanMap(m){ const out = {}; if(m && typeof m === "object") Object.entries(m).slice(0, 100).forEach(([k, v]) => { if(typeof v === "string" && AV_RE.test(v)) out[String(k).slice(0, 60)] = v; }); return out; }
+function avEnsure(){
+  if(!NET.role || !NET.peer) return;
+  const id = NET.peer.id;
+  if(NET.avFor !== id && (NET.role === "host" || (NET.hostConn && NET.hostConn.open))){ NET.avFor = id; avAnnounce(); }
+  if(NET.role === "host" && NET.avSeats !== NET.seats.length){ NET.avSeats = NET.seats.length; avBroadcast(); }
+}
+function avatarHtml(x){
+  const d = NET.avatars && NET.avatars[netKey(x.name)];
+  return d ? `<img class="av ${x.connected ? "" : "off"}" src="${d}" alt="">` : `<span class="net-dot ${x.connected ? "" : "off"}"></span>`;
+}
+function renderProfileCard(){
+  const d = avLoad();
+  return `<div class="menu-card"><h3>Profilbild</h3><p style="margin:6px 0 10px;">Wird nur in diesem Browser gespeichert und online in der Lobby neben deinem Namen angezeigt (farbig, wenn du verbunden bist, grau, wenn nicht). Erlaubt sind PNG, JPG, GIF, WebP, SVG und alle weiteren Formate, die dein Browser lesen kann. Das Bild wird auf 64 × 64 Pixel verkleinert.</p>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">${d ? `<img class="av" style="width:64px;height:64px;" src="${d}" alt="Dein Profilbild">` : `<span class="av" style="width:64px;height:64px;display:inline-block;background:var(--panel-2);"></span>`}
+      <label class="btn-primary" style="display:inline-block;cursor:pointer;padding:8px 14px;">Bild auswählen<input type="file" accept="image/*" style="display:none;" onchange="avSet(this.files[0]); this.value=''"></label>
+      ${d ? `<button class="btn-ghost" onclick="avClear()">Entfernen</button>` : ""}</div></div>`;
+}
+try{ if("serviceWorker" in navigator && /^https?:/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(() => {}); }catch(e){}
 /* ============ PLAYLIST ============ */
 const PL = { q:"", sort:"t", dir:1, f:{ genres:[], styles:[], decades:[], themes:[] }, open:false, playing:null, tm:0 };
 function openPlaylist(){ state.screen = "playlist"; PL.open = false; render(); window.scrollTo(0, 0); }
@@ -4567,25 +4647,29 @@ const TUT_KINDS = [
   ["multi", "👥 Mehrspieler", "Reihum, jeder mit eigener Zeitleiste"],
   ["blitz", "⚡ Blitz", "Gegen die Uhr, nur Position"],
   ["endless", "♾️ Endlos", "Ohne Ziel, 3 Fehler beenden"],
-  ["sudden", "💀 Sudden Death", "Ein Fehler und du bist raus"]
+  ["sudden", "💀 Sudden Death", "Ein Fehler und du bist raus"],
+  ["year", "🎯 Jahr-Schätzen", "Alle tippen ein Jahr, die kleinste Abweichung gewinnt"],
+  ["artist", "🎤 Interpret-Quiz", "Nur den Interpreten raten"],
+  ["handicap", "⚖️ Handicap", "Jeder Spieler hat eine eigene Schwierigkeit"]
 ];
 function startTutorial(kind){
   const base = { tokens:true, target:3, maxTokens:5, startTokens:2, mode:"solo", difficulty:"normal", turnLimit:0, challenge:false, challengeMode:"manual", yearTol:0,
     genres:Object.fromEntries(LIB.langs.map(l => [l.key, true])) };
   const extra = { solo:{}, coop:{ mode:"coop", startTokens:3, maxTokens:3 }, multi:{ mode:"multiplayer", challenge:true },
-    blitz:{ variant:"blitz", tokens:false, blitzSec:45, target:9999 }, endless:{ variant:"endless", lives:3, target:9999 }, sudden:{ variant:"sudden", lives:1 } }[kind] || {};
+    blitz:{ variant:"blitz", tokens:false, blitzSec:45, target:9999 }, endless:{ variant:"endless", lives:3, target:9999 }, sudden:{ variant:"sudden", lives:1 }, year:{ mode:"multiplayer", game:"year", rounds:3, target:3 }, artist:{ mode:"solo", game:"artist", rounds:3, target:3, answerMode:"choice" }, handicap:{ mode:"multiplayer", handicap:true } }[kind] || {};
   tutPrev = { settings:state.settings, hasSave:state.hasSave };
   const used = new Set(), sel = TUT_YEARS.map(y => {
     const c = SONGS.filter(x => x.id && !used.has(x.id)).sort((a, b) => Math.abs(a.y - y) - Math.abs(b.y - y) || a.t.localeCompare(b.t, "de"))[0];
     used.add(c.id); return c;
   });
   window.__tutBoot = true;
-  newGame({ ...base, ...extra }, kind === "multi" ? ["Spieler 1", "Spieler 2"] : null);
-  if(kind === "multi"){
+  newGame({ ...base, ...extra }, ["multi", "year", "handicap"].includes(kind) ? ["Spieler 1", "Spieler 2"] : null);
+  if(["multi", "year", "handicap"].includes(kind)){
     state.players[0].timeline = [{ ...sel[0], __starter:true }]; state.players[1].timeline = [{ ...sel[1], __starter:true }];
     state.timeline = state.players[0].timeline; state.deck = sel.slice(2);
   } else { state.timeline = [{ ...sel[0], __starter:true }]; state.deck = sel.slice(1); }
-  state.turnNo = 0; state.current = null; drawNext();
+  state.turnNo = 0; state.current = null;
+  if(extra.game) qgInit(); else { if(kind === "handicap"){ state.players[0].diff = "normal"; state.players[1].diff = "expert"; } drawNext(); }
   window.__tutBoot = false;
   state.tutorial = { kind, seen:{}, last:null };
   state.hasSave = false; render();
@@ -4605,15 +4689,25 @@ function tutPlaceText(){
   const where = i === 0 ? "vor " + ys[0] : i >= ys.length ? "nach " + ys[ys.length - 1] : "zwischen " + ys[i - 1] + " und " + ys[i];
   return `Zum Üben verraten wir dir das Jahr: Dieser Song ist von <b>${c.y}</b> (im echten Spiel kennst du es nicht). Er gehört also ${where}. Klicke auf die markierte Lücke, früher liegt links, später rechts.`;
 }
+function tutQgTip(T, seen){
+  const q = state.qg, y = q.kind === "year";
+  const L = [
+    ["qgplay", q.phase === "guess", 'button[onclick="qgPlay()"]', (y ? "Jahr-Schätzen: Alle hören denselben Song. " : "Interpret-Quiz: Du musst nur den Interpreten erraten. ") + "Starte den Song mit diesem Button."],
+    ["qgin", q.phase === "guess" && seen.qgplay, (y || q.answerMode !== "choice") ? "#qg-in" : null, y ? "Tippe das Jahr, das du für richtig hältst. Hier spielen zwei an einem Gerät, also gibst du es danach weiter. Online tippen alle gleichzeitig." : (q.answerMode === "choice" ? "Wähle einen der vier Interpreten. Im echten Spiel kannst du auch Freitext einstellen, dort sind Tippfehler und Wörter wie „and“ oder „+“ egal." : "Tippe den Interpreten ein. Kleine Tippfehler sind egal.")],
+    ["qgres", q.phase === "result", 'button[onclick="qgNextClick()"]', y ? "Jetzt siehst du das echte Jahr und die Punkte: Die kleinste Abweichung bekommt 3, dann 2, dann 1 Punkt, ein Volltreffer gibt +2." : "Hier siehst du, ob es gestimmt hat: 1 Punkt für jede richtige Antwort. Weiter geht es mit dem Button."]
+  ];
+  const c = L.find(x => x[1] && !seen[x[0]]); return c ? { id:c[0], sel:c[2], html:c[3] } : null;
+}
 function tutTip(){
   const T = state.tutorial, k = T.kind, seen = T.seen, ph = state.phase;
   if(state.screen === "end") return { id:"end", sel:null, html:"🎉 Das war das Tutorial-Spiel. Hier siehst du das Ergebnis, deine finale Zeitleiste (jeder Song lässt sich anspielen) und die Spielchronik mit allem, was du geraten hast. Dieses Spiel wurde nicht gespeichert und zählt nicht in die Statistik." };
+  if(state.qg) return tutQgTip(T, seen);
   const intro = { solo:"Willkommen! Ziel: 3 Karten richtig in deine Zeitleiste einsortieren.", coop:"Koop: Ihr spielt gemeinsam auf das Ziel von 3 Karten und startet mit festen Chrono-Tokens.",
     multi:"Mehrspieler: Zwei Spieler wechseln sich ab, jeder hat eine eigene Zeitleiste. Wer zuerst 3 Karten richtig hat, gewinnt.", blitz:"Blitz: Sobald du die erste Karte abspielst, läuft die Uhr oben. Aufdecken und Weiter passieren automatisch, nur Position (Jahr) zählt.",
-    endless:"Endlos: Es gibt kein Ziel. 3 Fehler beenden die Runde, dein Highscore ist die Zahl richtiger Karten.", sudden:"Sudden Death: Ein einziger Fehler beendet die Runde. Ziel: 3 Karten." }[k];
+    endless:"Endlos: Es gibt kein Ziel. 3 Fehler beenden die Runde, dein Highscore ist die Zahl richtiger Karten.", sudden:"Sudden Death: Ein einziger Fehler beendet die Runde. Ziel: 3 Karten.", handicap:"Handicap-Modus: Zwei Spieler mit unterschiedlicher Schwierigkeit. Ziel: 3 Punkte." }[k];
   const mode = { solo:"Chrono-Tokens: Für 1 Token wirfst du einen unbekannten Song ab und ziehst neu, für 3 Tokens kaufst du eine Karte. Titel &amp; Interpret richtig eintippen kann einen Bonus-Token bringen.",
     coop:"Koop: Die Tokens sind eure gemeinsamen Leben. Jede falsch platzierte Karte kostet einen Token, bei 0 ist das Spiel verloren.", multi:"Mit aktivierten Tokens kann ein Mitspieler per „Chronohit!“-Ruf Einspruch erheben und die Karte an eine andere Stelle setzen.",
-    blitz:"Tipp: Entscheide schnell. Falsche Karten kosten keine Zeit, aber jede Sekunde zählt.", endless:"Tipp: Wähle sicher. Dein Highscore wird nach der Runde gespeichert (hier im Tutorial nicht).", sudden:"Tipp: Lieber einmal länger überlegen, ein Fehler beendet alles." }[k];
+    blitz:"Tipp: Entscheide schnell. Falsche Karten kosten keine Zeit, aber jede Sekunde zählt.", endless:"Tipp: Wähle sicher. Dein Highscore wird nach der Runde gespeichert (hier im Tutorial nicht).", sudden:"Tipp: Lieber einmal länger überlegen, ein Fehler beendet alles.", handicap:"Spieler 2 spielt auf Experte: Titel, Interpret und Jahr müssen mit geraten werden, dafür zählen seine richtigen Karten doppelt. Profi zählt ×1,5." }[k];
   const L = [
     ["intro", ph === "draw", ".vinyl-wrap", intro + " Klicke auf die Schallplatte, um den Song abzuspielen."],
     ["place", ph === "placing", "#tutgap", tutPlaceText()],
@@ -4650,7 +4744,7 @@ function tutBubble(){
   } else { b.style.left = "50%"; b.style.bottom = "16px"; b.style.transform = "translateX(-50%)"; }
   if(el) b.style.transform = "none";
 }
-{ const r0 = render; render = function(){ if(state.screen === "online") state.screen = "play"; r0(); try{ topBackBar(); }catch(e){} try{ srPass(); }catch(e){} try{ chatUi(); }catch(e){} try{ vcUi(); }catch(e){} try{ tutBubble(); }catch(e){} }; }
+{ const r0 = render; render = function(){ if(state.screen === "online") state.screen = "play"; r0(); try{ topBackBar(); }catch(e){} try{ avEnsure(); }catch(e){} try{ srPass(); }catch(e){} try{ chatUi(); }catch(e){} try{ vcUi(); }catch(e){} try{ tutBubble(); }catch(e){} }; }
 function renderTutorial(){
   if(state.tutRules) return renderTutorialRules();
   app.innerHTML = `
@@ -4787,6 +4881,17 @@ function wizardMovePlayer(i, dir){
     [w.playerIds[i], w.playerIds[j]] = [w.playerIds[j], w.playerIds[i]];
     render();
   });
+}
+function kindOptions(w){
+  const cur = w.game && w.game !== "classic" ? w.game : (w.variant || "classic");
+  const L = w.mode === "multiplayer" ? [["classic", "Klassisch"], ["year", "Jahr-Schätzen"], ["artist", "Interpret-Quiz"]]
+    : [["classic", "Klassisch"], ["endless", "Endlos"], ...(w.online ? [] : [["blitz", "Blitz"]]), ["sudden", "Sudden Death"], ["artist", "Interpret-Quiz"]];
+  return L.map(([k, l]) => `<option value="${k}" ${cur === k ? "selected" : ""}>${l}</option>`).join("");
+}
+function wizardSetKind(v){
+  const w = state.wizard;
+  if(v === "year" || v === "artist"){ w.game = v; w.variant = "classic"; render(); }
+  else { w.game = "classic"; wizardSetVariant(v); }
 }
 function wizardSetGame(v){ state.wizard.game = v; render(); }
 function wizardSetMode(v){ state.wizard.mode = v; if(v !== "solo") state.wizard.variant = "classic"; if(v === "coop" || (v !== "multiplayer" && state.wizard.game === "year")) state.wizard.game = "classic"; render(); }
@@ -4967,21 +5072,14 @@ function renderWizardStep2(){
             <option value="multiplayer" ${w.mode==='multiplayer'?'selected':''}>Mehrspieler</option>
             <option value="coop" ${w.mode==='coop'?'selected':''}>Koop</option>
           </select>`)}
-        ${(w.mode === 'solo' || w.mode === 'multiplayer') ? infoRow('w-game', 'Spielart',
-          '<strong>Klassisch</strong>: Zeitleiste.<br><strong>Jahr-Schätzen</strong> (Mehrspieler): alle tippen zum selben Song ein Jahr, die kleinste Abweichung gewinnt. Punkte: 3 / 2 / 1 für die drei Besten, Volltreffer +2.<br><strong>Interpret-Quiz</strong>: nur den Interpreten raten, Freitext oder 4 Auswahlmöglichkeiten. Solo, reihum oder online.',
-          `<select class="dropdown" onchange="wizardSetGame(this.value)">
-            <option value="classic" ${(w.game || 'classic') === 'classic' ? 'selected' : ''}>Klassisch</option>
-            ${w.mode === 'multiplayer' ? `<option value="year" ${w.game === 'year' ? 'selected' : ''}>Jahr-Schätzen</option>` : ''}
-            <option value="artist" ${w.game === 'artist' ? 'selected' : ''}>Interpret-Quiz</option>
-          </select>`) + ((w.game && w.game !== 'classic') ? infoRow('w-rounds', 'Runden', 'Wie viele Songs gespielt werden (3 bis 30).',
+        ${(w.mode === 'solo' || w.mode === 'multiplayer') ? infoRow('w-variant', 'Spielvariante',
+          '<strong>Klassisch</strong>: bis zum Ziel.<br><strong>Endlos</strong>: ohne Ziel, eine einstellbare Zahl Fehler beendet die Runde, es zählt der Highscore.<br><strong>Blitz</strong> (nur offline): x Sekunden, so viele richtige Karten wie möglich.<br><strong>Sudden Death</strong>: ein Fehler und du bist raus.<br><strong>Jahr-Schätzen</strong> (Mehrspieler): alle tippen zum selben Song ein Jahr, die kleinste Abweichung gewinnt (3 / 2 / 1 Punkte, Volltreffer +2).<br><strong>Interpret-Quiz</strong>: nur den Interpreten raten, per Freitext oder mit 4 Auswahlmöglichkeiten.',
+          `<select class="dropdown" onchange="wizardSetKind(this.value)">${kindOptions(w)}</select>`)
+          + ((w.game && w.game !== 'classic') ? infoRow('w-rounds', 'Runden', 'Wie viele Songs gespielt werden (3 bis 30).',
           `<input type="number" class="pl-search" style="flex:none;width:90px;" min="3" max="30" value="${w.rounds || 10}" onchange="state.wizard.rounds = Math.max(3, Math.min(30, parseInt(this.value, 10) || 10)); render()">`) : '')
-          + (w.game === 'artist' ? infoRow('w-answer', 'Antwortart', 'Freitext (mit Toleranz bei Schreibweise) oder vier Auswahlmöglichkeiten.',
-          `<select class="dropdown" onchange="state.wizard.answerMode = this.value; render()"><option value="text" ${w.answerMode !== 'choice' ? 'selected' : ''}>Freitext</option><option value="choice" ${w.answerMode === 'choice' ? 'selected' : ''}>4 Auswahlmöglichkeiten</option></select>`) : '') : ''}
-        ${w.mode === 'solo' && !w.online && (w.game || 'classic') === 'classic' ? infoRow('w-variant', 'Spielvariante',
-          '<strong>Klassisch</strong>: bis zum Ziel.<br><strong>Endlos</strong>: ohne Ziel, eine einstellbare Zahl Fehler (Leben, Standard 3) beendet die Runde, es zählt der Highscore.<br><strong>Blitz</strong>: x Sekunden, so viele richtige Karten wie möglich; nur Position/Jahr, kein Titel/Interpret, keine Tokens, automatisches Aufdecken und Weiter.<br><strong>Sudden Death</strong>: ein Fehler und du bist raus.',
-          `<select class="dropdown" onchange="wizardSetVariant(this.value)">
-            ${Object.entries(VARIANTS).map(([k, v]) => `<option value="${k}" ${(w.variant || 'classic') === k ? 'selected' : ''}>${v}</option>`).join('')}
-          </select>`) + (w.variant === 'blitz' ? infoRow('w-blitz', 'Blitz-Dauer', 'Gesamtzeit der Runde. Sie startet, sobald die erste Karte abgespielt wird.',
+          + (w.game === 'artist' ? infoRow('w-answer', 'Antwortart', 'Freitext (mit Toleranz bei der Schreibweise) oder vier Auswahlmöglichkeiten.',
+          `<select class="dropdown" onchange="state.wizard.answerMode = this.value; render()"><option value="text" ${w.answerMode !== 'choice' ? 'selected' : ''}>Freitext</option><option value="choice" ${w.answerMode === 'choice' ? 'selected' : ''}>4 Auswahlmöglichkeiten</option></select>`) : '')
+          + (w.mode === 'solo' && w.variant === 'blitz' && (!w.game || w.game === 'classic') ? infoRow('w-blitz', 'Blitz-Dauer', 'Gesamtzeit der Runde. Sie startet, sobald die erste Karte abgespielt wird.',
           `<select class="dropdown" onchange="state.wizard.blitzSec=+this.value">${[30, 60, 90, 120, 180].map(x => `<option value="${x}" ${(w.blitzSec || 60) === x ? 'selected' : ''}>${x} Sekunden</option>`).join('')}</select>`) : '') : ''}
         ${((w.mode === 'solo' && w.variant === 'blitz') || (w.game && w.game !== 'classic')) ? '' : infoRow('w-difficulty', 'Schwierigkeit',
           '<strong>Normal</strong>: Nur die Position auf der Zeitleiste zählt.<br><strong>Profi</strong>: Titel &amp; Interpret müssen zusätzlich stimmen.<br><strong>Experte</strong>: zusätzlich auch das exakte Erscheinungsjahr.',
@@ -5804,24 +5902,33 @@ function renderDeleteOnFinishModal(){
 }
 
 function updateDocumentTitle(){
-  const map = {
-    splash: "Chronohit",
-    loading: "Lädt... - Chronohit",
-    menu: "Hauptmenü - Chronohit",
-    loadgame: "Spielstände - Chronohit",
-    tutorial: "Tutorial - Chronohit",
-    settings: "Einstellungen - Chronohit",
-    stats: "Statistiken - Chronohit",
-    online: "Online spielen - Chronohit",
-    join: "Spiel beitreten - Chronohit",
-    lobby: "Lobby - Chronohit",
-    resume: "Online-Spiel fortsetzen - Chronohit",
-    create: "Spiel erstellen - Chronohit",
-    game: `${state.activeSaveName ? state.activeSaveName : "Unbenannt"} - Chronohit`,
-    end: `${isMultiRound() ? "Spielende" : (state.won ? "Gewonnen" : "Verloren")} - Chronohit`,
-    timeline: "Zeitleiste - Chronohit"
-  };
-  document.title = map[state.screen] || "Chronohit";
+  const sc = state.screen, B = " – Chronohit", st = state.settings || {};
+  const kindName = state.qg ? (state.qg.kind === "year" ? "Jahr-Schätzen" : "Interpret-Quiz") : "";
+  const subs = { language:"Sprache", themes:"Themes", display:"Darstellung", save:"Speichern", play:"Spielen", sound:"Sound", profile:"Profilbild", diag:"Verbindungsdiagnose", experimental:"Experimentelles" };
+  let t = "Chronohit";
+  if(sc === "game"){
+    if(state.qg) t = kindName + " · Runde " + state.qg.round + "/" + state.qg.total + B;
+    else if(state.tutorial) t = "Tutorial" + B;
+    else if(state.daily) t = "Tägliche Challenge" + B;
+    else if(state.learn) t = "Lernrunde" + B;
+    else if(state.activeSaveName) t = state.activeSaveName + B;
+    else t = modeLabel(st.mode) + (st.variant ? " · " + variantLabel(st.variant) : "") + B;
+  } else if(sc === "end"){
+    const n = state.correctCount || 0;
+    if(state.qg) t = kindName + " · Ergebnis" + B;
+    else if(state.daily) t = dailyTitle(n) + " " + n + "/10 · Daily" + B;
+    else if(state.learn) t = dailyTitle(n) + " " + n + "/10 · Lernrunde" + B;
+    else if(isMultiRound()) t = "Spielende" + B;
+    else if(st.variant) t = endTitle() + " " + n + " Karten" + B;
+    else t = (state.won ? "Gewonnen" : "Verloren") + " · " + n + " Karten" + B;
+  } else {
+    const map = { splash:"Chronohit", loading:"Lädt …" + B, menu:"Hauptmenü" + B, play:"Spielen" + B, quickplay:"Quickplay" + B, loadgame:"Spielstände" + B,
+      tutorial:(state.tutRules ? "Regeln" : "Tutorial") + B, settings:(state.settingsSub && subs[state.settingsSub] ? subs[state.settingsSub] : "Einstellungen") + B, stats:"Statistiken" + B, recap:"Jahresrückblick" + B,
+      online:"Online spielen" + B, join:"Spiel beitreten" + B, lobby:"Lobby" + B, resume:"Online-Spiel fortsetzen" + B,
+      create:(state.wizard && state.wizard.quick != null ? "Quickplay einrichten" : "Spiel erstellen") + B, playlist:"Playlist" + B, timeline:"Finale Zeitleiste" + B };
+    t = map[sc] || "Chronohit";
+  }
+  document.title = t;
 }
 
 function render(){
@@ -7229,7 +7336,7 @@ document.addEventListener("keydown", e => { if(e.key === "Escape") cancelResetSt
    (Spotify-Player) nicht übertönt wird. Je Stil ein eigenes Klang-Paket (Wellenform, Tonhöhe,
    Ausklang). Audio startet erst nach einer Nutzer-Interaktion (Browser-Vorgabe). */
 const SFX_MASTER_MAX = 0.44; // Regler 100 %; Standard 50 % entspricht dem bisherigen Pegel
-function sfxMaster(){ return SFX_MASTER_MAX * Math.max(0, Math.min(1, prefs.soundVolume)); }
+function sfxMaster(){ return SFX_MASTER_MAX * Math.max(0, Math.min(1, prefs.soundVolume)) * (window.__sfxBoost || 1); }
 const SFX_PACKS = {
   standard: { wave:"sine",   pitch:1,    decay:1,   vol:1,    shimmer:false, clicky:true },
   modern:   { wave:"square", pitch:1.25, decay:.7,  vol:.5,   shimmer:false },
@@ -7381,6 +7488,7 @@ function sfx(name, delay, arg, force){
   if(name !== "click" || force) sfxSpecificAt = Date.now();
   const pk = (prefs.soundDesign && prefs.soundDesign !== "theme" && SFX_PACKS[prefs.soundDesign]) ? prefs.soundDesign : SFX_PACKS[currentTheme] ? currentTheme : SFX_PACKS[currentDesign()] ? currentDesign() : "standard";
   const pack = SFX_PACKS[pk];
+  window.__sfxBoost = (name === "win" || name === "lose") ? 1.8 : 1;
   const seq = SFX_SEQ[pk] && SFX_SEQ[pk][name];
   if(seq){ try{ const t1 = ctx.currentTime + 0.01 + (delay || 0); seq.forEach(n => sfxTone(ctx, pack, t1 + n[1], n[0], n[2], n[3] || .7, n[4] ? { fixed:true, slideTo:n[4] } : { fixed:true })); }catch(e){} }
   else try{ fn(ctx, pack, ctx.currentTime + 0.01 + (delay || 0), arg); }catch(e){}
@@ -8111,6 +8219,7 @@ async function netHostHandle(entry, d){
     case "rmvote": netHostRmVote(entry, d); break;
     case "vjoin": case "vleave": netHostVoice(entry, d); break;
     case "chat": netHostChat(entry, d); break;
+    case "ava": netHostAvatar(entry, d); break;
     case "diff": netHostDiff(entry, d); break;
     case "qg": netHostQg(entry, d); break;
     case "bye": try{ entry.conn.close(); }catch(e){} break;
@@ -8421,6 +8530,7 @@ function netGuestConnect(first){
         case "react": { if(NET_REACTS.includes(d.e)) showReaction(netCleanName(d.n) || "?", d.e); break; }
         case "state": netGuestApplyState(d); break;
         case "vlist": VC.ids = (Array.isArray(d.ids) ? d.ids : []).filter(x => VC_ID.test(String(x))).slice(0, 100); vcSync(); break;
+        case "avatars": NET.avatars = avCleanMap(d.m); netUiUpdate(); break;
         case "chatmsg": chatShow(String(d.n || "").slice(0, 20), d.i); break;
         case "rmreq": if(!NET.spec && !netMyTurnGuard()){ NET.rmAsk = true; NET.rmMine = ""; render(); } break;
         case "rmend": NET.rmAsk = false; NET.rmMine = ""; if(d.msg) toast(String(d.msg).slice(0, 120)); render(); break;
@@ -8534,6 +8644,9 @@ async function netHostFromWizard(){
   };
   if(w.mode === "multiplayer") settings.events = w.events === true;
   if(w.mode === "multiplayer" && w.teams) settings.teams = w.teams;
+  if(w.mode === "solo" && (!w.game || w.game === "classic") && (w.variant === "endless" || w.variant === "sudden")){
+    settings.variant = w.variant; if(w.variant === "endless"){ settings.lives = Math.max(1, Math.min(SONGS.length - 1, w.lives || 3)); settings.target = 9999; } else settings.lives = 1;
+  }
   applyGameKind(settings, w);
   const room = (w.name || "").trim(), hostName = netCleanName(w.hostName), pw = w.password;
   try{ localStorage.setItem("chronohit_netname", hostName); }catch(e){}
@@ -8606,7 +8719,7 @@ function renderLobby(){
   const nSeats = seats.length, st = info.ordered && nSeats ? (info.start || 0) % nSeats : 0;
   const rows = seats.map((_, k) => (k + st) % nSeats).map((i, k) => { const x = seats[i]; return `
     <div class="lobby-row">
-      <span class="net-dot ${x.connected ? '' : 'off'}"></span>
+      ${avatarHtml(x)}
       <span class="lobby-name">${info.ordered ? '<b>' + (k + 1) + '.</b> ' : ''}${esc(x.name)}${i === 0 ? ' <small>(Host)</small>' : ''}${netSameName(x.name, NET.myName) ? ' <small>(du)</small>' : ''}</span>
       ${info.handicap && !info.resume ? lobbyDiffHtml(host, i, x) : ``}
       ${info.teams && !info.resume ? lobbyTeamHtml(host, i, x, info.teams) : ``}
