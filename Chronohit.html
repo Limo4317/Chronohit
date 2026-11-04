@@ -1306,6 +1306,23 @@
   .theme-swatch[data-theme-preview="gameboy"] .theme-dots span:nth-child(1){ background:#0f380f; }
   .theme-swatch[data-theme-preview="gameboy"] .theme-dots span:nth-child(2){ background:#306230; }
   .theme-swatch[data-theme-preview="gameboy"] .theme-dots span:nth-child(3){ background:#8bac0f; }
+  @font-face{ font-family:"MinecraftLocal"; font-display:swap; src:local("Minecraft"), local("Minecraft Regular"), local("Minecraft Ten"), local("Minecraftia"), url("Minecraft.ttf") format("truetype"), url("minecraft.ttf") format("truetype"), url("fonts/Minecraft.ttf") format("truetype"); }
+  :root[data-theme="minecraft"]{
+    --bg:#4a3a2a; --bg-2:#3a2d20; --bg-highlight:#5b4733; --panel:#8b8b8b; --panel-2:#a0a0a0;
+    --text:#ffffff; --muted:#e0e0e0; --accent:#5fa83a; --accent-ink:#ffffff;
+    --correct:#55d14b; --wrong:#e04b3a; --line:#373737; --card-face:#c6c6c6; --ink:#1e1e1e;
+    --heading-font:'MinecraftLocal','Pixelify Sans',monospace; --body-font:'MinecraftLocal','Pixelify Sans',monospace; --radius:0px;
+    --body-bg-image: repeating-linear-gradient(0deg, rgba(0,0,0,.10) 0 8px, transparent 8px 16px), repeating-linear-gradient(90deg, rgba(0,0,0,.10) 0 8px, transparent 8px 16px);
+  }
+  :root[data-design="minecraft"] *{ border-radius:0 !important; }
+  :root[data-design="minecraft"] :is(h1,h2,h3,.btn-primary,.btn-ghost,.mark){ text-shadow:2px 2px 0 #3f3f3f; }
+  :root[data-design="minecraft"] :is(.card,.menu-card,.modal-box,.stat,.guess-box,.theme-swatch,.save-slot,.qp-row,#tut-bubble,.event-notice){ border:4px solid; border-color:#d0d0d0 #373737 #373737 #d0d0d0; box-shadow:inset 0 0 0 2px rgba(0,0,0,.12); }
+  :root[data-design="minecraft"] .btn-primary{ background:#5fa83a; color:#fff; border:4px solid; border-color:#8fd16a #2f5a1a #2f5a1a #8fd16a; }
+  :root[data-design="minecraft"] .btn-ghost{ background:#7d7d7d; color:#fff; border:4px solid; border-color:#c6c6c6 #373737 #373737 #c6c6c6; }
+  :root[data-design="minecraft"] :is(.btn-primary,.btn-ghost):hover{ filter:brightness(1.12); }
+  .theme-swatch[data-theme-preview="minecraft"] .theme-dots span:nth-child(1){ background:#4a3a2a; }
+  .theme-swatch[data-theme-preview="minecraft"] .theme-dots span:nth-child(2){ background:#8b8b8b; }
+  .theme-swatch[data-theme-preview="minecraft"] .theme-dots span:nth-child(3){ background:#5fa83a; }
   :root[data-theme="ostern"]{ --bg:#fbf7e6; --bg-2:#f3edd0; --bg-highlight:#fffdf2; --panel:#eaf4d7; --panel-2:#dff0c6; --text:#2f3a22; --muted:#6f7d56; --accent:#8e5bd1; --accent-ink:#ffffff; --correct:#2f8a4f; --wrong:#d0463a; --line:#c9dcaa; --card-face:#fffef7; --ink:#2f3a22; --body-bg-image: radial-gradient(700px 400px at 90% 0%, rgba(142,91,209,.14), transparent 60%), radial-gradient(600px 400px at 0% 100%, rgba(255,214,90,.25), transparent 60%); }
   :root[data-theme="valentin"]{ --bg:#2a0d1c; --bg-2:#1d0712; --bg-highlight:#3d1429; --panel:#3a1226; --panel-2:#4a1832; --text:#ffe8ef; --muted:#d79ab0; --accent:#ff5c8a; --accent-ink:#2a0d1c; --correct:#8fe0a8; --wrong:#ff8a7a; --line:#6b2845; --card-face:#fff0f4; --ink:#3a1226; --body-bg-image: radial-gradient(700px 420px at 85% 0%, rgba(255,92,138,.2), transparent 60%); }
   :root[data-theme="silvester"]{ --bg:#0a0c1f; --bg-2:#05061a; --bg-highlight:#171a3a; --panel:#131632; --panel-2:#1c2045; --text:#f4f1ff; --muted:#9aa0d0; --accent:#ffd24a; --accent-ink:#14122a; --correct:#5ee6a8; --wrong:#ff6b7d; --line:#2d3270; --card-face:#f4f1ff; --ink:#14122a; --body-bg-image: radial-gradient(600px 380px at 20% 0%, rgba(255,210,74,.14), transparent 60%), radial-gradient(600px 380px at 85% 10%, rgba(120,90,255,.2), transparent 60%); }
@@ -1385,6 +1402,17 @@
   .daily-pop{ position:fixed; top:12px; right:12px; z-index:40; padding:6px 12px; border-radius:99px; border:2px solid var(--accent); background:var(--panel); color:var(--text); font:inherit; font-size:.85em; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.3); animation:dailyWob 1.8s ease-in-out infinite; }
   @keyframes dailyWob{ 0%,100%{ transform:rotate(-2.5deg) translateX(-1px); } 50%{ transform:rotate(2.5deg) translateX(1px); } }
   html.reduce-motion .daily-pop{ animation:none; }
+  html.cb-tritan{ --correct:#1fbf8f !important; --wrong:#d6336c !important; }
+  html.cb-mono{ --correct:#f2f2f2 !important; --wrong:#2b2b2b !important; filter:grayscale(1); }
+  html.cb-mono .card .tag.bad, html.cb-mono .feedback.bad{ color:#fff !important; }
+  html.lefty .daily-pop{ right:auto; left:12px; }
+  html.lefty #vc-ui, html.lefty #chat-ui, html.lefty #chat-log{ left:auto; right:12px; }
+  html.lefty .menu-split, html.lefty .qp-row{ flex-direction:row-reverse; }
+  #chat-ui{ position:fixed; left:12px; bottom:56px; z-index:45; }
+  #chat-log{ position:fixed; left:12px; bottom:104px; z-index:44; display:flex; flex-direction:column; align-items:flex-start; pointer-events:none; }
+  .chat-msg{ background:var(--panel); color:var(--text); border:1px solid var(--accent); border-radius:12px; padding:6px 10px; margin-top:4px; max-width:260px; font-size:.9em; box-shadow:0 4px 12px rgba(0,0,0,.3); }
+  .chat-panel{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:8px; margin-bottom:6px; max-height:50vh; overflow:auto; display:flex; flex-direction:column; gap:4px; max-width:280px; }
+  .chat-panel button{ text-align:left; }
   .qp-row{ display:flex; align-items:center; gap:10px; width:100%; box-sizing:border-box; padding:8px 10px; border:1px solid var(--line); border-radius:var(--radius,12px); background:var(--panel-2); }
   .qp-host{ display:flex; align-items:center; gap:6px; font-size:.85em; cursor:pointer; white-space:nowrap; flex:0 0 auto; }
   .qp-host input{ width:18px; height:18px; accent-color:var(--accent); margin:0; }
@@ -1532,7 +1560,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
    s=Genres (mehrere möglich, ein Treffer reicht), c=Kategorien (optional, mehrere möglich).
    Jahrzehnte werden automatisch aus dem Jahr abgeleitet. */
 const SONGS_RAW = [
-  {t:"Waka Waka (This Time for Africa)", a:"Shakira", y:2010, g:"es", id:"63Tl9k1sH8tznn3bqoMuyF", s:["pop", "latin"], c:["sport"]},
+  {t:"Waka Waka (This Time for Africa)", a:"Shakira", y:2010, g:"en", id:"63Tl9k1sH8tznn3bqoMuyF", s:["pop", "latin"], c:["sport"]},
   {t:"Bailando", a:"Enrique Iglesias", y:2014, g:"es", id:"2r8wxDebKM8uuDsLUklMEx", s:["pop", "latin"]},
   {t:"Sofia", a:"Alvaro Soler", y:2015, g:"es", id:"5vj59ONIVbyhcrI8ZSwoRo", s:["pop", "latin"]},
   {t:"Calma", a:"Pedro Capó ft. Farruko", y:2018, g:"es", id:"6aLJnupvPpT9HLv3xaUhe1", s:["latin", "pop"]},
@@ -1542,7 +1570,7 @@ const SONGS_RAW = [
   {t:"Clandestino", a:"Manu Chao", y:1998, g:"es", id:"51R2M1JgyFfRS3e6v5wCt3", s:["latin", "indie"]},
   {t:"Hero", a:"Enrique Iglesias", y:2001, g:"es", id:"1PAgmT6YqGhd6zT9kN9gIo", s:["pop", "latin"], c:["ballad"]},
   {t:"La Camisa Negra", a:"Juanes", y:2004, g:"es", id:"2ZmCYW6bxYtvkthFexIFXL", s:["latin", "rock"]},
-  {t:"Hips Don't Lie", a:"Shakira ft. Wyclef Jean", y:2006, g:"es", id:"3d0WouFnFmr0K3kjeza3fF", s:["pop", "latin"]},
+  {t:"Hips Don't Lie", a:"Shakira ft. Wyclef Jean", y:2006, g:["en", "es"], id:"3d0WouFnFmr0K3kjeza3fF", s:["pop", "latin"]},
   {t:"Mi Gente", a:"J Balvin ft. Willy William", y:2017, g:"es", id:"5r6X3m7zrVHmU2lSp3DXmP", s:["latin", "dance"]},
   {t:"Malamente", a:"Rosalía", y:2018, g:"es", id:"1B0BQaSRHxhI0AUlItY3LK", s:["latin", "pop"]},
   {t:"Taki Taki", a:"DJ Snake ft. Selena Gomez, Ozuna & Cardi B", y:2018, g:"es", id:"0KoiMHhqKLoL4xM54rcWYY", s:["latin", "dance"]},
@@ -1735,7 +1763,7 @@ const SONGS_RAW = [
   {t:"Night Fever", a:"Bee Gees", y:1977, g:"en", id:"4t2euPkyLUs5n5j1HDZ2Tr", s:["funk"], c:["film"]},
   {t:"Glow", a:"Madcon", y:2010, g:"en", id:"4icNLSquKZp6e0iEkBn9RP", s:["hiphop", "pop"]},
   {t:"Voulez-Vous", a:"Cast of Mamma Mia!", y:2008, g:"en", id:"4UeDMzA4XjmRpl1RHogDzx", s:["funk", "pop"], c:["film"]},
-  {t:"Hips Don't Lie", a:"Shakira, Wyclef Jean", y:2005, g:"en", id:"3ZFTkvIE7kyPt6Nu3PEa7V", s:["pop", "latin"]},
+  {t:"Hips Don't Lie", a:"Shakira, Wyclef Jean", y:2005, g:["en", "es"], id:"3ZFTkvIE7kyPt6Nu3PEa7V", s:["pop", "latin"]},
   {t:"Only Girl (In The World)", a:"Rihanna", y:2010, g:"en", id:"0AH6WMe3OlAlUb5miXt2FQ", s:["pop", "dance"]},
   {t:"Another Brick In The Wall, Pt. 2", a:"Pink Floyd", y:1979, g:"en", id:"7rPzEczIS574IgPaiPieS3", s:["rock"]},
   {t:"Rocket Man (I Think It's Going To Be A Long, Long Time)", a:"Elton John", y:1972, g:"en", id:"3gdewACMIVMEWVbyb8O9sY", s:["rock", "pop"]},
@@ -2430,9 +2458,9 @@ function normText(s){
     .toLowerCase()
     .replace(/ß/g,"ss")
     .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
-    .replace(/&/g," und ")
+    .replace(/[&+]/g," ")
     .replace(/[^a-z0-9]+/g," ")
-    .replace(/\b(feat|ft|featuring|the|der|die|das|el|la|los)\b/g," ")
+    .replace(/\b(feat|ft|featuring|with|vs|and|und|et|y|n|x|the|der|die|das|el|la|los)\b/g," ")
     .replace(/ae/g,"a").replace(/oe/g,"o").replace(/ue/g,"u")
     .replace(/\s+/g," ")
     .trim();
@@ -2554,7 +2582,7 @@ function buildLibraryStats(){
   const decades = [...new Set(SONGS.map(s => decadeOf(s.y)))].sort((a, b) => a - b)
     .map(d => ({ key:String(d), label:decadeLabel(d), count: SONGS.filter(s => decadeOf(s.y) === d).length }));
   return {
-    langs:   count(LANG_DEFS,  s => [s.g]),
+    langs:   count(LANG_DEFS,  s => songLangs(s)),
     styles:  count(STYLE_DEFS, s => s.s || []),
     themes:  count(THEME_DEFS, s => songThemes(s)),
     decades
@@ -2564,7 +2592,7 @@ const LIB = buildLibraryStats();
 
 // f: { genres:{de:true,...} (Sprachen), styles|decades|themes: Array oder null = alle }
 function songMatches(song, f){
-  if(f.genres && !f.genres[song.g]) return false;
+  if(f.genres && !songLangs(song).some(l => f.genres[l])) return false;
   if(f.styles && !(song.s || []).some(k => f.styles.includes(k))) return false;
   if(f.decades && !f.decades.map(Number).includes(decadeOf(song.y))) return false;
   if(f.themes && !songThemes(song).some(k => f.themes.includes(k))) return false;
@@ -2799,7 +2827,24 @@ function reshuffleIfNeeded(){
   // die Niederlage (leerer Stapel) ist so gut wie unerreichbar.
 }
 
+const HC_MULT = { normal:1, pro:1.5, expert:2 };
+function handicapScore(p){ return p.correctCount * (HC_MULT[p.diff || "normal"] || 1); }
+function applyHandicap(){
+  const st = state.settings; if(!st || !st.handicap || !state.players || !state.players[state.currentPlayer]) return;
+  st.difficulty = state.players[state.currentPlayer].diff || "normal";
+}
+function hcApplyLocal(w){
+  const map = {}; (w.playerNames || []).forEach((n, i) => { map[(n || "").trim() || "Spieler " + (i + 1)] = (w.playerDiff || [])[i] || "normal"; });
+  state.players.forEach(p => { p.diff = map[p.name] || "normal"; }); applyHandicap();
+}
+function hcApplyNet(){ state.players.forEach((p, i) => { const q = NET.seats[i]; p.diff = (q && q.diff) || "normal"; }); applyHandicap(); }
+function hcEndHtml(){
+  if(!state.settings.handicap || !state.players) return "";
+  const L = { normal:"Normal", pro:"Profi ×1,5", expert:"Experte ×2" };
+  return `<div style="width:100%;text-align:left;margin:6px 0;"><b>Handicap-Wertung</b>${state.players.slice().sort((a, b) => handicapScore(b) - handicapScore(a)).map(p => `<div>${esc(p.name)}: ${p.correctCount} Karten (${L[p.diff || "normal"]}) = <b>${handicapScore(p)}</b> Punkte</div>`).join("")}</div>`;
+}
 function drawNext(){
+  applyHandicap();
   pauseSpotifyPlayback();
   state.skippedInfo = null;
   if(state.settings.mode === "coop" && state.tokens <= 0){
@@ -3187,6 +3232,11 @@ function nextTurn(){
 }
 
 function checkWin(){
+  if(state.settings.handicap && isMulti()){
+    syncActiveToPlayer();
+    if(state.players.some(p => handicapScore(p) >= state.settings.target)){ pauseSpotifyPlayback(); state.won = true; finalizeMultiplayer(); state.screen = "end"; render(); saveState(); return true; }
+    return false;
+  }
   // Die Startkarte zählt nicht mit: bei Ziel 10 müssen 10 Karten
   // wirklich richtig platziert worden sein.
   if(state.correctCount >= state.settings.target || (isMulti() && state.players.some((p, i) => i !== state.currentPlayer && p.correctCount >= state.settings.target))){
@@ -3468,6 +3518,7 @@ const THEME_INFO = [
   { key:"herbst", label:"Herbst", desc:"Warmes Braun mit Laubfarben. Automatisch im September, Oktober und November.", season:true },
   { key:"winter", label:"Winter", desc:"Eisiges Hellblau mit Schnee-Punkten. Automatisch im Dezember, Januar und Februar.", season:true },
   { key:"gameboy", label:"Gameboy", desc:"Genau vier Grüntöne wie auf dem Original-LCD, Pixelschrift, harte Schatten und feine Rasterlinien." },
+  { key:"minecraft", label:"Pixel-Blöcke", desc:"Klötzchen-Look wie in einem Bauspiel: Erde, Stein und Gras, eckige Rahmen mit Kanten, Pixel-Emojis und Pixelschrift. Für die Original-Schrift: Minecraft.ttf auf dem Gerät installieren oder neben die HTML-Datei legen." },
   { key:"notizbuch", label:"Notizbuch", desc:"Skizzenstil: Karopapier-Linien mit rotem Rand, Handschrift und leicht schiefen, gezeichneten Rahmen." },
   { key:"ostern", label:"Ostern", desc:"Pastellfarben mit Tulpen, Küken und Ostereiern. Automatisch von Palmsonntag bis Ostermontag.", season:true },
   { key:"valentin", label:"Valentinstag", desc:"Dunkles Rosé mit aufsteigenden Herzen. Automatisch vom 12. bis 14.2.", season:true },
@@ -3507,11 +3558,34 @@ function themeGroupsHtml(){
   const custom = by("custom");
   return `<div class="theme-list">${rest.map(themeSwatchHtml).join("")}</div>${grp("🌱 Jahreszeiten", THEME_SEASONS)}${grp("🎉 Feiertage", THEME_HOLIDAYS)}${custom ? `<div class="theme-list" style="margin-top:10px;">${themeSwatchHtml(custom)}</div>` : ""}`;
 }
-const SETTINGS_SUBS = [["language","🌐 Sprache"],["themes","🎨 Themes"],["display","👁️ Darstellung & Barrierefreiheit"],["save","💾 Speichern"],["play","🎮 Spielen"],["sound","🔊 Sound"],["experimental","🧪 Experimentelles"]];
+const SETTINGS_SUBS = [["language","🌐 Sprache"],["themes","🎨 Themes"],["display","👁️ Darstellung & Barrierefreiheit"],["save","💾 Speichern"],["play","🎮 Spielen"],["sound","🔊 Sound"],["diag","🔧 Verbindungsdiagnose"],["experimental","🧪 Experimentelles"]];
+function renderAutoThemeCard(){
+  const m = prefs.autoTheme || "off", opts = THEME_INFO.map(t => t.key).filter(k => k !== "custom");
+  const sel = (key, def) => `<select class="dropdown" onchange="setAutoTheme('${key}', this.value)">${opts.map(k => `<option value="${k}" ${(prefs[key] || def) === k ? "selected" : ""}>${(THEME_INFO.find(t => t.key === k) || {}).label || k}</option>`).join("")}</select>`;
+  return `<div class="menu-card"><h3>Automatisch hell/dunkel</h3>
+    <div class="setting-row"><div><div class="label">Umschalten</div><div class="hint">Wechselt zwischen deinem hellen und deinem dunklen Theme. „Nach System“ folgt der Einstellung von Windows, Android oder iOS, „Nach Uhrzeit“ nutzt hell von 7 bis 19 Uhr. Standard: aus.</div></div>
+      <select class="dropdown" onchange="setAutoTheme('autoTheme', this.value)">${[["off", "Aus"], ["system", "Nach System"], ["time", "Nach Uhrzeit"]].map(x => `<option value="${x[0]}" ${m === x[0] ? "selected" : ""}>${x[1]}</option>`).join("")}</select></div>
+    ${m !== "off" ? `<div class="setting-row"><div><div class="label">Helles Theme</div></div>${sel("autoLight", "notizbuch")}</div><div class="setting-row"><div><div class="label">Dunkles Theme</div></div>${sel("autoDark", "modern")}</div>` : ``}
+  </div>`;
+}
+function setAutoTheme(k, v){ prefs[k] = v; savePrefs(); if(k === "autoTheme" && v === "off"){ try{ applySeasonOrSaved(); }catch(e){} } else autoThemeCheck(); render(); }
+function autoThemeCheck(){
+  if(!prefs.autoTheme || prefs.autoTheme === "off") return;
+  if((THEME_SEASONS.includes(currentTheme) || THEME_HOLIDAYS.includes(currentTheme)) && prefs.seasonal && prefs.seasonal !== "off") return;
+  const h = new Date().getHours(), dark = prefs.autoTheme === "system" ? !!(window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches) : !(h >= 7 && h < 19);
+  const want = dark ? (prefs.autoDark || "modern") : (prefs.autoLight || "notizbuch");
+  if(want !== currentTheme && THEME_INFO.some(t => t.key === want)){ applyTheme(want, true); if(typeof render === "function" && state && state.screen) render(); }
+}
 function renderExperimentalCard(){
   return `<div class="menu-card"><h3>Experimentelles</h3>
     <div class="setting-row"><div><div class="label">Mehrspieler bis zu 100 Leute</div><div class="hint">Erhöht die Spielerzahl von 10 auf 100: im lokalen Mehrspieler-Spiel und in Online-Räumen, die du hostest. Bei vielen Spielern kann das Spiel je nach Gerät und Verbindung des Hosts langsam werden. Standard: aus.</div></div>${prefSwitchHtml("bigRooms")}</div>
-    <div class="setting-row"><div><div class="label">Sprachchat (online)</div><div class="hint">Zeigt in Online-Räumen unten links einen Button „Sprachchat beitreten“. Dabei sprechen alle Teilnehmenden direkt miteinander (Peer-to-Peer, ohne Server). Das Mikrofon wird erst nach deiner Freigabe aktiv. Die Teilnehmenden sehen dabei gegenseitig ihre IP-Adressen, und bei mehr als 6 bis 8 Sprechenden wird es instabil. Standard: aus.</div></div>${prefSwitchHtml("voiceChat")}</div>
+    <div class="setting-row"><div><div class="label">Sprachchat (online)</div><div class="hint">Zeigt in Online-Räumen unten links einen Button „Sprachchat beitreten“. Dabei sprechen alle Teilnehmenden direkt miteinander (Peer-to-Peer, ohne Server). Das Mikrofon wird erst nach deiner Freigabe aktiv. Ohne Relay (siehe unten) sehen sich die Teilnehmenden dabei gegenseitig ihre IP-Adressen, und bei mehr als 6 bis 8 Sprechenden wird es instabil. Standard: aus.</div></div>${prefSwitchHtml("voiceChat")}</div>
+    <div class="setting-row"><div><div class="label">IP-Adressen verbergen (TURN-Relay)</div><div class="hint">Leitet alle Online-Verbindungen (Spiel und Sprachchat) über einen TURN-Server, sodass sich die Spielenden nicht direkt sehen. Dafür brauchst du die Adresse eines TURN-Servers (zum Beispiel ein eigener coturn oder ein Anbieter), alle Teilnehmenden müssen dieselbe Einstellung nutzen. Ganz unsichtbar bist du trotzdem nicht: der TURN-Betreiber und der PeerJS-Vermittlungsserver sehen deine IP. Ist der Server nicht erreichbar, scheitert die Verbindung. Standard: aus.</div></div>${prefSwitchHtml("relayOnly")}</div>
+    ${prefs.relayOnly ? `<div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:6px;">
+      <input class="pl-search" placeholder="TURN-Adresse, z. B. turn:server.example:3478" value="${esc(prefs.turnUrl || "")}" oninput="prefs.turnUrl=this.value; savePrefs()" style="flex:none;width:280px;max-width:100%;">
+      <input class="pl-search" placeholder="Benutzername" value="${esc(prefs.turnUser || "")}" oninput="prefs.turnUser=this.value; savePrefs()" style="flex:none;width:200px;max-width:100%;">
+      <input class="pl-search" type="password" placeholder="Passwort" value="${esc(prefs.turnPass || "")}" oninput="prefs.turnPass=this.value; savePrefs()" style="flex:none;width:200px;max-width:100%;" autocomplete="off">
+    </div>` : ``}
   </div>`;
 }
 function renderSettings(){
@@ -3548,6 +3622,7 @@ function renderSettings(){
     </div>` : ``}
 
     ${sub === 'themes' && currentTheme === 'custom' ? renderCustomThemePanel() : ``}
+    ${sub === 'themes' ? renderAutoThemeCard() : ``}
 
     ${sub === 'display' ? renderAccessibilityCard() : ``}
 
@@ -3556,6 +3631,7 @@ function renderSettings(){
     ${sub === 'play' ? renderPlayCard() : ``}
 
     ${sub === 'sound' ? renderSoundCard() : ``}
+    ${sub === 'diag' ? renderDiagCard() : ``}
     ${sub === 'experimental' ? renderExperimentalCard() : ``}
 
     <div class="menu-actions">
@@ -3796,15 +3872,117 @@ setInterval(() => {
   const go = () => { if(state.screen === "game" && state.phase === "feedback") nextTurn(); };
   if(st.variant === "sudden") go(); else setTimeout(go, 1500);
 }, 200);
+/* ============ SCHNELLCHAT (vorgefertigte Sätze) ============ */
+const CHAT_PHRASES = ["Moment, ich hör grad nix 😅", "Das wusste ich tatsächlich!", "Boah, nee … keine Ahnung", "Den Song liebe ich", "Läuft bei euch, oder?", "Uff, das war knapp daneben", "Gleich hol ich auf, Leute", "GG, gut gespielt!", "Nochmal? Rematch?", "Kurze Pause bitte", "Hab mich verklickt, sorry", "Wer hat den Song denn ausgesucht?", "Okay, der war fies", "Haha, nice!", "Warte kurz, bin gleich wieder da", "Das lag mir auf der Zunge"];
+let chatOpen = false;
+function chatUi(){
+  let el = document.getElementById("chat-ui");
+  const show = (NET.role === "host" || NET.role === "guest") && !NET.spec && NET.peer;
+  if(!show){ if(el) el.remove(); const lg = document.getElementById("chat-log"); if(lg) lg.remove(); return; }
+  if(!el){ el = document.createElement("div"); el.id = "chat-ui"; document.body.appendChild(el); }
+  el.innerHTML = (chatOpen ? `<div class="chat-panel">${CHAT_PHRASES.map((t, i) => `<button class="btn-ghost btn-small" onclick="chatSend(${i})">${esc(t)}</button>`).join("")}</div>` : ``) + `<button class="btn-ghost btn-small" style="background:var(--panel);" onclick="chatOpen=!chatOpen; chatUi()" aria-label="Schnellchat" title="Schnellchat">💬</button>`;
+}
+function chatSend(i){
+  chatOpen = false; chatUi();
+  if(NET.role === "host"){ const me = (NET.seats[0] && NET.seats[0].name) || NET.myName || "Host"; netBroadcast({ t:"chatmsg", n:me, i }); chatShow(me, i); }
+  else netSendHost({ t:"chat", i });
+}
+function netHostChat(entry, d){
+  const i = d && d.i; if(!Number.isInteger(i) || i < 0 || i >= CHAT_PHRASES.length) return;
+  NET.chatLast = NET.chatLast || {}; const now = Date.now(); if(now - (NET.chatLast[entry.key] || 0) < 1500) return; NET.chatLast[entry.key] = now;
+  const q = NET.seats.find(x => netKey(x.name) === entry.key); if(!q) return;
+  netBroadcast({ t:"chatmsg", n:q.name, i }); chatShow(q.name, i);
+}
+function chatShow(name, i){
+  if(!Number.isInteger(i) || i < 0 || i >= CHAT_PHRASES.length) return;
+  let lg = document.getElementById("chat-log"); if(!lg){ lg = document.createElement("div"); lg.id = "chat-log"; document.body.appendChild(lg); }
+  const m = document.createElement("div"); m.className = "chat-msg"; m.innerHTML = "<b>" + esc(String(name).slice(0, 20)) + ":</b> " + esc(CHAT_PHRASES[i]);
+  lg.appendChild(m); while(lg.children.length > 4) lg.removeChild(lg.firstChild);
+  setTimeout(() => { if(m.parentNode) m.remove(); }, 7000);
+  if(prefs.screenReader) srSay(String(name) + ": " + CHAT_PHRASES[i]);
+}
+/* ============ VERBINDUNGSDIAGNOSE ============ */
+const DIAG = { rows:[], running:false, done:false };
+function openDiag(){ state.screen = "settings"; state.settingsSub = "diag"; render(); window.scrollTo(0, 0); }
+function diagIce(){
+  return new Promise(res => {
+    const types = { host:0, srflx:0, relay:0 }; let pc, tm;
+    const finish = () => { clearTimeout(tm); try{ pc.close(); }catch(e){} res(types); };
+    try{
+      const cfg = { iceServers:[{ urls:"stun:stun.l.google.com:19302" }] }, url = (prefs.turnUrl || "").trim();
+      if(url) cfg.iceServers.push({ urls:url, username:prefs.turnUser || "", credential:prefs.turnPass || "" });
+      pc = new RTCPeerConnection(cfg);
+    }catch(e){ return res(null); }
+    pc.createDataChannel("d");
+    pc.onicecandidate = e => { if(e.candidate){ const m = / typ (host|srflx|relay)/.exec(e.candidate.candidate); if(m) types[m[1]]++; } else finish(); };
+    tm = setTimeout(finish, 6000);
+    pc.createOffer().then(o => pc.setLocalDescription(o)).catch(finish);
+  });
+}
+async function runDiag(){
+  if(DIAG.running) return; DIAG.running = true; DIAG.done = false; DIAG.rows = [];
+  const add = (ok, label, detail) => { DIAG.rows.push({ ok, label, detail }); diagUpdate(); };
+  diagUpdate();
+  add(navigator.onLine ? 1 : 0, "Internetverbindung", navigator.onLine ? "Der Browser meldet online." : "Der Browser meldet offline.");
+  add(window.isSecureContext ? 1 : 2, "Sichere Seite", window.isSecureContext ? "Mikrofon und Zwischenablage sind erlaubt." : "Die Seite gilt nicht als sicher (zum Beispiel http). Mikrofon und Kopieren können eingeschränkt sein.");
+  try{ localStorage.setItem("chronohit_diag", "1"); localStorage.removeItem("chronohit_diag"); add(1, "Browser-Speicher", "Speichern funktioniert."); }catch(e){ add(0, "Browser-Speicher", "Speichern ist blockiert (privater Modus?). Spielstände gehen verloren."); }
+  add(navigator.clipboard && window.isSecureContext ? 1 : 2, "Zwischenablage", navigator.clipboard && window.isSecureContext ? "Kopieren per Knopfdruck funktioniert." : "Eingeschränkt. Das Spiel zeigt dann einen Dialog oder das Teilen-Menü.");
+  add(window.top !== window ? 2 : 1, "Eingebettetes Fenster", window.top !== window ? "Das Spiel läuft in einem eingebetteten Fenster (iframe) oder einer App-Ansicht. Mikrofon und Kopieren können dort gesperrt sein, öffne die Seite direkt im Browser." : "Das Spiel läuft direkt im Browser.");
+  try{ const pm = await navigator.permissions.query({ name:"microphone" }); add(pm.state === "granted" ? 1 : pm.state === "prompt" ? 1 : 0, "Mikrofon-Berechtigung", pm.state === "granted" ? "Erlaubt." : pm.state === "prompt" ? "Wird beim ersten Sprachchat abgefragt." : "Blockiert. In den Website-Einstellungen von Chrome (Schloss-Symbol) auf Zulassen stellen."); }catch(e){}
+  try{ const dv = await navigator.mediaDevices.enumerateDevices(), n = dv.filter(d => d.kind === "audioinput").length; add(n ? 1 : 2, "Mikrofon", n ? n + " Eingabegerät(e) gefunden." : "Kein Mikrofon gefunden (für den Sprachchat nötig)."); }catch(e){ add(2, "Mikrofon", "Konnte nicht geprüft werden."); }
+  const fb = typeof useFallbackEmbed !== "undefined" && useFallbackEmbed;
+  add(fb ? 2 : 1, "Spotify-Wiedergabe", fb ? "Ersatz-Player aktiv (die automatische Steuerung wurde blockiert, zum Beispiel durch einen Adblocker)." : "Normale Steuerung.");
+  const t0 = performance.now();
+  const pr = await new Promise(res => {
+    let done = false, p; const fin = r => { if(!done){ done = true; try{ p.destroy(); }catch(e){} res(r); } };
+    try{ p = new peerjs.Peer("chd-" + netRandHex(8), netPeerOptions()); p.on("open", () => fin({ ok:1, ms:Math.round(performance.now() - t0) })); p.on("error", e => fin({ ok:0, err:(e && e.type) || "Fehler" })); setTimeout(() => fin({ ok:0, err:"Zeitüberschreitung" }), 9000); }
+    catch(e){ fin({ ok:0, err:"nicht verfügbar" }); }
+  });
+  add(pr.ok ? 1 : 0, "Vermittlungsserver (PeerJS)", pr.ok ? "Erreichbar in " + pr.ms + " ms." : "Nicht erreichbar (" + pr.err + "). Ohne ihn lassen sich keine Räume öffnen oder betreten.");
+  const ice = await diagIce(), tu = (prefs.turnUrl || "").trim();
+  if(!ice) add(0, "WebRTC", "Dein Browser unterstützt keine direkten Verbindungen.");
+  else {
+    add(ice.srflx ? 1 : (ice.host ? 2 : 0), "Direkte Verbindungen (STUN)", ice.srflx ? "Möglich: dein Netzwerk erlaubt Verbindungen nach außen." : "Kein Ergebnis vom STUN-Server. Verbindungen klappen eventuell nur im selben WLAN. Firewall, VPN oder strenges Netz prüfen.");
+    if(tu) add(ice.relay ? 1 : 0, "TURN-Relay", ice.relay ? "Der TURN-Server antwortet." : "Der TURN-Server antwortet nicht (Adresse, Benutzername oder Passwort prüfen).");
+  }
+  DIAG.running = false; DIAG.done = true; diagUpdate();
+}
+function diagText(){ return "Chronohit Verbindungsdiagnose\n" + DIAG.rows.map(r => (r.ok === 1 ? "OK" : r.ok === 2 ? "Hinweis" : "Fehler") + ": " + r.label + " – " + r.detail).join("\n"); }
+function diagHtml(){
+  return `<button class="btn-primary" onclick="runDiag()" ${DIAG.running ? "disabled" : ""}>${DIAG.running ? "Prüfe …" : DIAG.done ? "Erneut prüfen" : "Diagnose starten"}</button>${DIAG.done ? ` <button class="btn-ghost" onclick="copyOrShow(diagText())">📋 Ergebnis kopieren</button>` : ""}
+    <div style="margin-top:10px;">${DIAG.rows.map(r => `<div style="padding:6px 0;border-top:1px solid var(--line);">${r.ok === 1 ? "✅" : r.ok === 2 ? "⚠️" : "❌"} <b>${esc(r.label)}</b><br><span style="color:var(--muted);font-size:calc(13px * var(--font-scale));">${esc(r.detail)}</span></div>`).join("")}</div>`;
+}
+function diagUpdate(){ const el = document.getElementById("diag-box"); if(el) el.innerHTML = diagHtml(); }
+function renderDiagCard(){ return `<div class="menu-card"><h3>Verbindungsdiagnose</h3><p style="margin:6px 0 10px;">Prüft, ob Online-Spiele, Sprachchat, Kopieren und Wiedergabe bei dir funktionieren. Es werden keine IP-Adressen angezeigt oder gespeichert.</p><div id="diag-box">${diagHtml()}</div></div>`; }
 /* ============ SPRACHCHAT (experimentell) ============ */
 const VC = { stream:null, on:false, muted:false, calls:{}, audio:{}, ids:[] };
 const VC_ID = /^chg-[0-9a-f]{24}$/;
 function vcMyId(){ return NET.peer && NET.peer.id; }
+function showInfoDialog(title, text){
+  const old = document.getElementById("info-dlg"); if(old) old.remove();
+  const el = document.createElement("div"); el.id = "info-dlg"; el.setAttribute("role", "dialog");
+  el.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:80;display:flex;align-items:center;justify-content:center;padding:16px;";
+  el.onclick = e => { if(e.target === el) el.remove(); };
+  el.innerHTML = `<div class="menu-card" style="max-width:440px;width:100%;"><h3>${esc(title)}</h3><p style="margin:8px 0 12px;">${esc(text)}</p><div class="menu-actions"><button class="btn-primary" onclick="document.getElementById('info-dlg').remove()">Verstanden</button></div></div>`;
+  document.body.appendChild(el);
+}
+document.addEventListener("keydown", e => { if(e.key === "Escape"){ const d = document.getElementById("info-dlg"); if(d) d.remove(); } });
+function vcFail(e){
+  const n = e && e.name, frame = window.top !== window; let msg;
+  if(!navigator.mediaDevices || !window.isSecureContext) msg = "Hier steht kein Mikrofon zur Verfügung, weil die Seite nicht als sicher gilt (zum Beispiel eine lokal geöffnete Datei auf dem Handy oder eine App-Ansicht). Öffne das Spiel direkt in Chrome, am besten über eine https-Adresse.";
+  else if(n === "NotAllowedError" || n === "SecurityError") msg = frame
+    ? "Das Mikrofon ist gesperrt, weil das Spiel in einem eingebetteten Fenster oder einer App läuft. Öffne die Seite direkt im Browser (Chrome)."
+    : "Das Mikrofon ist blockiert. Tippe in Chrome auf das Symbol links neben der Adresse, dann Berechtigungen, Mikrofon, Zulassen. Prüfe außerdem in den Android-Einstellungen unter Apps, Chrome, Berechtigungen, ob das Mikrofon erlaubt ist, und lade die Seite neu.";
+  else if(n === "NotFoundError") msg = "Es wurde kein Mikrofon gefunden.";
+  else if(n === "NotReadableError") msg = "Das Mikrofon wird gerade von einer anderen App benutzt. Schließe sie und versuche es erneut.";
+  else msg = "Das Mikrofon konnte nicht gestartet werden" + (n ? " (" + n + ")" : "") + ".";
+  showInfoDialog("Mikrofon nicht verfügbar", msg);
+}
 async function vcJoin(){
   if(VC.on || !NET.peer) return;
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ toast("Dein Browser erlaubt kein Mikrofon."); return; }
-  try{ VC.stream = await navigator.mediaDevices.getUserMedia({ audio:{ echoCancellation:true, noiseSuppression:true, autoGainControl:true } }); }
-  catch(e){ toast("Mikrofon nicht freigegeben."); return; }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ vcFail(null); return; }
+  try{ VC.stream = await navigator.mediaDevices.getUserMedia({ audio:true }); }
+  catch(e){ vcFail(e); return; }
   VC.on = true; VC.muted = false;
   if(!NET.peer.__vc){ NET.peer.__vc = true; NET.peer.on("call", call => { if(!VC.on) return; call.answer(VC.stream); vcAttach(call.peer, call); }); }
   if(NET.role === "host") vcHostBroadcast(); else netSendHost({ t:"vjoin", id:vcMyId() });
@@ -3910,9 +4088,9 @@ function dailyText(key, seq, score){ const [y, m, d] = key.split("-"); return "C
 function dailyCopyToday(){
   const r = dailyLoad().results[dateKey()];
   if(!r){ toast("Heute noch nicht gespielt."); return; }
-  netCopy(dailyText(dateKey(), r.seq, r.score));
+  copyOrShow(dailyText(dateKey(), r.seq, r.score)).then(ok => { if(ok) toast("Ergebnis kopiert"); });
 }
-function shareResult(){
+async function shareResult(auto){
   let t;
   if(state.daily && state.dailyInfo){ const [y, m, d] = state.daily.date.split("-"); t = "Chronohit Daily " + d + "." + m + "." + y + "\n" + state.dailyInfo.seq + " " + state.dailyInfo.score + "/10"; }
   else if(state.settings.mode === "multiplayer" && state.players){
@@ -3921,7 +4099,7 @@ function shareResult(){
     const st = state.settings, tgt = st.target >= 9999 ? "" : " von " + st.target;
     t = "Chronohit – " + modeLabel(st.mode) + (st.variant ? " · " + variantLabel(st.variant) : "") + "\n" + (state.correctCount || 0) + " richtig" + tgt + (resultSeq(30) ? "\n" + resultSeq(30) : "");
   }
-  netCopy(t);
+  if(!(await copyOrShow(t, auto))) return;
   const b = document.getElementById("share-btn");
   if(b){ if(!b.dataset.o) b.dataset.o = b.textContent; b.textContent = "✓ Ergebnis kopiert"; clearTimeout(window.__shT); window.__shT = setTimeout(() => { const c = document.getElementById("share-btn"); if(c) c.textContent = c.dataset.o; }, 2500); }
 }
@@ -3964,7 +4142,7 @@ function xpBarHtml(){
 function xpEndHtml(){
   const g = state.xpGain; if(!g) return "";
   const L = xpLevel(xpLoad().xp || 0), d = state.dailyInfo;
-  if(d && !state.autoCopied){ state.autoCopied = true; setTimeout(() => { if(state.screen === "end") shareResult(); }, 400); }
+  if(d && !state.autoCopied){ state.autoCopied = true; setTimeout(() => { if(state.screen === "end") shareResult(true); }, 400); }
   return `<div style="width:100%;text-align:center;margin:6px 0;"><b>+${g.total} XP</b>${g.up ? " · 🎉 Level " + L.lv + "!" : ""}
     <div style="font-size:calc(13px * var(--font-scale));color:var(--muted);">${g.parts.map(x => esc(x[0]) + " +" + x[1]).join(" · ")}</div>
     <div class="xp-bar"><i style="width:${Math.round(L.cur / L.need * 100)}%"></i></div><small>Level ${L.lv} · ${L.cur} / ${L.need} XP</small>
@@ -3981,9 +4159,10 @@ function quickSummary(w){
 }
 const QP_ICONS = {
   play: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5l12 7-12 7z" fill="currentColor"/></svg>',
-  edit: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3z"/><path d="M13.5 6.5l3 3"/></svg>',
+  edit: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>',
   trash: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/><path d="M10 11v6M14 11v6"/></svg>'
 };
+function songLangs(x){ return Array.isArray(x.g) ? x.g : [x.g]; }
 function renderQuickplay(){
   const Q = quickLoad();
   app.innerHTML = `
@@ -4044,7 +4223,7 @@ function quickSlotPick(i){
   el.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:70;display:flex;align-items:center;justify-content:center;padding:16px;";
   el.onclick = e => { if(e.target === el) closeQuickPick(); };
   const nm = k => { const c = slotsCache[k - 1]; return (c && (c.name || c.saveName)) || "Spielstand"; };
-  el.innerHTML = `<div class="menu-card" style="max-width:440px;width:100%;"><h3>Speicherplatz wählen</h3><p style="margin:6px 0 12px;">Alle 4 Speicherplätze sind belegt. Der gewählte Spielstand wird durch dieses Quickplay-Spiel überschrieben.</p><div class="menu-actions">${[1, 2, 3, 4].map(k => `<button class="btn-ghost" onclick="quickStartIn(${i}, ${k})">Slot ${k}: ${esc(nm(k))}</button>`).join("")}<button class="btn-ghost" onclick="closeQuickPick()">Abbrechen</button></div></div>`;
+  el.innerHTML = `<div class="menu-card" style="max-width:440px;width:100%;max-height:85vh;overflow:auto;"><h3>Speicherplatz wählen</h3><p style="margin:6px 0 12px;">Alle 4 Speicherplätze sind belegt. Der gewählte Spielstand wird durch dieses Quickplay-Spiel überschrieben.</p><div class="menu-actions">${[1, 2, 3, 4].map(k => `<div class="save-slot" style="cursor:pointer;" onclick="quickStartIn(${i}, ${k})"><div class="slot-info"><div class="slot-title">Slot ${k}: ${esc(nm(k))}</div>${slotsCache[k - 1] ? miniTimelineHtml(slotsCache[k - 1]) : ""}</div></div>`).join("")}<button class="btn-ghost" onclick="closeQuickPick()">Abbrechen</button></div></div>`;
   document.body.appendChild(el);
 }
 function closeQuickPick(){ const el = document.getElementById("qp-pick"); if(el) el.remove(); }
@@ -4175,6 +4354,143 @@ function startLearn(){
   state.timeline = [{ ...sel[0], __starter:true }]; state.deck = sel.slice(1); state.turnNo = 0; state.current = null; drawNext();
   window.__tutBoot = false; state.learn = true; state.hasSave = false; render();
 }
+/* ============ SPIELARTEN: JAHR-SCHÄTZEN & INTERPRET-QUIZ ============ */
+const QG_PTS = [3, 2, 1], QG = { playing:false, sentRound:0, round:0 };
+function MP(){ return state.settings.mode === "multiplayer" && !!state.players && state.players.length > 0; }
+function qgInit(){
+  const st = state.settings;
+  state.qg = { kind: st.game === "artist" ? "artist" : "year", round:0, total:st.rounds || 10, phase:"guess", songId:"", turn:0, answered:[], results:[], reveal:null, choices:null, answerMode: st.answerMode === "choice" ? "choice" : "text" };
+  state.qgPriv = { answers:{}, localIdx:0 }; state.currentPlayer = 0; state.phase = "qg"; state.screen = "game";
+  qgNextRound(true);
+}
+function qgRefresh(){ render(); saveState(); if(state.online && NET.role === "host") netScheduleBroadcast(); }
+function qgNextRound(first){
+  const q = state.qg;
+  if(!first && q.round >= q.total){ qgEnd(); return; }
+  const song = (state.deck || []).shift(); if(!song){ qgEnd(); return; }
+  state.current = song; q.round++; q.phase = "guess"; q.songId = song.id; q.answered = []; q.results = []; q.reveal = null; q.choices = null;
+  q.turn = q.kind === "artist" && MP() ? (q.round - 1) % state.players.length : 0;
+  if(q.kind === "artist" && q.answerMode === "choice"){
+    const pool = SONGS.filter(x => x.a && normText(x.a) !== normText(song.a)), seen = new Set([normText(song.a)]), ch = [song.a];
+    for(let n = 0; ch.length < 4 && n < 400; n++){ const c = pool[Math.floor(Math.random() * pool.length)]; if(c && !seen.has(normText(c.a))){ seen.add(normText(c.a)); ch.push(c.a); } }
+    for(let i = ch.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [ch[i], ch[j]] = [ch[j], ch[i]]; }
+    q.choices = ch;
+  }
+  state.qgPriv = { answers:{}, localIdx:0 }; QG.playing = false; QG.sentRound = 0;
+  try{ pauseSpotifyPlayback(); }catch(e){}
+  qgRefresh();
+}
+function qgRequired(){
+  const q = state.qg; if(q.kind === "artist") return [q.turn];
+  if(state.online) return NET.seats.map((_, i) => i).filter(i => NET.seats[i].connected);
+  return MP() ? state.players.map((_, i) => i) : [0];
+}
+function qgSubmit(pi, val){
+  const q = state.qg; if(!q || q.phase !== "guess") return;
+  const P = state.qgPriv; if(pi in P.answers || !qgRequired().includes(pi)) return;
+  P.answers[pi] = String(val).trim().slice(0, 60); q.answered = Object.keys(P.answers).map(Number);
+  if(!state.online && q.kind === "year") P.localIdx++;
+  if(qgRequired().every(i => i in P.answers)) qgReveal(); else qgRefresh();
+}
+function qgName(i){ return MP() && state.players[i] ? state.players[i].name : "Du"; }
+function qgReveal(){
+  const q = state.qg, P = state.qgPriv, song = state.current, res = [];
+  if(q.kind === "year"){
+    const arr = Object.keys(P.answers).map(Number).map(i => { const v = parseInt(P.answers[i], 10); return { i, v, diff:Number.isFinite(v) ? Math.abs(v - song.y) : Infinity }; });
+    qgRequired().forEach(i => { if(!arr.some(x => x.i === i)) arr.push({ i, v:NaN, diff:Infinity }); });
+    const ds = [...new Set(arr.filter(x => x.diff < Infinity).map(x => x.diff))].sort((a, b) => a - b);
+    arr.forEach(x => { x.pts = (x.diff === Infinity ? 0 : (QG_PTS[ds.indexOf(x.diff)] || 0)) + (x.diff === 0 ? 2 : 0); });
+    arr.sort((a, b) => (b.pts - a.pts) || (a.diff - b.diff) || (a.i - b.i));
+    arr.forEach(x => res.push({ i:x.i, name:qgName(x.i), v:Number.isFinite(x.v) ? String(x.v) : "–", diff:x.diff === Infinity ? -1 : x.diff, pts:x.pts, ok:x.diff === 0 }));
+  } else {
+    const i = q.turn, a = P.answers[i] || "", ok = q.answerMode === "choice" ? normText(a) === normText(song.a) : (a ? fuzzyMatch(a, artistVariants(song.a)) : false);
+    res.push({ i, name:qgName(i), v:a || "–", diff:0, pts:ok ? 1 : 0, ok });
+  }
+  q.results = res; q.reveal = { t:song.t, a:song.a, y:song.y }; q.phase = "result";
+  res.forEach(r => { if(MP()){ if(state.players[r.i]) state.players[r.i].correctCount += r.pts; } else state.correctCount = (state.correctCount || 0) + r.pts; });
+  if(MP()) state.correctCount = state.players[0].correctCount;
+  try{ sfx(res.some(r => r.pts > 0) ? "token" : "turn", 0.7); }catch(e){}
+  qgRefresh();
+}
+function qgNextClick(){ if(!state.online || NET.role === "host") qgNextRound(false); }
+function qgEnd(){ try{ pauseSpotifyPlayback(); }catch(e){} state.qg.phase = "end"; state.won = false; state.screen = "end"; state.phase = "qg"; qgRefresh(); }
+function qgPlay(){
+  const q = state.qg; if(!q) return;
+  if(QG.playing){ try{ pauseSpotifyPlayback(); }catch(e){} QG.playing = false; render(); return; }
+  QG.playing = true; try{ requestSpotifyPlay(state.current && state.current.id === q.songId ? state.current : { id:q.songId, t:"", a:"", y:0 }); }catch(e){} render();
+}
+function qgDeliver(v){
+  const q = state.qg, P = state.qgPriv || { answers:{}, localIdx:0 };
+  if(state.online){
+    if(NET.role === "host") qgSubmit(q.kind === "artist" ? (MP() ? q.turn : 0) : netMySeat(), v);
+    else { QG.sentRound = q.round; netSendHost({ t:"qg", v }); render(); }
+  } else qgSubmit(q.kind === "artist" ? (MP() ? q.turn : 0) : (MP() ? P.localIdx : 0), v);
+}
+function qgSend(){
+  const q = state.qg, el = document.getElementById("qg-in"); if(!el) return; let v = el.value.trim();
+  if(q.kind === "year"){ const y = parseInt(v, 10); if(!(y >= 1900 && y <= 2100)){ toast("Bitte gib ein Jahr zwischen 1900 und 2100 ein."); return; } v = String(y); }
+  else if(!v){ toast("Bitte gib einen Interpreten ein."); return; }
+  qgDeliver(v);
+}
+function qgChoose(i){ const q = state.qg; if(q.choices && q.choices[i] != null) qgDeliver(q.choices[i]); }
+function netHostQg(entry, d){
+  if(!state.online || !NET.started || !state.qg || state.qg.phase !== "guess") return;
+  const seat = NET.seats.findIndex(x => netKey(x.name) === entry.key); if(seat < 0) return;
+  const q = state.qg, pi = q.kind === "artist" ? (MP() ? (seat === q.turn ? q.turn : -1) : 0) : seat;
+  if(pi < 0) return; qgSubmit(pi, String(d.v == null ? "" : d.v).slice(0, 60));
+}
+function netCleanQg(q){
+  if(!q || typeof q !== "object") return null;
+  const cl = (v, n) => String(v == null ? "" : v).replace(/[\u0000-\u001f<>]/g, "").slice(0, n || 80);
+  return { kind:q.kind === "artist" ? "artist" : "year", round:netInt(q.round, 1, 0, 999), total:netInt(q.total, 10, 1, 999), phase:["guess", "result", "end"].includes(q.phase) ? q.phase : "guess", songId:cl(q.songId, 40), turn:netInt(q.turn, 0, 0, 100), answerMode:q.answerMode === "choice" ? "choice" : "text",
+    answered:(Array.isArray(q.answered) ? q.answered : []).slice(0, 100).map(v => netInt(v, 0, 0, 100)),
+    choices:Array.isArray(q.choices) ? q.choices.slice(0, 4).map(v => cl(v, 80)) : null,
+    reveal:q.reveal && typeof q.reveal === "object" ? { t:cl(q.reveal.t), a:cl(q.reveal.a), y:netInt(q.reveal.y, 0, 0, 3000) } : null,
+    results:(Array.isArray(q.results) ? q.results : []).slice(0, 100).map(r => ({ i:netInt(r && r.i, 0, 0, 100), name:cl(r && r.name, 20), v:cl(r && r.v, 60), diff:netInt(r && r.diff, 0, -1, 5000), pts:netInt(r && r.pts, 0, 0, 20), ok:!!(r && r.ok) })) };
+}
+function qgScores(){ return MP() ? state.players.map(p => ({ name:p.name, pts:p.correctCount })) : [{ name:"Du", pts:state.correctCount || 0 }]; }
+function renderQg(){
+  const q = state.qg, online = !!state.online, mySeat = online ? netMySeat() : -1, P = state.qgPriv || { answers:{}, localIdx:0 };
+  if(QG.round !== q.round){ QG.round = q.round; QG.playing = false; }
+  const names = i => (online && NET.seats[i]) ? NET.seats[i].name : qgName(i);
+  const scores = qgScores().map(x => `<div class="stat">${esc(x.name)} <b>${x.pts}</b></div>`).join("");
+  const head = `<div class="topbar"><div class="stat">${q.kind === "year" ? "Jahr-Schätzen" : "Interpret-Quiz"} <b>Runde ${q.round} / ${q.total}</b></div>${scores}</div>`;
+  let body = `<button class="btn-ghost" onclick="qgPlay()">${QG.playing ? "⏸ Pausieren" : "▶ Song abspielen"}</button>`;
+  if(q.phase === "guess"){
+    const answered = q.answered || [];
+    let canInput = false, headline = "";
+    if(q.kind === "year"){
+      if(online){ canInput = mySeat >= 0 && qgRequired().includes(mySeat) && !answered.includes(mySeat) && QG.sentRound !== q.round; headline = "Tippe das Erscheinungsjahr."; }
+      else { canInput = MP() ? P.localIdx < state.players.length : answered.length === 0; headline = MP() ? esc(state.players[Math.min(P.localIdx, state.players.length - 1)].name) + ": tippe dein Jahr. Die anderen schauen weg." : "Tippe das Erscheinungsjahr."; }
+    } else {
+      const who = MP() ? q.turn : 0;
+      if(online) canInput = (MP() ? mySeat === q.turn : mySeat >= 0) && !answered.includes(who) && QG.sentRound !== q.round; else canInput = !answered.includes(who);
+      headline = (MP() ? esc(names(q.turn)) + " ist dran: " : "") + "Wer singt den Song?";
+    }
+    const waitFor = qgRequired().filter(i => !answered.includes(i)).map(i => esc(names(i))).join(", ");
+    let input = "";
+    if(canInput){
+      if(q.kind === "artist" && q.answerMode === "choice") input = `<div class="menu-actions">${(q.choices || []).map((c, i) => `<button class="btn-ghost" onclick="qgChoose(${i})">${esc(c)}</button>`).join("")}</div>`;
+      else input = `<div style="display:flex;gap:8px;flex-wrap:wrap;"><input id="qg-in" class="pl-search" ${q.kind === "year" ? 'type="number" inputmode="numeric" min="1900" max="2100" placeholder="Jahr"' : 'type="text" maxlength="60" placeholder="Interpret"'} autocomplete="off" onkeydown="if(event.key==='Enter') qgSend()"><button class="btn-primary" onclick="qgSend()">Abschicken</button></div>`;
+    } else input = `<p>Antwort abgeschickt.</p>`;
+    body += `<p style="margin:12px 0 6px;"><b>${headline}</b></p>${input}${waitFor && (answered.length || !canInput) ? `<p style="color:var(--muted);">Warte auf: ${waitFor}</p>` : ""}${(!online || NET.role === "host") && answered.length && waitFor ? `<button class="btn-ghost btn-small" onclick="qgReveal()">Jetzt auflösen (ohne die Fehlenden)</button>` : ""}`;
+  } else if(q.phase === "result" && q.reveal){
+    const rows = q.results.map(r => `<div class="stats-row"><span>${esc(r.name)}: ${esc(r.v)}${q.kind === "year" ? (r.diff < 0 ? "" : r.diff === 0 ? " 🎯" : " (" + r.diff + " daneben)") : (r.ok ? " ✓" : " ✕")}</span><b>+${r.pts}</b></div>`).join("");
+    body += `<div class="menu-card" style="margin-top:12px;"><h3>${esc(q.reveal.t)}</h3><p>${esc(q.reveal.a)} · ${q.reveal.y}</p>${rows}</div>
+      ${(!online || NET.role === "host") ? `<button class="btn-primary" onclick="qgNextClick()">${q.round >= q.total ? "Ergebnis ansehen" : "Nächste Runde"}</button>` : `<p style="color:var(--muted);">Warte auf den Host …</p>`}`;
+  }
+  app.innerHTML = `${head}<div class="menu-card" style="margin-top:12px;">${body}</div>`;
+}
+function renderQgEnd(){
+  const rows = qgScores().map((x, i) => ({ ...x, i })).sort((a, b) => b.pts - a.pts), mx = rows.length ? rows[0].pts : 0;
+  app.innerHTML = `
+    <div class="brand"><div class="mark">RUNDE BEENDET</div></div>
+    <div class="menu-card end-card"><div class="end-heading won">${state.qg.kind === "year" ? "Jahr-Schätzen" : "Interpret-Quiz"}</div>
+      ${rows.map((r, k) => `<div class="stats-row"><span>${k + 1}. ${esc(r.name)}${r.pts === mx && rows.length > 1 ? " 🏆" : ""}</span><b>${r.pts} Punkte</b></div>`).join("")}
+      <div class="menu-actions" style="margin-top:14px;">${endExtraHtml()}<button class="btn-ghost" onclick="abandonGame()">Hauptmenü</button></div>
+    </div>`;
+}
+function qgFinish(){ if(state.qgDone) return; state.qgDone = true; state.statsRecorded = true; try{ sfx("win", 0.7); confettiBurst("big"); }catch(e){} }
 /* ============ PLAYLIST ============ */
 const PL = { q:"", sort:"t", dir:1, f:{ genres:[], styles:[], decades:[], themes:[] }, open:false, playing:null, tm:0 };
 function openPlaylist(){ state.screen = "playlist"; PL.open = false; render(); window.scrollTo(0, 0); }
@@ -4195,7 +4511,7 @@ function plListHtml(){
   const l = plRows(), td = "padding:4px 6px;";
   return `<p style="margin:6px 0;">${l.length} von ${SONGS.length} Liedern</p><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:calc(14px * var(--font-scale));">
     <tr style="text-align:left;"><th></th><th>Titel</th><th>Interpret</th><th>Jahr</th><th>Sprache</th><th>Genre / Kategorie</th></tr>
-    ${l.map(x => `<tr style="border-top:1px solid var(--line);"><td style="${td}"><button class="btn-ghost btn-small" onclick="plPlay('${x.id}')" aria-label="30 Sekunden abspielen">${PL.playing === x.id ? "⏸" : "▶"}</button></td><td style="${td}">${esc(x.t)}</td><td style="${td}">${esc(x.a)}</td><td style="${td}">${x.y}</td><td style="${td}">${esc((LIB.langs.find(i => i.key === x.g) || { label:x.g }).label)}</td><td style="${td}">${esc(plLabels(x))}</td></tr>`).join("")}
+    ${l.map(x => `<tr style="border-top:1px solid var(--line);"><td style="${td}"><button class="btn-ghost btn-small" onclick="plPlay('${x.id}')" aria-label="30 Sekunden abspielen">${PL.playing === x.id ? "⏸" : "▶"}</button></td><td style="${td}">${esc(x.t)}</td><td style="${td}">${esc(x.a)}</td><td style="${td}">${x.y}</td><td style="${td}">${esc(songLangs(x).map(g => (LIB.langs.find(i => i.key === g) || { label:g }).label).join(" / "))}</td><td style="${td}">${esc(plLabels(x))}</td></tr>`).join("")}
   </table></div>`;
 }
 function plUpdate(){ const el = document.getElementById("pl-list"); if(el) el.innerHTML = plListHtml(); const ft = document.getElementById("ft-body"); if(ft) ft.innerHTML = ftBodyHtml(); if(state.screen === "timeline") render(); const b = document.getElementById("pl-fbtn"); if(b) b.textContent = "⚙ Filter" + (plActiveCount() ? " (" + plActiveCount() + ")" : ""); }
@@ -4334,7 +4650,7 @@ function tutBubble(){
   } else { b.style.left = "50%"; b.style.bottom = "16px"; b.style.transform = "translateX(-50%)"; }
   if(el) b.style.transform = "none";
 }
-{ const r0 = render; render = function(){ if(state.screen === "online") state.screen = "play"; r0(); try{ topBackBar(); }catch(e){} try{ vcUi(); }catch(e){} try{ tutBubble(); }catch(e){} }; }
+{ const r0 = render; render = function(){ if(state.screen === "online") state.screen = "play"; r0(); try{ topBackBar(); }catch(e){} try{ srPass(); }catch(e){} try{ chatUi(); }catch(e){} try{ vcUi(); }catch(e){} try{ tutBubble(); }catch(e){} }; }
 function renderTutorial(){
   if(state.tutRules) return renderTutorialRules();
   app.innerHTML = `
@@ -4349,7 +4665,7 @@ function renderTutorial(){
 function renderTutorialRules(){
   app.innerHTML = `
     <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Regeln</h1></div>
-    <div class="menu-card"><div class="body"><details class="rules-sec" open><summary>🎵 Spielablauf</summary><div class="rules-body"><p><strong>1. Abspielen:</strong> Du ziehst eine Karte und klickst auf die Schallplatte. Der Song spielt unsichtbar im Hintergrund über Spotify, du siehst weder Titel noch Cover. Nochmal klicken pausiert/setzt fort. Mit Spotify Premium läuft der ganze Song, sonst die 30-Sekunden-Vorschau. Wird die Steuerung blockiert (z. B. durch einen Adblocker), springt das Spiel auf einen sichtbaren, zugeschnittenen Player um. Der Button ⟳ an der Schallplatte lädt den Player neu.</p><p style="font-size:calc(13px * var(--font-scale));">Hinweis: Bei „Bailando“ (Enrique Iglesias) lag nur ein Album-Link vor – dort öffnet sich stattdessen eine Spotify-Suche in neuem Tab.</p><p><strong>2. Platzieren:</strong> Ohne das Jahr zu kennen, klickst du auf die Lücke deiner Zeitleiste, die du für chronologisch richtig hältst (früher links, später rechts). Bis zum Aufdecken kannst du die Position noch ändern.</p><p><strong>3. Aufdecken:</strong> Liegt die Karte richtig, bleibt sie liegen und zählt einen Punkt (die Startkarte zählt nicht). Liegt sie falsch, kommt sie auf den Ablagestapel und bleibt dauerhaft draußen. Danach geht es mit „Weiter“ zur nächsten Karte.</p></div></details><details class="rules-sec" ><summary>🎯 Schwierigkeit</summary><div class="rules-body"><p><strong>Normal:</strong> nur die Position zählt.<br><strong>Profi:</strong> Titel &amp; Interpret müssen vor dem Aufdecken zusätzlich stimmen.<br><strong>Experte:</strong> zusätzlich das Erscheinungsjahr, mit einstellbarer Toleranz von bis zu ±5 Jahren.</p><p>Verglichen wird großzügig: Groß-/Kleinschreibung, Akzente, Umlaut-Schreibweisen und Tippfehler werden verziehen.</p></div></details><details class="rules-sec" ><summary>🪙 Chrono-Tokens</summary><div class="rules-body"><p>Wenn aktiviert (außerhalb von Koop), sind Start- und Maximalwert einstellbar.</p><p>&bull; <strong>Song unbekannt?</strong> Für 1 Token wirfst du die aktuelle Karte ab und ziehst eine neue, ohne zu platzieren.<br>&bull; <strong>Karte kaufen:</strong> Für 3 Tokens wird die nächste gezogene Karte garantiert richtig einsortiert, ohne Risiko.<br>&bull; <strong>Bonus-Token:</strong> Tippst du Titel und Interpret richtig ein, gibt es einen weiteren Token (in jedem Schwierigkeitsgrad).</p><p>Tastenkürzel: S = Überspringen, B = Kaufen.</p></div></details><details class="rules-sec" ><summary>🎮 Spielmodi</summary><div class="rules-body"><p><strong>Solo:</strong> Du spielst allein auf eine einstellbare Zielkartenzahl.</p><p><strong>Koop:</strong> Ihr startet gemeinsam mit einer festen Zahl Chrono-Tokens (1–10) und einer Startkarte. Jede falsch platzierte Karte kostet einen Token. Skip/Kaufen gibt es nicht, die Tokens sind eure gemeinsamen Leben. Bei 0 Tokens vor dem Ziel habt ihr verloren, sonst gewonnen.</p><p><strong>Mehrspieler:</strong> Jeder Spieler hat eine eigene Startkarte und Zeitleiste, ihr spielt reihum. Wer das Ziel erreicht, gewinnt; ist der Stapel leer, entscheidet die Zahl richtiger Karten (Gleichstand möglich).</p></div></details><details class="rules-sec" ><summary>📣 Chronohit!-Einspruch (Mehrspieler mit Tokens)</summary><div class="rules-body"><p>Bevor eine Karte aufgedeckt wird, kann ein Gegner mit einem Token „Chronohit!“ rufen und die Lücke wählen, wo die Karte seiner Meinung nach hingehört. Liegt der aktive Spieler falsch und der Rufer richtig, bekommt der Rufer die Karte. Der eingesetzte Token ist immer weg. Pro Zug zählt nur der erste Einspruch.</p><p><strong>Einspruchsfenster:</strong> Entweder beendet der aktive Spieler (online auch der Host) das Fenster per Klick, oder es schließt automatisch nach 5 bzw. 10 Sekunden oder (mit Zeitlimit) mit der Restzeit, mindestens 5 Sekunden. Ruft jemand, hat der Rufer mindestens 5 Sekunden für die Lückenwahl. Ohne gewählte Lücke wird der Ruf zurückgenommen und der Token kommt zurück.</p></div></details><details class="rules-sec" ><summary>🎲 Zufallsereignisse (Mehrspieler)</summary><div class="rules-body"><p>Optional, standardmäßig aus. Beim Spielerwechsel passiert mit etwa 22 % Wahrscheinlichkeit etwas: <strong>Doppelrunde</strong> (der Spieler ist zweimal hintereinander dran) oder <strong>Kartentausch</strong> (zwei Spieler tauschen je eine zufällige Karte, nie die Startkarte; sie werden nach Jahr neu einsortiert). Ein Banner zeigt das Ereignis an.</p></div></details><details class="rules-sec" ><summary>⚡ Solo-Varianten</summary><div class="rules-body"><p><strong>Klassisch:</strong> bis zum Ziel.<br><strong>Endlos:</strong> kein Ziel, die Runde endet nach einer einstellbaren Zahl Fehler (Leben, Standard 3). Dein Highscore ist die Zahl richtiger Karten.<br><strong>Blitz:</strong> x Sekunden (30–180) für so viele richtige Karten wie möglich. Die Uhr startet beim Abspielen der ersten Karte; Abspielen, Aufdecken und Weiter laufen automatisch. Nur die Position zählt, ohne Titel/Interpret und ohne Tokens.<br><strong>Sudden Death:</strong> ein Fehler und du bist raus.</p><p>Highscores werden pro Variante (Blitz pro Dauer) gespeichert.</p></div></details><details class="rules-sec" ><summary>⏱ Zeitlimit pro Zug</summary><div class="rules-body"><p>Optional. Pro Zug bleibt nur begrenzte Zeit zum Platzieren (und in Profi/Experte oder für den Bonus zum Raten von Titel/Interpret). Die Zeit läuft ab dem Start des Songs. Läuft sie ab, gilt der Zug als verloren: Die Karte wird verworfen und zählt als falsch (im Koop kostet das einen Token).</p></div></details><details class="rules-sec" ><summary>🎼 Songauswahl und Filter</summary><div class="rules-body"><p>Beim Erstellen eines Spiels filterst du die Songs nach <strong>Sprache</strong>, <strong>Genre</strong> (ein Song kann mehrere haben, ein Treffer genügt), <strong>Jahrzehnt</strong> und <strong>Kategorien</strong> (z. B. Filmmusik oder Balladen; „Sonstige“ sind Songs ohne besondere Kategorie). Die Zahlen an den Chips zeigen, wie viele Songs es gibt. Die Reihenfolge der Filtergruppen lässt sich ändern.</p></div></details><details class="rules-sec" ><summary>🌐 Online spielen</summary><div class="rules-body"><p>Über „Spiel hosten / beitreten“ eröffnet ein Host einen Raum (Raumname, optional Passwort), Mitspieler treten bei, Zuschauer können zusehen. Der Host steuert Einstellungen und Start. Im Online-Solo und -Koop dürfen alle Teilnehmer gleichzeitig tippen (und raten). Im <strong>Team-Modus</strong> (Mehrspieler online) bilden die Spieler Teams mit gemeinsamer Zeitleiste und gemeinsamen Tokens; jedes Teammitglied darf tippen und raten, die Teams sind reihum dran. Die Teams wählst du in der Lobby selbst, der Host kann sie ändern oder zufällig verteilen. Ein <strong>Rematch</strong> startet nur, wenn alle verbundenen Mitspieler zustimmen; wer ablehnt, bricht die Anfrage ab.</p></div></details><details class="rules-sec" ><summary>💾 Spielstände</summary><div class="rules-body"><p>Beim Erstellen eines Spiels wählst du einen von 4 Speicherplätzen und einen Namen. Über den 💾-Button im Spiel speicherst du jederzeit in diesen Slot. Über „Spiel laden“ machst du dort weiter.</p></div></details><details class="rules-sec" ><summary>📜 Spielende, Chronik und Statistik</summary><div class="rules-body"><p>Am Ende siehst du das Ergebnis (bei Varianten mit Highscore-Vergleich). „Finale Zeitleiste ansehen“ zeigt alle Karten mit einem ▶ darunter, das die 30-Sekunden-Vorschau spielt. Die <strong>Spielchronik</strong> listet jeden Zug samt dem, was geraten wurde (Platzierung, Titel, Interpret, Jahr). Statistiken und der Jahresrückblick im Hauptmenü zählen deine Runden; Tutorial-Runden zählen nicht.</p></div></details><details class="rules-sec" ><summary>📅 Tägliche Challenge, Level und XP</summary><div class="rules-body"><p><strong>Tägliche Challenge:</strong> Jeden Tag gibt es 10 feste Karten (aus dem Datum abgeleitet, für alle mit derselben Songliste gleich), ohne Tokens. Dein Ergebnis ist x/10. Du darfst beliebig oft spielen, aber nur der erste Versuch des Tages zählt für XP und Serie. Der Teilen-Text zeigt nur Datum und Farbquadrate (🟩 richtig, 🟥 falsch), keine Songs.</p><p><strong>XP:</strong> 10 pro richtig platzierter Karte, 5 pro richtig geratenem Titel oder Interpreten, 50 für einen Sieg, 25 für einen neuen Highscore, 100 für die Tägliche Challenge plus 10 pro Serientag (bis 7). Das Level steigt mit wachsendem Bedarf (100 XP für Level 2, danach je 40 mehr). Alles wird nur lokal gespeichert. Tutorial-Runden zählen nicht.</p></div></details><details class="rules-sec" ><summary>🎓 Lernrunde und Auswertungen</summary><div class="rules-body"><p><strong>Auswertung:</strong> Ab dem Update merkt sich Chronohit lokal im Browser jede platzierte Karte (Song, richtig/falsch, Tag). Daraus entstehen in den Statistiken die Trefferquote pro Epoche und Genre mit schwächster Epoche/Genre (ab 5 Karten pro Gruppe), ein Verlaufsdiagramm der letzten 30 Tage (Trefferquote, richtige oder gespielte Karten, XP) und ein Kalender mit Spieltagen und Challenge-Tagen. Bei Online-Spielen als Gast werden Karten nicht mitgeschrieben, nur beim Host und lokal.</p><p><strong>Lernrunde:</strong> 10 Karten, bei denen Songs mit vielen bisherigen Fehlern häufiger vorkommen. Ohne bisherige Daten sind es zufällige Songs. Die Runde wird nicht gespeichert, zählt aber für XP und Statistik.</p></div></details><details class="rules-sec" ><summary>🎧 Playlist</summary><div class="rules-body"><p>Im Hauptmenü listet die Playlist alle Lieder mit Jahr, Sprache und Genre/Kategorie. Du kannst suchen, über „Filter“ nach Sprache, Genre, Jahrzehnt und Kategorien filtern, nach Titel, Interpret oder Jahr sortieren und mit ▶ die 30-Sekunden-Vorschau anspielen.</p></div></details><details class="rules-sec" ><summary>🎨 Themes und Darstellung</summary><div class="rules-body"><p>In den Einstellungen wählst du ein Theme. Jahreszeiten (Frühling bis Winter) und Feiertage (Valentinstag, Ostern, Halloween, Weihnachten, Silvester) sind aufklappbare Gruppen mit Hintergrund-Deko; Feiertags-Themes haben eigene Sounds. „Jahreszeiten-Themes nach Datum“ schaltet beim Start automatisch auf das passende Theme (Aus / Nur Feiertage / Feiertage &amp; Jahreszeiten). „Benutzerdefiniert“ erlaubt eigene Farben, Schrift und Stil. „Animationen reduzieren“ schaltet Deko-Animationen, Feuerwerk und Flattertiere aus.</p></div></details><details class="rules-sec" ><summary>⌨️ Bedienung per Tastatur</summary><div class="rules-body"><p>Wenn aktiviert: ←/→ oder A/D wählen die Lücke, Enter/Leertaste bestätigt (platzieren, aufdecken, weiter), Rücktaste ändert die Position, S überspringt, B kauft, P pausiert (nicht online). <strong>Esc</strong> geht in jedem Menü eine Ebene zurück.</p></div></details></div></div>
+    <div class="menu-card"><div class="body"><details class="rules-sec" open><summary>🎵 Spielablauf</summary><div class="rules-body"><p><strong>1. Abspielen:</strong> Du ziehst eine Karte und klickst auf die Schallplatte. Der Song spielt unsichtbar im Hintergrund über Spotify, du siehst weder Titel noch Cover. Nochmal klicken pausiert/setzt fort. Mit Spotify Premium läuft der ganze Song, sonst die 30-Sekunden-Vorschau. Wird die Steuerung blockiert (z. B. durch einen Adblocker), springt das Spiel auf einen sichtbaren, zugeschnittenen Player um. Der Button ⟳ an der Schallplatte lädt den Player neu.</p><p style="font-size:calc(13px * var(--font-scale));">Hinweis: Bei „Bailando“ (Enrique Iglesias) lag nur ein Album-Link vor – dort öffnet sich stattdessen eine Spotify-Suche in neuem Tab.</p><p><strong>2. Platzieren:</strong> Ohne das Jahr zu kennen, klickst du auf die Lücke deiner Zeitleiste, die du für chronologisch richtig hältst (früher links, später rechts). Bis zum Aufdecken kannst du die Position noch ändern.</p><p><strong>3. Aufdecken:</strong> Liegt die Karte richtig, bleibt sie liegen und zählt einen Punkt (die Startkarte zählt nicht). Liegt sie falsch, kommt sie auf den Ablagestapel und bleibt dauerhaft draußen. Danach geht es mit „Weiter“ zur nächsten Karte.</p></div></details><details class="rules-sec" ><summary>🎯 Schwierigkeit</summary><div class="rules-body"><p><strong>Normal:</strong> nur die Position zählt.<br><strong>Profi:</strong> Titel &amp; Interpret müssen vor dem Aufdecken zusätzlich stimmen.<br><strong>Experte:</strong> zusätzlich das Erscheinungsjahr, mit einstellbarer Toleranz von bis zu ±5 Jahren.</p><p>Verglichen wird großzügig: Groß-/Kleinschreibung, Akzente, Umlaut-Schreibweisen und Tippfehler werden verziehen.</p></div></details><details class="rules-sec" ><summary>🪙 Chrono-Tokens</summary><div class="rules-body"><p>Wenn aktiviert (außerhalb von Koop), sind Start- und Maximalwert einstellbar.</p><p>&bull; <strong>Song unbekannt?</strong> Für 1 Token wirfst du die aktuelle Karte ab und ziehst eine neue, ohne zu platzieren.<br>&bull; <strong>Karte kaufen:</strong> Für 3 Tokens wird die nächste gezogene Karte garantiert richtig einsortiert, ohne Risiko.<br>&bull; <strong>Bonus-Token:</strong> Tippst du Titel und Interpret richtig ein, gibt es einen weiteren Token (in jedem Schwierigkeitsgrad).</p><p>Tastenkürzel: S = Überspringen, B = Kaufen.</p></div></details><details class="rules-sec" ><summary>🎮 Spielmodi</summary><div class="rules-body"><p><strong>Solo:</strong> Du spielst allein auf eine einstellbare Zielkartenzahl.</p><p><strong>Koop:</strong> Ihr startet gemeinsam mit einer festen Zahl Chrono-Tokens (1–10) und einer Startkarte. Jede falsch platzierte Karte kostet einen Token. Skip/Kaufen gibt es nicht, die Tokens sind eure gemeinsamen Leben. Bei 0 Tokens vor dem Ziel habt ihr verloren, sonst gewonnen.</p><p><strong>Mehrspieler:</strong> Jeder Spieler hat eine eigene Startkarte und Zeitleiste, ihr spielt reihum. Wer das Ziel erreicht, gewinnt; ist der Stapel leer, entscheidet die Zahl richtiger Karten (Gleichstand möglich).</p></div></details><details class="rules-sec" ><summary>📣 Chronohit!-Einspruch (Mehrspieler mit Tokens)</summary><div class="rules-body"><p>Bevor eine Karte aufgedeckt wird, kann ein Gegner mit einem Token „Chronohit!“ rufen und die Lücke wählen, wo die Karte seiner Meinung nach hingehört. Liegt der aktive Spieler falsch und der Rufer richtig, bekommt der Rufer die Karte. Der eingesetzte Token ist immer weg. Pro Zug zählt nur der erste Einspruch.</p><p><strong>Einspruchsfenster:</strong> Entweder beendet der aktive Spieler (online auch der Host) das Fenster per Klick, oder es schließt automatisch nach 5 bzw. 10 Sekunden oder (mit Zeitlimit) mit der Restzeit, mindestens 5 Sekunden. Ruft jemand, hat der Rufer mindestens 5 Sekunden für die Lückenwahl. Ohne gewählte Lücke wird der Ruf zurückgenommen und der Token kommt zurück.</p></div></details><details class="rules-sec" ><summary>🎲 Zufallsereignisse (Mehrspieler)</summary><div class="rules-body"><p>Optional, standardmäßig aus. Beim Spielerwechsel passiert mit etwa 22 % Wahrscheinlichkeit etwas: <strong>Doppelrunde</strong> (der Spieler ist zweimal hintereinander dran) oder <strong>Kartentausch</strong> (zwei Spieler tauschen je eine zufällige Karte, nie die Startkarte; sie werden nach Jahr neu einsortiert). Ein Banner zeigt das Ereignis an.</p></div></details><details class="rules-sec" ><summary>⚡ Solo-Varianten</summary><div class="rules-body"><p><strong>Klassisch:</strong> bis zum Ziel.<br><strong>Endlos:</strong> kein Ziel, die Runde endet nach einer einstellbaren Zahl Fehler (Leben, Standard 3). Dein Highscore ist die Zahl richtiger Karten.<br><strong>Blitz:</strong> x Sekunden (30–180) für so viele richtige Karten wie möglich. Die Uhr startet beim Abspielen der ersten Karte; Abspielen, Aufdecken und Weiter laufen automatisch. Nur die Position zählt, ohne Titel/Interpret und ohne Tokens.<br><strong>Sudden Death:</strong> ein Fehler und du bist raus.</p><p>Highscores werden pro Variante (Blitz pro Dauer) gespeichert.</p></div></details><details class="rules-sec" ><summary>⏱ Zeitlimit pro Zug</summary><div class="rules-body"><p>Optional. Pro Zug bleibt nur begrenzte Zeit zum Platzieren (und in Profi/Experte oder für den Bonus zum Raten von Titel/Interpret). Die Zeit läuft ab dem Start des Songs. Läuft sie ab, gilt der Zug als verloren: Die Karte wird verworfen und zählt als falsch (im Koop kostet das einen Token).</p></div></details><details class="rules-sec" ><summary>🎼 Songauswahl und Filter</summary><div class="rules-body"><p>Beim Erstellen eines Spiels filterst du die Songs nach <strong>Sprache</strong>, <strong>Genre</strong> (ein Song kann mehrere haben, ein Treffer genügt), <strong>Jahrzehnt</strong> und <strong>Kategorien</strong> (z. B. Filmmusik oder Balladen; „Sonstige“ sind Songs ohne besondere Kategorie). Die Zahlen an den Chips zeigen, wie viele Songs es gibt. Die Reihenfolge der Filtergruppen lässt sich ändern.</p></div></details><details class="rules-sec" ><summary>🌐 Online spielen</summary><div class="rules-body"><p>Über „Spiel hosten / beitreten“ eröffnet ein Host einen Raum (Raumname, optional Passwort), Mitspieler treten bei, Zuschauer können zusehen. Der Host steuert Einstellungen und Start. Im Online-Solo und -Koop dürfen alle Teilnehmer gleichzeitig tippen (und raten). Im <strong>Team-Modus</strong> (Mehrspieler online) bilden die Spieler Teams mit gemeinsamer Zeitleiste und gemeinsamen Tokens; jedes Teammitglied darf tippen und raten, die Teams sind reihum dran. Die Teams wählst du in der Lobby selbst, der Host kann sie ändern oder zufällig verteilen. Ein <strong>Rematch</strong> startet nur, wenn alle verbundenen Mitspieler zustimmen; wer ablehnt, bricht die Anfrage ab.</p></div></details><details class="rules-sec" ><summary>💾 Spielstände</summary><div class="rules-body"><p>Beim Erstellen eines Spiels wählst du einen von 4 Speicherplätzen und einen Namen. Über den 💾-Button im Spiel speicherst du jederzeit in diesen Slot. Über „Spiel laden“ machst du dort weiter.</p></div></details><details class="rules-sec" ><summary>📜 Spielende, Chronik und Statistik</summary><div class="rules-body"><p>Am Ende siehst du das Ergebnis (bei Varianten mit Highscore-Vergleich). „Finale Zeitleiste ansehen“ zeigt alle Karten mit einem ▶ darunter, das die 30-Sekunden-Vorschau spielt. Die <strong>Spielchronik</strong> listet jeden Zug samt dem, was geraten wurde (Platzierung, Titel, Interpret, Jahr). Statistiken und der Jahresrückblick im Hauptmenü zählen deine Runden; Tutorial-Runden zählen nicht.</p></div></details><details class="rules-sec" ><summary>📅 Tägliche Challenge, Level und XP</summary><div class="rules-body"><p><strong>Tägliche Challenge:</strong> Jeden Tag gibt es 10 feste Karten (aus dem Datum abgeleitet, für alle mit derselben Songliste gleich), ohne Tokens. Dein Ergebnis ist x/10. Du darfst beliebig oft spielen, aber nur der erste Versuch des Tages zählt für XP und Serie. Der Teilen-Text zeigt nur Datum und Farbquadrate (🟩 richtig, 🟥 falsch), keine Songs.</p><p><strong>XP:</strong> 10 pro richtig platzierter Karte, 5 pro richtig geratenem Titel oder Interpreten, 50 für einen Sieg, 25 für einen neuen Highscore, 100 für die Tägliche Challenge plus 10 pro Serientag (bis 7). Das Level steigt mit wachsendem Bedarf (100 XP für Level 2, danach je 40 mehr). Alles wird nur lokal gespeichert. Tutorial-Runden zählen nicht.</p></div></details><details class="rules-sec" ><summary>🎯 Spielarten und Handicap</summary><div class="rules-body"><p><strong>Jahr-Schätzen</strong> (Mehrspieler, lokal oder online): Zu jedem Song tippen alle ein Jahr. Lokal gibst du das Gerät reihum weiter, online tippen alle gleichzeitig. Die kleinste Abweichung gewinnt die Runde: 3 / 2 / 1 Punkte für die drei Besten (gleiche Abweichung teilt sich den Platz), Volltreffer +2 Punkte. <strong>Interpret-Quiz</strong> (Solo, reihum oder online): nur den Interpreten raten, per Freitext (mit Toleranz bei Schreibweise) oder mit 4 Auswahlmöglichkeiten. Richtig gibt 1 Punkt, reihum wechseln die Spieler pro Song. Beide Spielarten laufen über die gewählte Rundenzahl (3 bis 30), sind nicht in XP und Statistik gezählt und haben keine Tokens. <strong>Handicap-Modus</strong> (Klassisch, Mehrspieler): Jeder Spieler hat seine eigene Schwierigkeit (Normal, Profi, Experte). Profi zählt ×1,5, Experte ×2 für Ziel und Wertung.</p></div></details><details class="rules-sec" ><summary>💬 Schnellchat, Diagnose und Zugänglichkeit</summary><div class="rules-body"><p><strong>Schnellchat:</strong> In Online-Räumen gibt es unten links einen 💬-Button mit vorgefertigten Sätzen. Alle sehen die Nachricht kurz mit deinem Namen (höchstens eine alle 1,5 Sekunden). <strong>Beitreten:</strong> Füge den kopierten Einladungstext des Hosts ein, dann werden Raumname und Passwort ausgefüllt. <strong>Verbindungsdiagnose</strong> (Einstellungen oder Beitreten-Seite) prüft Internet, Vermittlungsserver, Netzwerkart, Mikrofon, Kopieren und Spotify. <strong>Zugänglichkeit:</strong> Farbsehschwäche-Voreinstellungen, Screenreader-Modus und Linkshändermodus (alle standardmäßig aus) sowie „Automatisch hell/dunkel“ nach System oder Uhrzeit unter Themes.</p></div></details><details class="rules-sec" ><summary>🎓 Lernrunde und Auswertungen</summary><div class="rules-body"><p><strong>Auswertung:</strong> Ab dem Update merkt sich Chronohit lokal im Browser jede platzierte Karte (Song, richtig/falsch, Tag). Daraus entstehen in den Statistiken die Trefferquote pro Epoche und Genre mit schwächster Epoche/Genre (ab 5 Karten pro Gruppe), ein Verlaufsdiagramm der letzten 30 Tage (Trefferquote, richtige oder gespielte Karten, XP) und ein Kalender mit Spieltagen und Challenge-Tagen. Bei Online-Spielen als Gast werden Karten nicht mitgeschrieben, nur beim Host und lokal.</p><p><strong>Lernrunde:</strong> 10 Karten, bei denen Songs mit vielen bisherigen Fehlern häufiger vorkommen. Ohne bisherige Daten sind es zufällige Songs. Die Runde wird nicht gespeichert, zählt aber für XP und Statistik.</p></div></details><details class="rules-sec" ><summary>🎧 Playlist</summary><div class="rules-body"><p>Im Hauptmenü listet die Playlist alle Lieder mit Jahr, Sprache und Genre/Kategorie. Du kannst suchen, über „Filter“ nach Sprache, Genre, Jahrzehnt und Kategorien filtern, nach Titel, Interpret oder Jahr sortieren und mit ▶ die 30-Sekunden-Vorschau anspielen.</p></div></details><details class="rules-sec" ><summary>🎨 Themes und Darstellung</summary><div class="rules-body"><p>In den Einstellungen wählst du ein Theme. Jahreszeiten (Frühling bis Winter) und Feiertage (Valentinstag, Ostern, Halloween, Weihnachten, Silvester) sind aufklappbare Gruppen mit Hintergrund-Deko; Feiertags-Themes haben eigene Sounds. „Jahreszeiten-Themes nach Datum“ schaltet beim Start automatisch auf das passende Theme (Aus / Nur Feiertage / Feiertage &amp; Jahreszeiten). „Benutzerdefiniert“ erlaubt eigene Farben, Schrift und Stil. „Animationen reduzieren“ schaltet Deko-Animationen, Feuerwerk und Flattertiere aus.</p></div></details><details class="rules-sec" ><summary>⌨️ Bedienung per Tastatur</summary><div class="rules-body"><p>Wenn aktiviert: ←/→ oder A/D wählen die Lücke, Enter/Leertaste bestätigt (platzieren, aufdecken, weiter), Rücktaste ändert die Position, S überspringt, B kauft, P pausiert (nicht online). <strong>Esc</strong> geht in jedem Menü eine Ebene zurück.</p></div></details></div></div>
     <div class="menu-actions">
       <button class="btn-ghost" onclick="state.tutRules=false; render()">← Zurück zum Tutorial</button>
     </div>
@@ -4403,7 +4719,7 @@ function wizardStepKeys(){
   keys.push("mode");
   if(state.wizard.mode === "multiplayer" && !state.wizard.online) keys.push("players");
   const w = state.wizard;
-  if(!(w.mode === "solo" && w.variant === "blitz" && !w.online)) keys.push("settings");   // Blitz: alles Nötige steht schon beim Modus
+  if(!(w.mode === "solo" && w.variant === "blitz" && !w.online) && !(w.game && w.game !== "classic")) keys.push("settings");   // Blitz: alles Nötige steht schon beim Modus
   keys.push("songs");
   return keys;
 }
@@ -4472,7 +4788,8 @@ function wizardMovePlayer(i, dir){
     render();
   });
 }
-function wizardSetMode(v){ state.wizard.mode = v; if(v !== "solo") state.wizard.variant = "classic"; render(); }
+function wizardSetGame(v){ state.wizard.game = v; render(); }
+function wizardSetMode(v){ state.wizard.mode = v; if(v !== "solo") state.wizard.variant = "classic"; if(v === "coop" || (v !== "multiplayer" && state.wizard.game === "year")) state.wizard.game = "classic"; render(); }
 function wizardSetVariant(v){ state.wizard.variant = v; if(v === "blitz"){ state.wizard.difficulty = "normal"; state.wizard.tokens = false; state.wizard.timer = false; } render(); }
 function wizardSetDifficulty(v){ state.wizard.difficulty = v; render(); }
 function wizardToggleTokens(){ state.wizard.tokens = !state.wizard.tokens; render(); }
@@ -4568,7 +4885,7 @@ function filterItems(key){
   return key === "genres" ? LIB.langs : key === "styles" ? LIB.styles : key === "decades" ? LIB.decades : LIB.themes;
 }
 function stageKeysOf(song, key){
-  return key === "genres" ? [song.g]
+  return key === "genres" ? songLangs(song)
        : key === "styles" ? (song.s || [])
        : key === "decades" ? [String(decadeOf(song.y))]
        : songThemes(song);
@@ -4600,6 +4917,7 @@ function wizardMoveFilter(key, dir){
 function wizardPoolSize(){ return wizardStages().final; }
 function wizardPoolNeeded(){
   const w = state.wizard;
+  if(w.game && w.game !== "classic") return (w.rounds || 10) + 1;
   const starters = w.mode === "multiplayer" ? w.playerCount : 1;
   return starters + w.target + 1;
 }
@@ -4621,6 +4939,7 @@ function renderWizardStep1(){
         <div class="slot-info">
           <div class="slot-title">${slot && slot.name ? esc(slot.name) : `Slot ${n}`}</div>
           <div class="slot-meta">${slot ? `belegt · ${formatSlotDate(slot.savedAt)}` : 'leer'}</div>
+          ${slot ? miniTimelineHtml(slot) : ``}
         </div>
         ${selected ? `<span class="wizard-check">✓</span>` : ``}
       </div>`;
@@ -4648,13 +4967,23 @@ function renderWizardStep2(){
             <option value="multiplayer" ${w.mode==='multiplayer'?'selected':''}>Mehrspieler</option>
             <option value="coop" ${w.mode==='coop'?'selected':''}>Koop</option>
           </select>`)}
-        ${w.mode === 'solo' && !w.online ? infoRow('w-variant', 'Spielvariante',
+        ${(w.mode === 'solo' || w.mode === 'multiplayer') ? infoRow('w-game', 'Spielart',
+          '<strong>Klassisch</strong>: Zeitleiste.<br><strong>Jahr-Schätzen</strong> (Mehrspieler): alle tippen zum selben Song ein Jahr, die kleinste Abweichung gewinnt. Punkte: 3 / 2 / 1 für die drei Besten, Volltreffer +2.<br><strong>Interpret-Quiz</strong>: nur den Interpreten raten, Freitext oder 4 Auswahlmöglichkeiten. Solo, reihum oder online.',
+          `<select class="dropdown" onchange="wizardSetGame(this.value)">
+            <option value="classic" ${(w.game || 'classic') === 'classic' ? 'selected' : ''}>Klassisch</option>
+            ${w.mode === 'multiplayer' ? `<option value="year" ${w.game === 'year' ? 'selected' : ''}>Jahr-Schätzen</option>` : ''}
+            <option value="artist" ${w.game === 'artist' ? 'selected' : ''}>Interpret-Quiz</option>
+          </select>`) + ((w.game && w.game !== 'classic') ? infoRow('w-rounds', 'Runden', 'Wie viele Songs gespielt werden (3 bis 30).',
+          `<input type="number" class="pl-search" style="flex:none;width:90px;" min="3" max="30" value="${w.rounds || 10}" onchange="state.wizard.rounds = Math.max(3, Math.min(30, parseInt(this.value, 10) || 10)); render()">`) : '')
+          + (w.game === 'artist' ? infoRow('w-answer', 'Antwortart', 'Freitext (mit Toleranz bei Schreibweise) oder vier Auswahlmöglichkeiten.',
+          `<select class="dropdown" onchange="state.wizard.answerMode = this.value; render()"><option value="text" ${w.answerMode !== 'choice' ? 'selected' : ''}>Freitext</option><option value="choice" ${w.answerMode === 'choice' ? 'selected' : ''}>4 Auswahlmöglichkeiten</option></select>`) : '') : ''}
+        ${w.mode === 'solo' && !w.online && (w.game || 'classic') === 'classic' ? infoRow('w-variant', 'Spielvariante',
           '<strong>Klassisch</strong>: bis zum Ziel.<br><strong>Endlos</strong>: ohne Ziel, eine einstellbare Zahl Fehler (Leben, Standard 3) beendet die Runde, es zählt der Highscore.<br><strong>Blitz</strong>: x Sekunden, so viele richtige Karten wie möglich; nur Position/Jahr, kein Titel/Interpret, keine Tokens, automatisches Aufdecken und Weiter.<br><strong>Sudden Death</strong>: ein Fehler und du bist raus.',
           `<select class="dropdown" onchange="wizardSetVariant(this.value)">
             ${Object.entries(VARIANTS).map(([k, v]) => `<option value="${k}" ${(w.variant || 'classic') === k ? 'selected' : ''}>${v}</option>`).join('')}
           </select>`) + (w.variant === 'blitz' ? infoRow('w-blitz', 'Blitz-Dauer', 'Gesamtzeit der Runde. Sie startet, sobald die erste Karte abgespielt wird.',
           `<select class="dropdown" onchange="state.wizard.blitzSec=+this.value">${[30, 60, 90, 120, 180].map(x => `<option value="${x}" ${(w.blitzSec || 60) === x ? 'selected' : ''}>${x} Sekunden</option>`).join('')}</select>`) : '') : ''}
-        ${(w.mode === 'solo' && w.variant === 'blitz') ? '' : infoRow('w-difficulty', 'Schwierigkeit',
+        ${((w.mode === 'solo' && w.variant === 'blitz') || (w.game && w.game !== 'classic')) ? '' : infoRow('w-difficulty', 'Schwierigkeit',
           '<strong>Normal</strong>: Nur die Position auf der Zeitleiste zählt.<br><strong>Profi</strong>: Titel &amp; Interpret müssen zusätzlich stimmen.<br><strong>Experte</strong>: zusätzlich auch das exakte Erscheinungsjahr.',
           `<select class="dropdown" onchange="wizardSetDifficulty(this.value)">
             <option value="normal" ${w.difficulty==='normal'?'selected':''}>Normal</option>
@@ -4713,6 +5042,8 @@ function renderWizardStep3(n){
             <div class="val">${w.target}</div>
             <button onclick="wizardStepTarget(1)">+</button>
           </div>`)}
+        ${w.mode === 'multiplayer' && !w.teams ? infoRow('w-handicap', 'Handicap-Modus', 'Jeder Spieler hat seine eigene Schwierigkeit (Normal, Profi, Experte). Schwerere Stufen zählen mehr: Profi ×1,5, Experte ×2. Das gilt für Ziel und Wertung. Lokal wählst du die Stufe im Spieler-Schritt, online in der Lobby. Standard: aus.',
+          `<div class="switch ${w.handicap ? 'on' : ''}" onclick="state.wizard.handicap = !state.wizard.handicap; render()"><div class="knob"></div></div>`) : ''}
         ${w.online && w.mode === 'multiplayer' ? infoRow('w-teams', 'Team-Modus', 'Mehrere Spieler bilden ein Team mit gemeinsamer Zeitleiste und gemeinsamen Tokens. Jedes Teammitglied darf tippen und raten, die Teams sind reihum dran. Die Teams wählen die Spieler in der Lobby selbst, der Host kann sie ändern oder zufällig verteilen.',
           `<select class="dropdown" onchange="state.wizard.teams = +this.value; render()">${[[0, 'Aus (jeder für sich)'], [2, '2 Teams'], [3, '3 Teams'], [4, '4 Teams']].map(x => `<option value="${x[0]}" ${(w.teams || 0) === x[0] ? 'selected' : ''}>${x[1]}</option>`).join('')}</select>`) : ''}
         ${w.mode === 'multiplayer' ? infoRow('w-events', 'Zufallsereignisse',
@@ -4789,6 +5120,7 @@ function renderWizardPlayers(n){
       <input class="guess-input" type="text" maxlength="20" autocomplete="off"
         placeholder="Spieler ${i+1}" value="${esc(name)}"
         oninput="state.wizard.playerNames[${i}]=this.value">
+      ${w.handicap ? `<select class="dropdown" aria-label="Schwierigkeit" onchange="(state.wizard.playerDiff = state.wizard.playerDiff || [])[${i}] = this.value">${[["normal", "Normal"], ["pro", "Profi"], ["expert", "Experte"]].map(x => `<option value="${x[0]}" ${((w.playerDiff || [])[i] || "normal") === x[0] ? "selected" : ""}>${x[1]}</option>`).join("")}</select>` : ``}
       ${custom ? `
         <button class="btn-ghost btn-small icon-btn" onclick="wizardMovePlayer(${i},-1)" ${i===0?'disabled':''} aria-label="Nach oben">▲</button>
         <button class="btn-ghost btn-small icon-btn" onclick="wizardMovePlayer(${i},1)" ${i===w.playerNames.length-1?'disabled':''} aria-label="Nach unten">▼</button>` : ``}
@@ -4844,6 +5176,15 @@ function renderCreateGame(){
     </div>
   `;
 }
+function applyGameKind(settings, w){
+  const g = (w.game && w.game !== "classic" && (w.mode === "solo" || w.mode === "multiplayer")) ? w.game : "classic";
+  if(g === "year" && w.mode !== "multiplayer") return;
+  if(g !== "classic"){
+    settings.game = g; settings.rounds = Math.max(3, Math.min(30, w.rounds || 10)); settings.answerMode = w.answerMode === "choice" ? "choice" : "text";
+    settings.tokens = false; settings.difficulty = "normal"; settings.target = settings.rounds; settings.events = false; settings.challenge = false;
+    delete settings.variant; delete settings.teams; delete settings.lives; delete settings.blitzSec;
+  } else if(w.mode === "multiplayer" && w.handicap && !w.teams) settings.handicap = true;
+}
 async function createGameFromWizard(){
   const w = state.wizard;
   if(w.online) return netHostFromWizard();
@@ -4875,6 +5216,7 @@ async function createGameFromWizard(){
     if(w.variant === "sudden"){ settings.lives = 1; }
     if(w.variant === "blitz"){ settings.tokens = false; settings.difficulty = "normal"; settings.turnLimit = 0; settings.yearTol = 0; settings.blitzSec = w.blitzSec || 60; settings.target = 9999; }
   }
+  applyGameKind(settings, w);
   const slotNum = w.slot;
   const saveName = (w.name || "").trim();
   let playerNames = null;
@@ -4885,8 +5227,10 @@ async function createGameFromWizard(){
     settings.playerCount = playerNames.length;
   }
   state.wizard = null;
-  if(w.quickPlay){ window.__tutBoot = true; newGame(settings, playerNames); window.__tutBoot = false; state.quickGame = true; state.hasSave = false; render(); return; }
+  if(w.quickPlay){ window.__tutBoot = true; newGame(settings, playerNames); if(settings.game) qgInit(); if(settings.handicap) hcApplyLocal(w); window.__tutBoot = false; state.quickGame = true; state.hasSave = false; render(); return; }
   newGame(settings, playerNames);
+  if(settings.game) qgInit();
+  if(settings.handicap) hcApplyLocal(w);
   state.activeSlot = slotNum;
   state.activeSaveName = saveName;
   const snapshot = JSON.parse(JSON.stringify(state));
@@ -4976,6 +5320,7 @@ function renderPlayersDrawer(){
 }
 
 function renderGame(){
+  if(state.qg) return renderQg();
   const s = state.settings;
   const timeline = state.timeline;
   const online = !!state.online;
@@ -5259,8 +5604,9 @@ function isMultiRound(){ return isMulti() && state.players.length > 1; }
 
 function rankedPlayers(){
   const list = state.players.map((_, i) => ({ i, v: playerView(i) }));
-  list.forEach(r => { r.pos = 1 + list.filter(o => o.v.correctCount > r.v.correctCount).length; });
-  list.sort((a, b) => (b.v.correctCount - a.v.correctCount) || (a.v.wrongCount - b.v.wrongCount) || (a.i - b.i));
+  const sc = r => state.settings.handicap ? r.v.correctCount * (HC_MULT[(state.players[r.i] || {}).diff || "normal"] || 1) : r.v.correctCount;
+  list.forEach(r => { r.pos = 1 + list.filter(o => sc(o) > sc(r)).length; });
+  list.sort((a, b) => (sc(b) - sc(a)) || (a.v.wrongCount - b.v.wrongCount) || (a.i - b.i));
   return list;
 }
 
@@ -5301,6 +5647,7 @@ function blitzTick(){
 }
 setInterval(blitzTick, 200);
 function renderEnd(){
+  if(state.qg){ qgFinish(); return renderQgEnd(); }
   maybeRecordGameEnd();
   const s = state.settings;
   if(isMultiRound()){
@@ -5419,7 +5766,7 @@ function renderTimelineOnly(){
     ${body}
     <div class="menu-actions" style="margin-top:24px;">
       <button class="btn-ghost" onclick="plStop(true); state.screen='end'; render()">← Zurück zum Ergebnis</button>
-      <button class="btn-primary" onclick="plStop(true); requestDeleteOnFinish()">Hauptmenü</button>
+      <button class="btn-primary" onclick="plStop(true); ${state.activeSlot ? 'requestDeleteOnFinish()' : 'abandonGame()'}">Hauptmenü</button>
     </div>
     ${state.confirmDeleteOnFinish ? renderDeleteOnFinishModal() : ``}
   `;
@@ -5767,14 +6114,14 @@ function currentDesign(){
   if(currentTheme === "custom"){
     return DESIGN_OPTIONS.some(o => o.key === customTheme.design) ? customTheme.design : "standard";
   }
-  return ["modern", "glass", "norisk", "terminal", "synthwave", "notizbuch", "gameboy"].includes(currentTheme) ? currentTheme : "standard";
+  return ["modern", "glass", "norisk", "terminal", "synthwave", "notizbuch", "gameboy", "minecraft"].includes(currentTheme) ? currentTheme : "standard";
 }
 function syncDesign(){
   const d = currentDesign();
   document.documentElement.setAttribute("data-design", d);
   if(d === "norisk" && !prefs.reduceMotion) startCursorGlow(); else stopCursorGlow();
 }
-const THEME_GOOGLE = { terminal: ["VT323", "IBM+Plex+Mono:wght@400;600"], synthwave: ["Orbitron:wght@500;700"], halloween: ["Creepster"], notizbuch: ["Caveat:wght@500;700", "Patrick+Hand"], gameboy: ["Press+Start+2P"] };
+const THEME_GOOGLE = { terminal: ["VT323", "IBM+Plex+Mono:wght@400;600"], synthwave: ["Orbitron:wght@500;700"], halloween: ["Creepster"], notizbuch: ["Caveat:wght@500;700", "Patrick+Hand"], gameboy: ["Press+Start+2P"], minecraft: ["Pixelify+Sans:wght@400;700"] };
 function applyTheme(theme, auto){
   currentTheme = theme;
   (THEME_GOOGLE[theme] || []).forEach(ensureGoogleFont);
@@ -5808,7 +6155,8 @@ const DECO = {
   ostern:      { gr:["🌷","🐣","🥚","🌼","🐰","🥚","🌷","🐥"], dr:["🦋","🦋","🦋","🦋"] },
   valentin:    { up:["💖","💗","💕","🌹","💘"] },
   silvester:   { fl:["🎊","🎉","🥂","✨"], fw:true },
-  notizbuch:   { gr:["✏️","📎","📐"] }
+  notizbuch:   { gr:["✏️","📎","📐"] },
+  minecraft:   { gr:["🌲","🐑","🌳","🐖","🌲","🐄"], pixel:true }
 };
 let fwRaf = 0;
 function stopFw(){ if(fwRaf) cancelAnimationFrame(fwRaf); fwRaf = 0; }
@@ -5852,6 +6200,18 @@ function flutter(el){
     sp.animate(kf, { duration:(bee ? r(16, 26) : bat ? r(26, 40) : ghost ? r(80, 120) : r(36, 54)) * 1000, iterations:Infinity, easing:"linear", delay:-r(0, 60) * 1000 });
   });
 }
+const PX_CACHE = {};
+function pxEmoji(ch){
+  if(PX_CACHE[ch]) return PX_CACHE[ch];
+  let html = ch;
+  try{
+    const R = 20, c = document.createElement("canvas"); c.width = c.height = R; const x = c.getContext("2d");
+    x.textAlign = "center"; x.textBaseline = "middle"; x.font = Math.round(R * .78) + 'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+    x.fillText(ch, R / 2, R / 2 + 1);
+    html = `<img alt="" src="${c.toDataURL()}" style="width:1em;height:1em;display:block;image-rendering:pixelated;">`;
+  }catch(e){}
+  return PX_CACHE[ch] = html;
+}
 function syncDeco(){
   stopFw();
   const cfg = DECO[currentTheme]; let el = document.getElementById("theme-deco");
@@ -5859,7 +6219,7 @@ function syncDeco(){
   if(!el){ el = document.createElement("div"); el.id = "theme-deco"; document.body.appendChild(el); }
   const r = (a, b) => a + Math.random() * (b - a); let h = "";
   const W = innerWidth, k = Math.min(1, W / 1200);
-  const add = (cls, arr, n, fn) => { if(arr) for(let i = 0; i < n; i++) h += `<span class="${cls}" style="${fn(i)}">${arr[i % arr.length]}</span>`; };
+  const add = (cls, arr, n, fn) => { if(arr) for(let i = 0; i < n; i++) h += `<span class="${cls}" style="${fn(i)}">${cfg.pixel ? pxEmoji(arr[i % arr.length]) : arr[i % arr.length]}</span>`; };
   if(cfg.gr){
     const n = Math.max(3, Math.min(cfg.gr.length * 2, Math.floor(W / 100))), sp = W / n;
     add("gr", cfg.gr, n, i => `left:${((i + .5) / n * 100 + r(-1, 1)).toFixed(1)}vw;font-size:${Math.max(28, Math.min(86, sp * .9) * r(.65, 1)).toFixed(0)}px;animation-duration:${r(3, 6).toFixed(1)}s;animation-delay:-${r(0, 5).toFixed(1)}s`);
@@ -6178,6 +6538,19 @@ function netRollOrder(){
   NET.orderLen = NET.seats.length;
   netBroadcastLobby(); render();
 }
+function lobbyDiffHtml(host, i, x){
+  const me = netSameName(x.name, NET.myName), can = !NET.started && (host || me), d = x.diff || "normal", L = { normal:"Normal", pro:"Profi", expert:"Experte" };
+  if(!can) return `<span class="lobby-ready">${L[d]}</span>`;
+  return `<select class="dropdown" aria-label="Schwierigkeit" onchange="netSetDiff(${i}, this.value)">${Object.entries(L).map(([k, l]) => `<option value="${k}" ${k === d ? "selected" : ""}>${l}</option>`).join("")}</select>`;
+}
+function netSetDiff(i, v){
+  if(!["normal", "pro", "expert"].includes(v)) return;
+  if(NET.role === "host"){ const q = NET.seats[i]; if(q){ q.diff = v; netBroadcastLobby(); netUiUpdate(); } } else netSendHost({ t:"diff", v });
+}
+function netHostDiff(entry, d){
+  if(NET.role !== "host" || NET.started || !["normal", "pro", "expert"].includes(d.v)) return;
+  const q = NET.seats.find(x => netKey(x.name) === entry.key); if(!q) return; q.diff = d.v; netBroadcastLobby(); netUiUpdate();
+}
 function lobbyTeamHtml(host, i, x, T){
   const t = x.team || 0, me = netSameName(x.name, NET.myName), can = !NET.started && (host || me);
   if(!can) return `<span class="lobby-ready">Team ${t + 1}</span>`;
@@ -6401,6 +6774,22 @@ let recapYear = null;
 const MONTHS_DE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 function openRecap(){ recapYear = String(new Date().getFullYear()); state.screen = "recap"; render(); }
 function setRecapYear(y){ recapYear = String(y); render(); }
+const RC = { vals:[] };
+function recapChartSvg(vals){
+  RC.vals = vals;
+  const max = niceMax(Math.max(...vals)), W = 640, H = 240, L0 = 56, R0 = 10, T0 = 14, B0 = 34, cw = W - L0 - R0, ch = H - T0 - B0, bw = cw / 12;
+  let g = "";
+  for(let t = 0; t <= 4; t++){ const y = T0 + ch - ch * t / 4;
+    g += `<line x1="${L0}" y1="${y}" x2="${W - R0}" y2="${y}" style="stroke:var(--line);stroke-width:${t ? 1 : 2};opacity:${t ? .55 : 1};"/><text x="${L0 - 8}" y="${y + 5}" text-anchor="end" style="fill:var(--text);font-size:16px;">${Math.round(max * t / 4 * 10) / 10}</text>`; }
+  const bars = vals.map((v, i) => { const h = v ? Math.max(3, v / max * ch) : 0;
+    return `${v ? `<rect x="${(L0 + i * bw + 6).toFixed(1)}" y="${(T0 + ch - h).toFixed(1)}" width="${(bw - 12).toFixed(1)}" height="${h.toFixed(1)}" rx="3" data-rbar="${i}" style="fill:var(--accent);"></rect>` : `<circle cx="${(L0 + i * bw + bw / 2).toFixed(1)}" cy="${T0 + ch}" r="2" style="fill:var(--muted);"></circle>`}<text x="${(L0 + i * bw + bw / 2).toFixed(1)}" y="${H - 10}" text-anchor="middle" style="fill:var(--text);font-size:15px;">${MONTHS_DE[i].slice(0, 3)}</text><rect x="${(L0 + i * bw).toFixed(1)}" y="${T0}" width="${bw.toFixed(1)}" height="${ch}" style="fill:transparent;cursor:pointer;" onmouseenter="recapBar(${i})" onclick="recapBar(${i})"></rect>`; }).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;" role="img" aria-label="Karten pro Monat">${g}${bars}</svg>`;
+}
+function recapBar(i){
+  const r = document.getElementById("recap-readout"), v = RC.vals[i];
+  if(r) r.innerHTML = "<b>" + MONTHS_DE[i] + "</b>: " + (v ? "<b>" + v + " Karten</b>" : "keine Karten");
+  document.querySelectorAll("[data-rbar]").forEach(e => { e.style.opacity = +e.dataset.rbar === i ? 1 : .45; });
+}
 function renderRecap(){
   const years = Object.keys(stats.years || {});
   const cur = String(new Date().getFullYear());
@@ -6448,7 +6837,7 @@ function renderRecap(){
         ${strongDec ? `<div class="stats-row"><span>Stärkstes Jahrzehnt (ab 5 Karten)</span><b>${strongDec[0]}er (${pct(strongDec[1].ok, strongDec[1].n)} richtig)</b></div>` : ``}
       </div>
       <div class="menu-card"><h3>Karten pro Monat</h3>
-        <div style="display:flex; gap:6px; align-items:flex-end;">${bars}</div>
+        <div id="recap-readout" style="min-height:1.5em;">Fahre über einen Balken oder tippe ihn an, um den genauen Wert zu sehen.</div>${recapChartSvg(perMonth)}
         <div class="stats-note">Trefferquote: richtige Karten ÷ alle aufgedeckten Karten; ein abgelaufener Zug zählt als falsch. Die Werte liegen nur in diesem Browser; „Statistiken zurücksetzen“ löscht auch den Jahresrückblick.</div>
       </div>`;
   }
@@ -6513,7 +6902,7 @@ async function netRematch(){
   if(NET.seats.length < 2){ toast("Für ein Rematch werden mindestens 2 verbundene Spieler benötigt."); render(); return; }
   const settings = JSON.parse(JSON.stringify(state.settings)), names = NET.seats.map(q => q.name);
   const slot = state.activeSlot, room = state.activeSaveName;
-  if(settings.mode === "multiplayer"){ const TS = netTeamSetup(), nm = TS ? TS.names : names; NET.teamOfNew = TS ? TS.teamOf : null; settings.playerCount = nm.length; newGame(settings, nm); } else newGame(settings);
+  if(settings.mode === "multiplayer"){ const TS = netTeamSetup(), nm = TS ? TS.names : names; NET.teamOfNew = TS ? TS.teamOf : null; settings.playerCount = nm.length; newGame(settings, nm); if(settings.game) qgInit(); if(settings.handicap) hcApplyNet(); } else newGame(settings);
   state.online = true; state.net = { seats: NET.seats, turn: 0, teamOf: NET.teamOfNew || null }; state.turnNo = state.turnNo || 1;
   const st = Math.floor(Math.random() * NET.seats.length);   // neuer Startspieler
   if(st > 0){
@@ -6572,7 +6961,7 @@ function openFinalTimeline(){
 function closeFinalTimeline(){ const el = document.getElementById("ft-overlay"); if(el){ el.remove(); plStop(true); } }
 document.addEventListener("keydown", e => { if(e.key === "Escape") closeFinalTimeline(); });
 function endExtraHtml(){
-  let h = xpEndHtml() + `<button class="btn-ghost" onclick="openChronicle()">📜 Spielchronik</button>`;
+  let h = hcEndHtml() + xpEndHtml() + `<button class="btn-ghost" onclick="openChronicle()">📜 Spielchronik</button>`;
   if(state.online && NET.role === "host"){
     if(NET.rm){
       const rows = NET.seats.slice(1).filter(q => NET.rm.votes[netKey(q.name)] !== undefined).map(q => `<div>${NET.rm.votes[netKey(q.name)] === true ? "✅" : "⏳"} ${esc(q.name)}</div>`).join("");
@@ -6740,7 +7129,7 @@ function mpWin(g){
   try{ const my = netMyTeam(), mx = Math.max(...state.players.map(q => q.correctCount)); if(state.players[my] && state.players[my].correctCount === mx) g.won = (g.won || 0) + 1; }catch(e){}
 }
 function maybeRecordGameEnd(){
-  if(state.tutorial) return;
+  if(state.tutorial || state.qg) return;
   if(state.statsRecorded) return;
   state.statsRecorded = true;
   statsTouch();
@@ -6849,6 +7238,7 @@ const SFX_PACKS = {
   terminal:   { wave:"square",   pitch:1.2, decay:.4,  vol:.35, shimmer:false },
   synthwave:  { wave:"sawtooth", pitch:.9,  decay:1.5, vol:.5,  shimmer:true, synth:true },
   gameboy:    { wave:"square",   pitch:1.5, decay:.35, vol:.4,  shimmer:false },
+  minecraft:  { wave:"square",   pitch:.8,  decay:.3,  vol:.4,  shimmer:false },
   weihnachten:{ wave:"sine",     pitch:1.9, decay:1.8, vol:.8,  shimmer:true, sparkle:true },
   halloween:  { wave:"sawtooth", pitch:.6,  decay:1.8, vol:.5,  shimmer:false, eerie:true },
   ostern:     { wave:"triangle", pitch:1.5, decay:1,   vol:.8,  shimmer:true },
@@ -7011,7 +7401,7 @@ document.addEventListener("click", e => {
 
 /* ============ DARSTELLUNG & BARRIEREFREIHEIT ============ */
 const PREFS_KEY = "chronohit_prefs";
-const PREF_DEFAULTS = { voiceChat: false, bigRooms: false, autoPlay: false, soundDesign: "theme", reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, autoSave: "turn", autoSaveSec: 30, seasonal: "off", fontFamily: "theme", cardSize: "m", density: "normal", autoNextSec: 0, keys: true, sound: true, soundVolume: 0.5, soundGroups: null };
+const PREF_DEFAULTS = { relayOnly: false, turnUrl: "", turnUser: "", turnPass: "", voiceChat: false, bigRooms: false, autoPlay: false, soundDesign: "theme", reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, colorMode: "off", screenReader: false, leftHand: false, autoTheme: "off", autoLight: "notizbuch", autoDark: "", autoSave: "turn", autoSaveSec: 30, seasonal: "off", fontFamily: "theme", cardSize: "m", density: "normal", autoNextSec: 0, keys: true, sound: true, soundVolume: 0.5, soundGroups: null };
 let prefs = { ...PREF_DEFAULTS, reduceMotion: false, soundGroups: defaultSoundGroups() };
 function loadPrefs(){
   let saved = {};
@@ -7038,6 +7428,39 @@ function loadPrefs(){
 function savePrefs(){
   try{ localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); }catch(e){}
 }
+const SEL_COLOR = [["off", "Aus"], ["rg", "Rot-Grün-Schwäche (Blau/Orange)"], ["tritan", "Blau-Gelb-Schwäche (Grün/Pink)"], ["mono", "Graustufen (Vollfarbenblindheit)"]];
+function colorModeSelect(){
+  const cur = prefs.colorMode && prefs.colorMode !== "off" ? prefs.colorMode : (prefs.colorSafe ? "rg" : "off");
+  return `<select class="dropdown" aria-label="Farbsehschwäche" onchange="setColorMode(this.value)">${SEL_COLOR.map(([v, l]) => `<option value="${v}" ${cur === v ? "selected" : ""}>${l}</option>`).join("")}</select>`;
+}
+function setColorMode(v){ prefs.colorMode = v; prefs.colorSafe = v !== "off"; savePrefs(); applyPrefs(); render(); }
+/* Screenreader-Hilfen */
+function srSay(t){
+  let d = document.getElementById("sr-live");
+  if(!d){ d = document.createElement("div"); d.id = "sr-live"; d.setAttribute("role", "status"); d.setAttribute("aria-live", "polite"); d.style.cssText = "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;"; document.body.appendChild(d); }
+  d.textContent = ""; setTimeout(() => { d.textContent = t; }, 60);
+}
+function srPass(){
+  if(!prefs.screenReader) return;
+  const yrs = (state.timeline || []).map(x => x.y);
+  document.querySelectorAll(".gap").forEach((g, i) => {
+    g.setAttribute("role", "button"); g.setAttribute("tabindex", "0");
+    g.setAttribute("aria-label", "Karte hier einsortieren: " + (i === 0 ? "vor " + yrs[0] : i >= yrs.length ? "nach " + yrs[yrs.length - 1] : "zwischen " + yrs[i - 1] + " und " + yrs[i]));
+    if(!g.__kb){ g.__kb = true; g.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); g.click(); } }); }
+  });
+  const key = state.screen + ":" + state.phase + ":" + (state.turnNo || 0) + ":" + (state.lastResult ? 1 : 0);
+  if(key === srPass.last) return; srPass.last = key;
+  let t = "";
+  if(state.screen === "menu") t = "Hauptmenü.";
+  else if(state.screen === "end") t = "Runde beendet. " + (state.correctCount || 0) + " Karten richtig.";
+  else if(state.screen === "game"){
+    if(state.phase === "draw") t = "Neue Karte. Aktiviere die Schallplatte, um den Song abzuspielen.";
+    else if(state.phase === "placing") t = "Wähle eine Lücke. Deine Zeitleiste hat " + yrs.length + " Karten: " + yrs.join(", ") + ".";
+    else if(state.phase === "revealed_pending") t = "Lücke gewählt. Bestätige mit Aufdecken.";
+    else if(state.phase === "feedback" && state.current) t = (state.lastResult && state.lastResult.ok ? "Richtig. " : "Falsch. ") + state.current.t + " von " + state.current.a + ", " + state.current.y + ".";
+  }
+  if(t) srSay(t);
+}
 function applyPrefs(){
   const root = document.documentElement;
   root.classList.toggle("reduce-motion", !!prefs.reduceMotion);
@@ -7045,7 +7468,9 @@ function applyPrefs(){
   // Liquid Glass: Lichtbrechung nur ohne "Animationen reduzieren" (dann bleibt Blur + Glanz)
   root.classList.toggle("glass-refract", refractionSupported && !prefs.reduceMotion);
   root.classList.toggle("high-contrast", !!prefs.highContrast);
-  root.classList.toggle("cb-safe", !!prefs.colorSafe);
+  { const cm = prefs.colorMode && prefs.colorMode !== "off" ? prefs.colorMode : (prefs.colorSafe ? "rg" : "off");
+    root.classList.toggle("cb-safe", cm !== "off"); root.classList.toggle("cb-tritan", cm === "tritan"); root.classList.toggle("cb-mono", cm === "mono");
+    root.classList.toggle("lefty", !!prefs.leftHand); root.classList.toggle("sr-mode", !!prefs.screenReader); }
   root.style.setProperty("--font-scale", String(prefs.fontScale));
   { const cw = { s: 96, m: 118, l: 146, xl: 176 }[prefs.cardSize] || 118, gw = { tight: 14, normal: 26, wide: 44 }[prefs.density] || 26;
     root.style.setProperty("--card-w", cw + "px"); root.style.setProperty("--card-scale", String(cw / 118)); root.style.setProperty("--gap-w", gw + "px"); }
@@ -7076,7 +7501,7 @@ function soundVolumeHtml(){
     <span class="sv-val" style="min-width:48px; text-align:right;">${pct} %</span>
   </div>`;
 }
-const SOUND_DESIGNS = [["theme", "Wie Theme (automatisch)"], ["standard", "Standard"], ["modern", "Modern"], ["glass", "Liquid Glass"], ["norisk", "NRC"], ["weihnachten", "Weihnachten (glitzernd)"], ["halloween", "Halloween (gruselig)"], ["ostern", "Ostern"], ["valentin", "Valentinstag"], ["silvester", "Silvester"], ["notizbuch", "Notizbuch (Papier)"], ["terminal", "Retro-Terminal"], ["synthwave", "Synthwave"], ["gameboy", "Gameboy (8-Bit)"]];
+const SOUND_DESIGNS = [["theme", "Wie Theme (automatisch)"], ["standard", "Standard"], ["modern", "Modern"], ["glass", "Liquid Glass"], ["norisk", "NRC"], ["weihnachten", "Weihnachten (glitzernd)"], ["halloween", "Halloween (gruselig)"], ["ostern", "Ostern"], ["valentin", "Valentinstag"], ["silvester", "Silvester"], ["notizbuch", "Notizbuch (Papier)"], ["terminal", "Retro-Terminal"], ["synthwave", "Synthwave"], ["gameboy", "Gameboy (8-Bit)"], ["minecraft", "Pixel-Blöcke"]];
 function setSoundDesign(v){
   prefs.soundDesign = SOUND_DESIGNS.some(x => x[0] === v) ? v : "theme"; savePrefs();
   try{ sfx("turn", 0, undefined, true); }catch(e){}
@@ -7153,7 +7578,9 @@ function renderAccessibilityCard(){
         </div>
         ${row('Animationen reduzieren', 'Schaltet Übergänge, drehende Schallplatte und Cursor-Leuchtkreis ab. Ohne eigene Wahl folgt es deiner Systemeinstellung.', sw('reduceMotion'))}
         ${row('Hoher Kontrast', 'Kräftigere Rahmen, stärkerer Text und deckende Flächen.', sw('highContrast'))}
-        ${row('Farbenblind-freundlich', 'Blau/Orange statt Grün/Rot für richtig/falsch, dazu zusätzliche Symbole (✓ / ✕).', sw('colorSafe'))}
+        ${row('Farbsehschwäche', 'Voreinstellung für die Farben von richtig/falsch, dazu zusätzliche Symbole (✓ / ✕). Rot-Grün: Blau/Orange. Blau-Gelb: Grün/Pink. Graustufen: für Vollfarbenblindheit.', colorModeSelect())}
+        ${row('Screenreader-Modus', 'Sagt Spielereignisse an (neue Karte, richtig/falsch, Ergebnis) und beschriftet die Lücken der Zeitleiste mit den Nachbarjahren. Standard: aus.', sw('screenReader'))}
+        ${row('Linkshändermodus', 'Spiegelt schwebende Buttons und Button-Reihen, damit alles mit der linken Hand gut erreichbar ist. Standard: aus.', sw('leftHand'))}
       </div>
     </div>`;
 }
@@ -7172,7 +7599,11 @@ const NET_MAX_PLAYERS = 100;   // Obergrenze beim Verarbeiten von Daten
 function netJoinCap(){ return prefs && prefs.bigRooms ? 100 : 10; }   // Beitrittsgrenze (Standard 10; „Experimentelles“ erlaubt 100)
 const NET_PBKDF2_ITER = 300000;
 // Leer = öffentlicher PeerJS-Cloud-Server. Eigener Server z. B.: { host:"mein.server", port:443, path:"/", secure:true }
-const NET_PEER_OPTIONS = { debug: 0 };
+function netPeerOptions(){
+  const o = { debug: 0 }, url = (prefs.turnUrl || "").trim();
+  if(prefs.relayOnly && url) o.config = { iceServers:[{ urls:url, username:prefs.turnUser || "", credential:prefs.turnPass || "" }], iceTransportPolicy:"relay" };
+  return o;
+}
 const NET_PING_MS = 2000, NET_DEAD_MS = 15000;
 const NET_ACTIONS = ["playCurrent", "chooseGap", "changePosition", "revealCard", "nextTurn", "doSkipWithToken", "doBuyWithTokens", "callChallenge", "chooseChallengeGap", "cancelChallenge", "resolveChallenge"];
 const NET_LOCAL_DEFAULTS = {
@@ -7378,7 +7809,7 @@ function netBuildSnapshot(){
     settings: netPublicSettings(st.settings),
     timeline: st.timeline, current: cur, phase: st.phase, pendingGap: st.pendingGap, lastResult: st.lastResult,
     tokens: st.tokens, correctCount: st.correctCount, wrongCount: st.wrongCount, won: st.won, bonusClaimed: st.bonusClaimed,
-    guess: st.guess, guessResult: st.guessResult, skippedInfo: st.skippedInfo, eventInfo: st.eventInfo || null, wrongSongs: st.wrongSongs || [],
+    guess: st.guess, guessResult: st.guessResult, skippedInfo: st.skippedInfo, eventInfo: st.eventInfo || null, qg: st.qg || null, wrongSongs: st.wrongSongs || [],
     challenge: st.challenge ? { caller: st.challenge.caller, gap: st.challenge.gap } : null,
     players: st.players || [], currentPlayer: st.currentPlayer || 0, winners: st.winners || [], chronicle: (st.chronicle || []).slice(-300),
     turnNo: st.turnNo || 0, deckCount: st.deck.length,
@@ -7476,6 +7907,7 @@ function netCleanSnapshot(s){
       ? { t: netCleanSong({ t: s.skippedInfo.t }).t, a: netCleanSong({ a: s.skippedInfo.a }).a, y: netInt(s.skippedInfo.y, 0, 0, 3000) } : null,
     challenge: s.challenge && typeof s.challenge === "object" ? { caller: s.challenge.caller == null ? null : netInt(s.challenge.caller, 0, 0, NET_MAX_PLAYERS), gap: s.challenge.gap == null ? null : netInt(s.challenge.gap, 0, 0, 500) } : null,
     eventInfo: s.eventInfo && typeof s.eventInfo === "object" ? { text: String(s.eventInfo.text || "").slice(0, 200) } : null,
+    qg: netCleanQg(s.qg),
     wrongSongs: netCleanSongs(s.wrongSongs), players, currentPlayer: netInt(s.currentPlayer, 0, 0, NET_MAX_PLAYERS),
     winners: (Array.isArray(s.winners) ? s.winners : []).map(i => netInt(i, 0, 0, NET_MAX_PLAYERS)).slice(0, NET_MAX_PLAYERS),
     turnNo: netInt(s.turnNo, 0, 0, 1e6), deckCount: netInt(s.deckCount, 0, 0, 1e5), chronicle: netCleanChronicle(s.chronicle),
@@ -7613,7 +8045,7 @@ async function netHostOpen(room, password, hostName, config, resume){
   NET.tickTimer = setInterval(netPeriodic, NET_PING_MS);
 }
 function netHostPeer(){
-  const peer = new peerjs.Peer(NET.roomId, NET_PEER_OPTIONS);
+  const peer = new peerjs.Peer(NET.roomId, netPeerOptions());
   NET.peer = peer;
   peer.on("open", () => {
     if(NET.peer !== peer) return;
@@ -7678,6 +8110,9 @@ async function netHostHandle(entry, d){
     case "react": netHostReact(entry, d); break;
     case "rmvote": netHostRmVote(entry, d); break;
     case "vjoin": case "vleave": netHostVoice(entry, d); break;
+    case "chat": netHostChat(entry, d); break;
+    case "diff": netHostDiff(entry, d); break;
+    case "qg": netHostQg(entry, d); break;
     case "bye": try{ entry.conn.close(); }catch(e){} break;
   }
 }
@@ -7755,11 +8190,11 @@ function netSeatsChanged(){
 }
 function netLobbyInfo(){
   const s = NET.resume ? state.settings : (NET.config && NET.config.settings) || {};
-  return { room: NET.roomLabel, mode: s.mode, difficulty: s.difficulty, target: s.target, turnLimit: s.turnLimit || 0, tokens: !!s.tokens, resume: NET.resume, specs: (NET.specs || []).slice(0, 20), teams: NET.resume ? 0 : (s.teams || 0), ordered: netOrderValid(), start: netOrderValid() ? NET.orderStart : 0 };
+  return { room: NET.roomLabel, mode: s.mode, difficulty: s.difficulty, target: s.target, turnLimit: s.turnLimit || 0, tokens: !!s.tokens, resume: NET.resume, specs: (NET.specs || []).slice(0, 20), teams: NET.resume ? 0 : (s.teams || 0), handicap: !NET.resume && !!s.handicap, ordered: netOrderValid(), start: netOrderValid() ? NET.orderStart : 0 };
 }
 function netBroadcastLobby(){
   if(NET.role !== "host" || NET.started) return;
-  netBroadcast({ t: "lobby", seats: NET.seats.map(x => ({ name: x.name, connected: !!x.connected, ready: !!x.ready && !!x.connected, team: x.team || 0 })), info: netLobbyInfo() });
+  netBroadcast({ t: "lobby", seats: NET.seats.map(x => ({ name: x.name, connected: !!x.connected, ready: !!x.ready && !!x.connected, team: x.team || 0, diff: x.diff || "normal" })), info: netLobbyInfo() });
 }
 function netHostAct(entry, d){
   if(!state.online || !NET.started || state.screen !== "game") return;
@@ -7807,7 +8242,7 @@ async function netHostStartGame(){
   NET.seats = NET.seats.filter(s => s.connected);
   const cfg = NET.config, names = NET.seats.map(s => s.name);
   const settings = JSON.parse(JSON.stringify(cfg.settings));
-  if(settings.mode === "multiplayer"){ const TS = netTeamSetup(), nm = TS ? TS.names : names; NET.teamOfNew = TS ? TS.teamOf : null; settings.playerCount = nm.length; newGame(settings, nm); }
+  if(settings.mode === "multiplayer"){ const TS = netTeamSetup(), nm = TS ? TS.names : names; NET.teamOfNew = TS ? TS.teamOf : null; settings.playerCount = nm.length; newGame(settings, nm); if(settings.game) qgInit(); if(settings.handicap) hcApplyNet(); }
   else newGame(settings);
   state.online = true; state.net = { seats: NET.seats, turn: 0, teamOf: NET.teamOfNew || null }; state.turnNo = state.turnNo || 1;
   { // ausgewürfelte Startposition: Zugreihenfolge läuft reihum ab dem gewürfelten Spieler
@@ -7908,7 +8343,7 @@ function netGuestConnect(first){
   try{ if(NET.hostConn) NET.hostConn.close(); }catch(e){}
   try{ if(NET.peer) NET.peer.destroy(); }catch(e){}
   NET.hostConn = null;
-  const peer = new peerjs.Peer("chg-" + netRandHex(12), NET_PEER_OPTIONS);
+  const peer = new peerjs.Peer("chg-" + netRandHex(12), netPeerOptions());
   NET.peer = peer;
   let nh = null, ng = null, done = false, opened = false;
   const giveUp = msg => {
@@ -7977,15 +8412,16 @@ function netGuestConnect(first){
         case "kick": NET.notice = String(d.reason || "Du wurdest aus dem Raum entfernt.").slice(0, 200); netLeave(); break;
         case "closed": NET.notice = "Der Host hat den Raum geschlossen."; netLeave(); break;
         case "lobby": {
-          const seats = Array.isArray(d.seats) ? d.seats.slice(0, NET_MAX_PLAYERS).map(x => ({ name: netCleanName(x && x.name), connected: !!(x && x.connected), ready: !!(x && x.ready), team: netInt(x && x.team, 0, 0, 3) })).filter(x => x.name) : [];
+          const seats = Array.isArray(d.seats) ? d.seats.slice(0, NET_MAX_PLAYERS).map(x => ({ name: netCleanName(x && x.name), connected: !!(x && x.connected), ready: !!(x && x.ready), team: netInt(x && x.team, 0, 0, 3), diff: ["normal", "pro", "expert"].includes(x && x.diff) ? x.diff : "normal" })).filter(x => x.name) : [];
           const i = d.info || {};
-          NET.lobby = { seats, info: { room: String(i.room || "").slice(0, 60), mode: i.mode, difficulty: i.difficulty, target: netInt(i.target, 10, 1, 50), turnLimit: netInt(i.turnLimit, 0, 0, 600), tokens: !!i.tokens, resume: !!i.resume, ordered: !!i.ordered, teams: netInt(i.teams, 0, 0, 4), start: netInt(i.start, 0, 0, NET_MAX_PLAYERS), specs: Array.isArray(i.specs) ? i.specs.slice(0, 20).map(netCleanName).filter(Boolean) : [] } };
+          NET.lobby = { seats, info: { room: String(i.room || "").slice(0, 60), mode: i.mode, difficulty: i.difficulty, target: netInt(i.target, 10, 1, 50), turnLimit: netInt(i.turnLimit, 0, 0, 600), tokens: !!i.tokens, resume: !!i.resume, ordered: !!i.ordered, teams: netInt(i.teams, 0, 0, 4), handicap: !!i.handicap, start: netInt(i.start, 0, 0, NET_MAX_PLAYERS), specs: Array.isArray(i.specs) ? i.specs.slice(0, 20).map(netCleanName).filter(Boolean) : [] } };
           if(!state.online){ if(state.screen === "join" || state.screen === "online") state.screen = "lobby"; netUiUpdate(); }
           break;
         }
         case "react": { if(NET_REACTS.includes(d.e)) showReaction(netCleanName(d.n) || "?", d.e); break; }
         case "state": netGuestApplyState(d); break;
         case "vlist": VC.ids = (Array.isArray(d.ids) ? d.ids : []).filter(x => VC_ID.test(String(x))).slice(0, 100); vcSync(); break;
+        case "chatmsg": chatShow(String(d.n || "").slice(0, 20), d.i); break;
         case "rmreq": if(!NET.spec && !netMyTurnGuard()){ NET.rmAsk = true; NET.rmMine = ""; render(); } break;
         case "rmend": NET.rmAsk = false; NET.rmMine = ""; if(d.msg) toast(String(d.msg).slice(0, 120)); render(); break;
         case "guess": {
@@ -8031,6 +8467,11 @@ function renderOnlineHub(){
     </div>`;
 }
 function openJoin(){ NET.error = ""; NET.status = "idle"; state.screen = "join"; render(); }
+function joinInvite(v){
+  const m = /Raum:\s*(.+?)\s+Passwort:\s*(.+?)\s*$/s.exec(String(v || ""));
+  if(!m) return;
+  NET.form.room = m[1].trim().slice(0, 40); NET.form.pw = m[2].trim().slice(0, 64); NET.form.inviteOk = true; render();
+}
 function renderJoin(){
   const f = NET.form, busy = NET.role === "guest" && (NET.status === "connecting");
   app.innerHTML = `
@@ -8039,6 +8480,10 @@ function renderJoin(){
       <div class="settings-grid">
         <div><div class="label" style="margin-bottom:6px;">Dein Name</div>
           <input class="guess-input" type="text" maxlength="20" autocomplete="off" placeholder="Name" value="${esc(f.name)}" oninput="NET.form.name=this.value"></div>
+        <div><div class="label" style="margin-bottom:6px;">Einladung</div>
+          <input class="guess-input" type="text" autocomplete="off" spellcheck="false" placeholder="Einladungstext des Hosts hier einfügen" oninput="joinInvite(this.value)">
+          <div style="color:${f.inviteOk ? 'var(--correct)' : 'var(--muted)'}; font-size:calc(13px * var(--font-scale)); margin-top:4px;">${f.inviteOk ? '✓ Einladung erkannt, Raumname und Passwort sind unten ausgefüllt.' : 'Den kopierten Text des Hosts einfügen, dann werden Raumname und Passwort automatisch ausgefüllt.'}</div></div>
+        <div style="text-align:center; color:var(--muted);">– oder –</div>
         <div><div class="label" style="margin-bottom:6px;">Raumname</div>
           <input class="guess-input" type="text" maxlength="40" autocomplete="off" placeholder="Raumname" value="${esc(f.room)}" oninput="NET.form.room=this.value"></div>
         <div><div class="label" style="margin-bottom:6px;">Passwort</div>
@@ -8052,6 +8497,7 @@ function renderJoin(){
     </div>
     <div class="menu-actions">
       <button class="btn-primary" onclick="netJoin()" ${busy ? 'disabled' : ''}>Beitreten</button>
+      <button class="btn-ghost" onclick="openDiag()">🔧 Verbindungsdiagnose</button>
       <button class="btn-ghost" onclick="netCancelJoin()">← Zurück</button>
     </div>`;
 }
@@ -8088,6 +8534,7 @@ async function netHostFromWizard(){
   };
   if(w.mode === "multiplayer") settings.events = w.events === true;
   if(w.mode === "multiplayer" && w.teams) settings.teams = w.teams;
+  applyGameKind(settings, w);
   const room = (w.name || "").trim(), hostName = netCleanName(w.hostName), pw = w.password;
   try{ localStorage.setItem("chronohit_netname", hostName); }catch(e){}
   const config = { settings, slot: w.slot, room };
@@ -8125,8 +8572,32 @@ async function netResumeHost(){
   const hostName = (state.net && state.net.seats[0] && state.net.seats[0].name) || "Host";
   await netHostOpen(state.activeSaveName, pw, hostName, { resume: true }, true);
 }
-function netCopy(text){
-  try{ navigator.clipboard.writeText(text); }catch(e){}
+async function clipCopy(text){
+  try{ if(navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(text); return true; } }catch(e){}
+  try{
+    const ta = document.createElement("textarea"); ta.value = text; ta.setAttribute("readonly", "");
+    ta.style.cssText = "position:fixed;left:-9999px;top:0;opacity:0;"; document.body.appendChild(ta);
+    ta.select(); ta.setSelectionRange(0, text.length); const ok = document.execCommand("copy"); ta.remove(); if(ok) return true;
+  }catch(e){}
+  return false;
+}
+function netCopy(text){ clipCopy(text); }
+function showCopyDialog(t){
+  closeCopyDialog();
+  const el = document.createElement("div"); el.id = "copy-dlg"; el.setAttribute("role", "dialog");
+  el.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:80;display:flex;align-items:center;justify-content:center;padding:16px;";
+  el.onclick = e => { if(e.target === el) closeCopyDialog(); };
+  el.innerHTML = `<div class="menu-card" style="max-width:440px;width:100%;"><h3>Ergebnis kopieren</h3><p style="margin:6px 0 8px;">Dein Browser erlaubt hier kein automatisches Kopieren. Halte den markierten Text gedrückt und wähle „Kopieren“.</p><textarea id="copy-ta" readonly rows="4" style="width:100%;box-sizing:border-box;padding:8px;background:var(--panel-2);color:var(--text);border:1px solid var(--line);border-radius:var(--radius,10px);font:inherit;">${esc(t)}</textarea><div class="menu-actions" style="margin-top:10px;">${navigator.share ? `<button class="btn-primary" onclick="navigator.share({text:document.getElementById('copy-ta').value}).catch(()=>{})">Teilen …</button>` : ""}<button class="btn-ghost" onclick="closeCopyDialog()">Schließen</button></div></div>`;
+  document.body.appendChild(el);
+  const ta = document.getElementById("copy-ta"); ta.focus(); ta.select(); ta.setSelectionRange(0, t.length);
+}
+function closeCopyDialog(){ const el = document.getElementById("copy-dlg"); if(el) el.remove(); }
+document.addEventListener("keydown", e => { if(e.key === "Escape") closeCopyDialog(); });
+async function copyOrShow(t, auto){
+  if(await clipCopy(t)) return true;
+  if(auto) return false;
+  if(navigator.share){ try{ await navigator.share({ text:t }); return true; }catch(e){ if(e && e.name === "AbortError") return false; } }
+  showCopyDialog(t); return false;
 }
 function renderLobby(){
   const host = NET.role === "host";
@@ -8137,6 +8608,7 @@ function renderLobby(){
     <div class="lobby-row">
       <span class="net-dot ${x.connected ? '' : 'off'}"></span>
       <span class="lobby-name">${info.ordered ? '<b>' + (k + 1) + '.</b> ' : ''}${esc(x.name)}${i === 0 ? ' <small>(Host)</small>' : ''}${netSameName(x.name, NET.myName) ? ' <small>(du)</small>' : ''}</span>
+      ${info.handicap && !info.resume ? lobbyDiffHtml(host, i, x) : ``}
       ${info.teams && !info.resume ? lobbyTeamHtml(host, i, x, info.teams) : ``}
       ${!info.resume ? `<span class="lobby-ready" style="font-size:calc(13px * var(--font-scale)); color:${i === 0 || (x.connected && x.ready) ? 'var(--correct, #3ecf8e)' : 'var(--muted)'};">${i === 0 ? '✓ Bereit' : (x.connected && x.ready ? '✓ Bereit' : 'Wartet …')}</span>` : ``}
       ${host && !NET.started && !NET.resume && i > 0 ? `<button class="btn-ghost btn-small" onclick="netKick(${i})">Entfernen</button>` : ``}
@@ -8209,6 +8681,7 @@ function netWatchCaption(){
   loadStats();
   loadTheme();
   applyPrefs();
+  autoThemeCheck(); setInterval(autoThemeCheck, 60000); try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", autoThemeCheck); }catch(e){}
   setInterval(turnTick, 250);
   setInterval(chTick, 250);
   setInterval(autoNextTick, 250);
