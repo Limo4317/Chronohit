@@ -986,6 +986,8 @@
   .ach-prog{ font-size:calc(11px * var(--font-scale)); color:var(--muted); }
   .ach-bar{ height:8px; border-radius:6px; background:rgba(128,128,128,.25); overflow:hidden; margin:6px 0 10px; }
   .ach-bar > div{ height:100%; background:var(--accent); }
+  .wk-row{ margin:8px 0; }
+  .wk-row.done{ opacity:.7; }
   .ach-feat{ display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin-top:6px; }
   .badge-chips{ display:inline-flex; gap:3px; margin-left:6px; vertical-align:middle; }
   .badge-chip{ --tier-c:#b08d57; width:22px; height:22px; border-radius:50%; font-size:13px; line-height:1; padding:0; border:0; cursor:pointer; background:var(--tier-c); box-shadow:inset 0 0 0 2px rgba(255,255,255,.3); }
@@ -4768,27 +4770,44 @@ function renderQgEnd(){
 function qgFinish(){ if(state.qgDone) return; state.qgDone = true; state.statsRecorded = true; try{ qgXpAward(); }catch(e){} try{ achOnQuizEnd(); }catch(e){} try{ sfx("win", 0.7); confettiBurst("big"); }catch(e){} }
 /* ============ ERRUNGENSCHAFTEN & ABZEICHEN ============ */
 const ACH_LS = "chronohit_ach_v1";
-const ACH_CATS = [["streak", "🔥 Serien"], ["collect", "🃏 Sammeln"], ["win", "🏆 Siege"], ["guess", "🎧 Raten"], ["special", "🌟 Besonderes"], ["mode", "🎮 Spielarten"], ["daily", "📅 Daily & Level"], ["online", "🌐 Online & Quiz"]];
+const ACH_XP = { 1:25, 2:50, 3:100 };   // XP pro neu freigeschaltetem Abzeichen (Bronze/Silber/Gold); beim nachträglichen Freischalten gibt es keine XP
+const ACH_CATS = [["streak", "🔥 Serien"], ["collect", "🃏 Sammeln"], ["win", "🏆 Siege"], ["guess", "🎧 Raten"], ["special", "🌟 Besonderes"], ["mode", "🎮 Spielarten"], ["hard", "💪 Schwierigkeit & Handicaps"], ["tokens", "💰 Token & Shop"], ["music", "🎼 Musikwissen"], ["daily", "📅 Daily & Level"], ["online", "🌐 Online & Quiz"], ["secret", "🔒 Geheim"]];
 const ACH_DEFS = [
   { id:"streak5", cat:"streak", tier:1, icon:"🔥", name:"Auf Kurs", desc:"5 richtige Karten in Folge.", prog:A => [A.c.best || 0, 5] },
   { id:"streak10", cat:"streak", tier:2, icon:"🏅", name:"Reihenmeister", desc:"10 richtige Karten in Folge.", prog:A => [A.c.best || 0, 10] },
   { id:"streak20", cat:"streak", tier:3, icon:"🚀", name:"Unaufhaltsam", desc:"20 richtige Karten in Folge.", prog:A => [A.c.best || 0, 20] },
   { id:"cards100", cat:"collect", tier:1, icon:"🃏", name:"Sammler", desc:"Insgesamt 100 richtige Karten.", prog:A => [A.c.cards || 0, 100] },
   { id:"cards1000", cat:"collect", tier:3, icon:"📚", name:"Archivar", desc:"Insgesamt 1000 richtige Karten.", prog:A => [A.c.cards || 0, 1000] },
+  { id:"songs100", cat:"collect", tier:1, icon:"💿", name:"Plattensammler", desc:"100 verschiedene Songs mindestens einmal richtig gelegt (oder im Quiz richtig beantwortet).", prog:A => [achCount(A, "all"), 100] },
+  { id:"songs300", cat:"collect", tier:2, icon:"🗄️", name:"Schallarchiv", desc:"300 verschiedene Songs richtig gelegt oder im Quiz richtig beantwortet.", prog:A => [achCount(A, "all"), 300] },
+  { id:"songs500", cat:"collect", tier:3, icon:"🏛️", name:"Musikmuseum", desc:"500 verschiedene Songs richtig gelegt oder im Quiz richtig beantwortet.", prog:A => [achCount(A, "all"), 500] },
+  { id:"songsall", cat:"collect", tier:3, icon:"📀", name:"Komplettist", desc:"Jeden einzelnen Song mindestens einmal richtig gelegt (Karte platziert, Interpret im Quiz oder Jahr genau getroffen).", prog:A => [achCount(A, "all"), achGroups().all] },
   { id:"win1", cat:"win", tier:1, icon:"🏆", name:"Erster Sieg", desc:"Ein Spiel gewinnen." },
   { id:"win10", cat:"win", tier:2, icon:"👑", name:"Seriensieger", desc:"10 Spiele gewinnen.", prog:A => [A.c.wins || 0, 10] },
   { id:"flawless", cat:"win", tier:3, icon:"✨", name:"Makellos", desc:"Ein Spiel mit Ziel ab 10 ohne einen einzigen Fehler gewinnen." },
   { id:"coopwin", cat:"win", tier:1, icon:"🤝", name:"Teamgeist", desc:"Ein Koop-Spiel gewinnen." },
+  { id:"marathon", cat:"win", tier:2, icon:"🏃", name:"Marathon", desc:"Ein Spiel mit Ziel 25 oder mehr gewinnen." },
   { id:"guess1", cat:"guess", tier:1, icon:"💡", name:"Gutes Ohr", desc:"Titel und Interpret in einer Runde richtig raten." },
   { id:"guess25", cat:"guess", tier:2, icon:"🎧", name:"Musikkenner", desc:"25-mal Titel und Interpret richtig raten.", prog:A => [A.c.guess || 0, 25] },
   { id:"timetravel", cat:"special", tier:3, icon:"⏳", name:"Zeitreisender", desc:"Karten aus allen Jahrzehnten (50er bis 2020er) auf einer Zeitleiste." },
   { id:"ruf", cat:"special", tier:2, icon:"⚡", name:"Einspruch!", desc:"Einen Chronohit!-Einspruch gewinnen." },
   { id:"joker", cat:"special", tier:2, icon:"🎴", name:"Doppelt hält besser", desc:"Mit einer Joker-Karte richtig platzieren." },
   { id:"special", cat:"special", tier:1, icon:"🍀", name:"Glückskind", desc:"Eine Spezialkarte ziehen." },
-  { id:"hint", cat:"special", tier:1, icon:"🔎", name:"Hinweisjäger", desc:"Einen Hinweis im Hinweisshop kaufen." },
+  { id:"weekly10", cat:"special", tier:2, icon:"📆", name:"Wochenheld", desc:"10 Wochen-Challenges abschließen.", prog:A => [A.c.weeklies || 0, 10] },
+  { id:"weekfull", cat:"special", tier:2, icon:"🎉", name:"Rundum-Woche", desc:"Alle 3 Wochen-Challenges einer Woche schaffen." },
   { id:"blitz15", cat:"mode", tier:2, icon:"⏱️", name:"Blitzmerker", desc:"Im Blitz-Modus 15 Karten schaffen." },
   { id:"endless25", cat:"mode", tier:2, icon:"♾️", name:"Dauerläufer", desc:"Im Endlos-Modus 25 Karten schaffen." },
   { id:"sudden15", cat:"mode", tier:3, icon:"🧊", name:"Nervenstark", desc:"Bei Sudden Death 15 Karten schaffen." },
+  { id:"pro", cat:"hard", tier:2, icon:"🎓", name:"Profi-Status", desc:"Ein Spiel mit Ziel ab 10 auf Profi gewinnen." },
+  { id:"hardcore", cat:"hard", tier:3, icon:"💀", name:"Hardcore", desc:"Ein Spiel mit Ziel ab 10 auf Experte gewinnen." },
+  { id:"blindflug", cat:"hard", tier:3, icon:"🙈", name:"Blindflug", desc:"Ein Handicap-Spiel gewinnen, in dem die Jahre auf der Zeitleiste verdeckt waren." },
+  { id:"comeback", cat:"hard", tier:2, icon:"🔄", name:"Comeback", desc:"Ein Spiel gewinnen, in dem du mindestens 3 falsche Karten in Folge hattest." },
+  { id:"underdog", cat:"hard", tier:3, icon:"🐺", name:"Underdog", desc:"Ein Handicap-Spiel mit mindestens 3 erschwerenden Handicaps gewinnen (Profi und Experte zählen mit)." },
+  { id:"pressure", cat:"hard", tier:2, icon:"😰", name:"Unter Druck", desc:"Ein Spiel mit höchstens 20 Sekunden Zeitlimit pro Zug gewinnen." },
+  { id:"sparfuchs", cat:"tokens", tier:2, icon:"🦊", name:"Sparfuchs", desc:"Ein Spiel mit Tokens (Ziel ab 10, kein Koop) gewinnen, ohne einen einzigen Token auszugeben." },
+  { id:"hamster", cat:"tokens", tier:1, icon:"🐹", name:"Hamster", desc:"Die maximale Zahl an Tokens gleichzeitig halten." },
+  { id:"hint", cat:"tokens", tier:1, icon:"🔎", name:"Hinweisjäger", desc:"Einen Hinweis im Hinweisshop kaufen." },
+  { id:"hint25", cat:"tokens", tier:2, icon:"🕵️", name:"Detektiv", desc:"25 Hinweise im Hinweisshop kaufen.", prog:A => [A.c.hints || 0, 25] },
   { id:"daily1", cat:"daily", tier:1, icon:"📅", name:"Tagesstart", desc:"Die tägliche Challenge abschließen." },
   { id:"daily7", cat:"daily", tier:2, icon:"🗓️", name:"Wochenserie", desc:"7 Tage in Folge die tägliche Challenge abschließen." },
   { id:"daily10", cat:"daily", tier:3, icon:"🎯", name:"Tagessieger", desc:"Die tägliche Challenge mit 10 von 10 abschließen." },
@@ -4798,29 +4817,94 @@ const ACH_DEFS = [
   { id:"online1", cat:"online", tier:1, icon:"🌐", name:"Netzwerker", desc:"Ein Online-Spiel beenden." },
   { id:"onlinewin", cat:"online", tier:2, icon:"🥇", name:"Online-Champion", desc:"Ein Online-Spiel gewinnen." },
   { id:"quiz1", cat:"online", tier:1, icon:"🎤", name:"Quizfreund", desc:"Ein Interpret-Quiz oder Jahr-Schätzen beenden." },
-  { id:"artistperfect", cat:"online", tier:3, icon:"🎶", name:"Treffsicher", desc:"Ein Interpret-Quiz mit mindestens 5 Runden komplett richtig beenden." }
+  { id:"artistperfect", cat:"online", tier:3, icon:"🎶", name:"Treffsicher", desc:"Ein Interpret-Quiz mit mindestens 5 Runden komplett richtig beenden." },
+  { id:"nightowl", cat:"secret", tier:1, icon:"🦉", name:"Nachteule", desc:"Ein Spiel zwischen 0 und 5 Uhr nachts beenden.", secret:true },
+  { id:"unlucky", cat:"secret", tier:1, icon:"🌧️", name:"Pechvogel", desc:"5 falsche Karten in Folge legen.", secret:true },
+  { id:"lucky", cat:"secret", tier:2, icon:"🎰", name:"Glückspilz", desc:"3 Spezialkarten in einem Spiel ziehen.", secret:true },
+  { id:"phoenix", cat:"secret", tier:3, icon:"🦅", name:"Phönix", desc:"Ein Spiel gewinnen, in dem du 5 falsche Karten in Folge hattest.", secret:true },
+  { id:"holiday", cat:"secret", tier:1, icon:"🎄", name:"Feiertagsspieler", desc:"Ein Spiel am 24., 25., 26. oder 31. Dezember oder am 1. Januar beenden.", secret:true },
+  { id:"memory", cat:"secret", tier:2, icon:"🧠", name:"Gedächtnispalast", desc:"5-mal in Folge Titel und Interpret richtig raten.", secret:true }
 ];
+/* Musikwissen: Abzeichen je Genre, Sprache und Jahrzehnt (zählen verschiedene richtig gelegte Songs der Gruppe) */
+const ACH_GENRE = { pop:["🎤", "Pop-Profi"], rock:["🎸", "Rock-Legende"], indie:["🌿", "Indie-Seele"], hiphop:["🧢", "Hip-Hop-Kopf"], rnb:["🎙️", "Soul-Kenner"], dance:["🪩", "Tanzflächen-Held"], funk:["🕺", "Disco-König"], latin:["💃", "Latin-Lover"], reggae:["🌴", "Reggae-Fan"], country:["🤠", "Country-Cowboy"], jazz:["🎺", "Jazz-Kenner"], schlager:["🍻", "Schlager-Fan"] };
+const ACH_LANG = { de:["🥨", "Heimspiel", "deutschen"], en:["🗽", "Weltsprache", "englischen"], es:["🌶️", "Olé!", "spanischen"] };
+const ACH_DEC = { 1950:"📻", 1960:"☮️", 1970:"🕶️", 1980:"📼", 1990:"📟", 2000:"📱", 2010:"📸", 2020:"🆕" };
+let ACH_GROUPS = null;
+function achGroups(){
+  if(ACH_GROUPS) return ACH_GROUPS;
+  const g = { s:{}, l:{}, d:{}, all:0, by:{} };
+  SONGS.forEach(x => { if(!x.id) return; g.all++; g.by[x.id] = x; (x.s || []).forEach(k => { g.s[k] = (g.s[k] || 0) + 1; }); songLangs(x).forEach(k => { g.l[k] = (g.l[k] || 0) + 1; }); const d = decadeOf(x.y); g.d[d] = (g.d[d] || 0) + 1; });
+  ACH_GROUPS = g; return g;
+}
+(function(){
+  const g = achGroups(), clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  Object.keys(ACH_GENRE).forEach(k => { const n = g.s[k] || 0; if(!n) return; const goal = clamp(Math.ceil(n * .25), 1, 40), lb = (STYLE_DEFS.find(d => d.key === k) || { label:k }).label;
+    ACH_DEFS.push({ id:"genre_" + k, cat:"music", tier:2, icon:ACH_GENRE[k][0], name:ACH_GENRE[k][1], desc:goal + " verschiedene Songs aus dem Genre „" + lb + "“ richtig gelegt.", coll:["s", k, goal] }); });
+  Object.keys(ACH_LANG).forEach(k => { const n = g.l[k] || 0; if(!n) return; const goal = clamp(Math.ceil(n * .35), 1, 100);
+    ACH_DEFS.push({ id:"lang_" + k, cat:"music", tier:2, icon:ACH_LANG[k][0], name:ACH_LANG[k][1], desc:goal + " verschiedene Songs in " + ACH_LANG[k][2] + " Sprache richtig gelegt.", coll:["l", k, goal] }); });
+  Object.keys(ACH_DEC).forEach(k => { const n = g.d[k] || 0; if(!n) return; const goal = clamp(Math.ceil(n * .3), 5, 30), lb = decadeLabel(+k);
+    ACH_DEFS.push({ id:"dec_" + k, cat:"music", tier:2, icon:ACH_DEC[k], name:"Meister der " + lb, desc:goal + " verschiedene Songs aus den " + lb + " Jahren richtig gelegt.", coll:["d", k, goal] }); });
+  ACH_DEFS.forEach(d => { if(d.coll) d.prog = A => [achCount(A, d.coll[0], d.coll[1]), d.coll[2]]; });
+})();
 const ACH_BY = {}; ACH_DEFS.forEach(d => { ACH_BY[d.id] = d; });
 function achLv(){ try{ return xpLevel(xpLoad().xp || 0).lv; }catch(e){ return 0; } }
 function achLoad(){
-  try{ const o = JSON.parse(localStorage.getItem(ACH_LS) || "{}") || {}; return { u: (o.u && typeof o.u === "object") ? o.u : {}, c: (o.c && typeof o.c === "object") ? o.c : {}, f: Array.isArray(o.f) ? o.f.filter(id => ACH_BY[id]).slice(0, 3) : [] }; }
-  catch(e){ return { u:{}, c:{}, f:[] }; }
+  try{ const o = JSON.parse(localStorage.getItem(ACH_LS) || "{}") || {};
+    return { u: (o.u && typeof o.u === "object") ? o.u : {}, c: (o.c && typeof o.c === "object") ? o.c : {}, f: Array.isArray(o.f) ? o.f.filter(id => ACH_BY[id]).slice(0, 3) : [], s: (o.s && typeof o.s === "object") ? o.s : {}, g: (o.g && typeof o.g === "object") ? o.g : {}, w: (o.w && typeof o.w === "object") ? o.w : null }; }
+  catch(e){ return { u:{}, c:{}, f:[], s:{}, g:{}, w:null }; }
 }
-function achSave(A){ try{ localStorage.setItem(ACH_LS, JSON.stringify(A)); }catch(e){} }
-function achUnlock(A, id){
+let ACH_LAST = "";
+function achSave(A){ try{ const j = JSON.stringify(A); if(j !== ACH_LAST){ ACH_LAST = j; localStorage.setItem(ACH_LS, j); } }catch(e){} }
+/* --- Songsammlung: verschiedene Songs, die mindestens einmal richtig gelegt/beantwortet wurden (auch aus dem bisherigen Kartenprotokoll) --- */
+const ACH_COLL = new WeakMap();
+function achColl(A){
+  let set = ACH_COLL.get(A); if(set) return set;
+  set = new Set(Object.keys(A.s || {}));
+  try{ const L = cardsLoad(); for(const [id, r] of Object.entries(L.songs)) if(r && r.n - r.w > 0) set.add(id); }catch(e){}
+  const by = achGroups().by; set.forEach(id => { if(!by[id]) set.delete(id); });
+  ACH_COLL.set(A, set); return set;
+}
+function achCount(A, kind, key){
+  const set = achColl(A), by = achGroups().by; if(kind === "all") return set.size;
+  let n = 0; set.forEach(id => { const x = by[id]; if(!x) return;
+    if(kind === "s" && (x.s || []).includes(key)) n++; else if(kind === "l" && songLangs(x).includes(key)) n++; else if(kind === "d" && String(decadeOf(x.y)) === String(key)) n++; });
+  return n;
+}
+function achAddSong(A, id){   // true, wenn der Song neu in der Sammlung ist
+  if(!id || !achGroups().by[id]) return false;
+  const set = achColl(A); if(set.has(id)) return false;
+  A.s[id] = 1; set.add(id); return true;
+}
+function achCollectCheck(A, silent){
+  const n = achCount(A, "all"), all = achGroups().all;
+  if(n >= 100) achUnlock(A, "songs100", silent); if(n >= 300) achUnlock(A, "songs300", silent); if(n >= 500) achUnlock(A, "songs500", silent); if(all && n >= all) achUnlock(A, "songsall", silent);
+  ACH_DEFS.forEach(d => { if(d.coll && !A.u[d.id] && achCount(A, d.coll[0], d.coll[1]) >= d.coll[2]) achUnlock(A, d.id, silent); });
+}
+/* --- Freischalten, XP, Meldungen --- */
+function achAddXp(n){
+  const X = xpLoad(), before = xpLevel(X.xp || 0).lv; X.xp = (X.xp || 0) + n;
+  try{ localStorage.setItem("chronohit_xp", JSON.stringify(X)); }catch(e){} try{ cardsAddXp(n); }catch(e){}
+  return xpLevel(X.xp).lv > before;
+}
+let ACH_DEPTH = 0;
+function achLevelCheck(A, silent){ const lv = achLv(); if(lv >= 5) achUnlock(A, "level5", silent); if(lv >= 10) achUnlock(A, "level10", silent); if(lv >= 25) achUnlock(A, "level25", silent); }
+function achUnlock(A, id, silent){
   if(!ACH_BY[id] || A.u[id]) return false;
-  A.u[id] = Date.now();
+  const d = ACH_BY[id]; A.u[id] = Date.now();
+  if(silent){ A.__n = (A.__n || 0) + 1; return true; }
   if(A.f.length < 3) A.f.push(id);   // die ersten drei werden automatisch angezeigt (änderbar)
-  achNotify(id); return true;
+  const xp = ACH_XP[d.tier] || 0; if(xp) achAddXp(xp);
+  achToast("Neue Errungenschaft!", d.name + " · +" + xp + " XP", achBadge(d, false), () => achPop(id));
+  if(ACH_DEPTH < 3){ ACH_DEPTH++; try{ achLevelCheck(A); }finally{ ACH_DEPTH--; } }
+  return true;
 }
 function achBadge(d, locked, extra){ return `<span class="badge-ico tier-${d.tier} ${locked ? "locked" : ""} ${extra || ""}"><span class="bi">${d.icon}</span></span>`; }
-function achNotify(id){
-  const d = ACH_BY[id]; if(!d) return;
+function achToast(title, text, iconHtml, onClick){
   try{ sfx("streak", 0.2); }catch(e){}
   const el = document.createElement("div"); el.className = "ach-toast";
   el.style.top = (12 + document.querySelectorAll(".ach-toast").length * 74) + "px";
-  el.innerHTML = `${achBadge(d, false)}<span><b>Neue Errungenschaft!</b><br>${esc(d.name)}</span>`;
-  el.onclick = () => { el.remove(); achPop(id); };
+  el.innerHTML = `${iconHtml || `<span class="badge-ico tier-2"><span class="bi">📆</span></span>`}<span><b>${esc(title)}</b><br>${esc(text)}</span>`;
+  el.onclick = () => { el.remove(); if(onClick) onClick(); };
   document.body.appendChild(el);
   setTimeout(() => { try{ el.remove(); }catch(e){} }, 6000);
 }
@@ -4831,7 +4915,7 @@ function achPop(id, owner){   // owner: Name eines anderen Spielers (dann nur An
   const A = achLoad(), other = typeof owner === "string" && owner !== "", got = other || !!A.u[id], secret = !!d.secret && !got;
   const pg = !other && !got && d.prog ? d.prog(A) : null;
   const date = !other && A.u[id] ? new Date(A.u[id]).toLocaleDateString("de-DE") : "";
-  const isF = A.f.includes(id);
+  const isF = A.f.includes(id), xp = ACH_XP[d.tier] || 0;
   const el = document.createElement("div"); el.id = "ach-pop"; el.className = "modal-backdrop";
   el.onclick = e => { if(e.target === el) achPopClose(); };
   el.innerHTML = `<div class="modal-box" role="dialog" aria-label="Abzeichen" style="text-align:center;">
@@ -4840,6 +4924,7 @@ function achPop(id, owner){   // owner: Name eines anderen Spielers (dann nur An
     ${other ? `<p style="color:var(--muted);margin:0 0 6px;">Abzeichen von ${esc(owner)}</p>` : ``}
     <p>${secret ? "Geheimes Abzeichen." : esc(d.desc)}</p>
     ${pg ? `<p style="color:var(--muted);">Fortschritt: ${Math.min(pg[0], pg[1])} / ${pg[1]}</p>` : ``}
+    ${!other && !got ? `<p style="color:var(--muted);">Belohnung: ${xp} XP</p>` : ``}
     ${date ? `<p style="color:var(--muted);">Erhalten am ${date}</p>` : ``}
     <div class="modal-actions">
       ${!other && got ? `<button class="btn-primary" onclick="achToggleFeatured('${id}')">${isF ? "Nicht mehr anzeigen" : "⭐ Online anzeigen"}</button>` : ``}
@@ -4859,94 +4944,218 @@ function achChipsHtml(name){
   if(!ids.length) return "";
   return `<span class="badge-chips">${ids.map(id => ACH_BY[id] ? `<button class="badge-chip tier-${ACH_BY[id].tier}" data-n="${esc(name)}" onclick="event.stopPropagation(); achShowOther('${id}', this.dataset.n)" title="${esc(ACH_BY[id].name)}" aria-label="Abzeichen ${esc(ACH_BY[id].name)}">${ACH_BY[id].icon}</button>` : "").join("")}</span>`;
 }
-function openAch(){ state.screen = "achievements"; render(); }
+/* --- Wochen-Challenges --- */
+function weekId(d){
+  d = d || new Date(); const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())), day = t.getUTCDay() || 7;
+  t.setUTCDate(t.getUTCDate() + 4 - day); const y = t.getUTCFullYear(), w = Math.ceil(((t - Date.UTC(y, 0, 1)) / 864e5 + 1) / 7);
+  return y + "-W" + String(w).padStart(2, "0");
+}
+const WEEKLY_POOL = [
+  { id:"cards", ev:"card", goal:25, xp:60, text:"Lege 25 richtige Karten." },
+  { id:"wins", ev:"win", goal:3, xp:70, text:"Gewinne 3 Spiele." },
+  { id:"streak", ev:"streakmax", goal:8, xp:80, text:"Schaffe 8 richtige Karten in Folge." },
+  { id:"guess", ev:"guess", goal:10, xp:60, text:"Rate 10-mal Titel und Interpret richtig." },
+  { id:"daily", ev:"daily", goal:3, xp:60, text:"Schließe 3 Daily Challenges ab." },
+  { id:"games", ev:"game", goal:5, xp:50, text:"Beende 5 Spiele." },
+  { id:"hints", ev:"hint", goal:3, xp:40, text:"Kaufe 3 Hinweise im Hinweisshop." },
+  { id:"online", ev:"online", goal:1, xp:50, text:"Beende ein Online-Spiel." },
+  { id:"dec", ev:"dec", goal:12, xp:70, text:"Lege 12 richtige Karten aus den {dec} Jahren." },
+  { id:"quiz", ev:"quiz", goal:2, xp:50, text:"Beende 2 Quiz-Spiele (Interpret-Quiz oder Jahr-Schätzen)." },
+  { id:"newsong", ev:"newsong", goal:15, xp:80, text:"Lege 15 Songs richtig, die du noch nie richtig hattest." }
+];
+function weeklyPick(wid){
+  let h = 2166136261; for(const c of wid){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); }
+  let a = h >>> 0; const rnd = () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const pool = WEEKLY_POOL.slice(); for(let i = pool.length - 1; i > 0; i--){ const j = Math.floor(rnd() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  const decs = Object.keys(achGroups().d).map(Number).sort((x, y) => x - y), dec = decs[Math.floor(rnd() * decs.length)] || 1980;
+  return pool.slice(0, 3).map(c => ({ id:c.id, ev:c.ev, goal:c.goal, xp:c.xp, dec: c.ev === "dec" ? dec : 0, text: c.text.replace("{dec}", decadeLabel(dec)), n:0, done:false }));
+}
+function achWeekly(A){ const wid = weekId(); if(!A.w || A.w.id !== wid) A.w = { id:wid, ch:weeklyPick(wid), bonus:false }; return A.w; }
+function achEv(A, ev, val, extra){
+  const W = achWeekly(A);
+  W.ch.forEach(c => {
+    if(c.done || c.ev !== ev) return; if(ev === "dec" && c.dec !== extra) return;
+    c.n = ev === "streakmax" ? Math.max(c.n, val) : c.n + val;
+    if(c.n >= c.goal){ c.n = c.goal; c.done = true; A.c.weeklies = (A.c.weeklies || 0) + 1; achAddXp(c.xp); achToast("Wochen-Challenge geschafft!", c.text + " (+" + c.xp + " XP)"); }
+  });
+  if(!W.bonus && W.ch.every(c => c.done)){ W.bonus = true; achAddXp(50); achToast("Alle Wochen-Challenges geschafft!", "Bonus: +50 XP"); achUnlock(A, "weekfull"); }
+  if((A.c.weeklies || 0) >= 10) achUnlock(A, "weekly10");
+}
+/* --- Sammlung ansehen --- */
+function openAch(){ try{ achBackfill(); }catch(e){} state.screen = "achievements"; render(); }
 function renderAch(){
-  const A = achLoad(), n = ACH_DEFS.filter(d => A.u[d.id]).length, tot = ACH_DEFS.length;
+  const A = achLoad(), n = ACH_DEFS.filter(d => A.u[d.id]).length, tot = ACH_DEFS.length, W = achWeekly(A), cn = achCount(A, "all"), call = achGroups().all;
   const tile = d => { const got = !!A.u[d.id], pg = !got && d.prog ? d.prog(A) : null;
     return `<button class="ach-tile ${got ? "got" : "locked"}" onclick="achPop('${d.id}')">${achBadge(d, !got)}<span class="ach-name">${(d.secret && !got) ? "???" : esc(d.name)}</span>${pg ? `<span class="ach-prog">${Math.min(pg[0], pg[1])} / ${pg[1]}</span>` : (got && A.f.includes(d.id) ? `<span class="ach-prog">⭐</span>` : ``)}</button>`; };
+  const wk = W.ch.map(c => `<div class="wk-row ${c.done ? "done" : ""}"><div>${c.done ? "✅ " : ""}${esc(c.text)} <small>(+${c.xp} XP)</small></div><div class="ach-bar"><div style="width:${Math.round(c.n / c.goal * 100)}%"></div></div><small>${c.n} / ${c.goal}</small></div>`).join("");
   app.innerHTML = `
     <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Errungenschaften</h1></div>
     <div class="menu-card">
       <h3>Abzeichensammlung</h3>
       <p style="margin:4px 0;"><b>${n} / ${tot}</b> Abzeichen erhalten</p>
       <div class="ach-bar"><div style="width:${Math.round(n / tot * 100)}%"></div></div>
-      <p style="color:var(--muted);font-size:calc(13px * var(--font-scale));">Tippe ein Abzeichen an. Bis zu 3 erhaltene Abzeichen kannst du mit ⭐ auswählen, sie erscheinen in Online-Spielen neben deinem Namen und sind dort anklickbar.</p>
+      <p style="color:var(--muted);font-size:calc(13px * var(--font-scale));">Tippe ein Abzeichen an. Jedes neue Abzeichen gibt XP (Bronze 25, Silber 50, Gold 100). Bis zu 3 erhaltene Abzeichen kannst du mit ⭐ auswählen, sie erscheinen in Online-Spielen neben deinem Namen.</p>
       <div class="ach-feat"><span>⭐ Angezeigt:</span> ${A.f.length ? A.f.map(id => achBadge(ACH_BY[id], false, "mini")).join("") : `<span style="color:var(--muted);">noch keins</span>`}</div>
     </div>
+    <div class="menu-card"><h3>📆 Wochen-Challenges (${W.id.replace("-W", " · KW ")})</h3>${wk}
+      <p style="color:var(--muted);font-size:calc(13px * var(--font-scale));margin:6px 0 0;">Jede Woche drei neue Aufgaben. Alle drei geben zusätzlich +50 XP.</p></div>
+    <div class="menu-card"><h3>💿 Songsammlung</h3>
+      <p style="margin:4px 0;"><b>${cn} / ${call}</b> Songs mindestens einmal richtig gelegt</p>
+      <div class="ach-bar"><div style="width:${call ? Math.round(cn / call * 100) : 0}%"></div></div>
+      <p style="color:var(--muted);font-size:calc(13px * var(--font-scale));margin:0;">Zählt: Karte richtig platziert, im Interpret-Quiz den Interpreten richtig getroffen oder im Jahr-Schätzen das genaue Jahr.</p></div>
     ${ACH_CATS.map(([k, label]) => `<div class="menu-card"><h3>${label}</h3><div class="ach-grid">${ACH_DEFS.filter(d => d.cat === k).map(tile).join("")}</div></div>`).join("")}
     <div class="menu-actions"><button class="btn-ghost" onclick="backToMenu()">Zurück</button></div>`;
 }
 /* --- Erfassen --- */
-let ACH_SEEN = "", ACH_HINT = "", ACH_SPEC = "";
+let ACH_SEEN = "", ACH_HINT = "", ACH_SPEC = "", ACH_QG = "", ACH_TOKLAST = "";
 function achCtx(){
-  if(!state.settings || state.tutorial || state.learn || state.qg) return { counts:false };
+  if(!state.settings || state.tutorial || state.learn) return { counts:false };
   const online = !!state.online, mp = state.settings.mode === "multiplayer" && state.players && state.players.length > 0;
-  if(mp && !online && state.players.length > 1) return { counts:false };   // Hot-Seat: kein „ich“
   if(!mp) return { counts:true, mine:true, team:-1 };
-  const t = online ? netMyTeam() : 0;
+  if(!online) return { counts:true, mine:true, team:-1 };   // lokal am Gerät: alle Spieler zählen gemeinsam
+  const t = netMyTeam();
   return { counts: t >= 0, mine: state.currentPlayer === t, team: t };
 }
-function achObserve(){
-  if(state.screen !== "game" || !state.current) return;
-  const ctx = achCtx(); if(!ctx.counts) return;
-  const lr = state.lastResult;
-  if(state.phase === "feedback" && lr && Date.now() - (lr.ts || 0) < 20000){
-    const key = (lr.ts || 0) + ":" + (state.turnNo || 0);
-    if(key !== ACH_SEEN){ ACH_SEEN = key; achOnResult(lr, ctx); }
-  }
-  if(ctx.mine && state.hint){ const k = (state.current.id || "") + ":" + state.hint.kind + ":" + (state.turnNo || 0); if(k !== ACH_HINT){ ACH_HINT = k; const A = achLoad(); achUnlock(A, "hint"); achSave(A); } }
-  if(ctx.mine && state.special && state.phase !== "feedback"){ const k = (state.current.id || "") + ":" + state.special.type + ":" + (state.turnNo || 0); if(k !== ACH_SPEC){ ACH_SPEC = k; const A = achLoad(); achUnlock(A, "special"); achSave(A); } }
+function achGame(A){   // Zähler pro Spiel; neue Spiel-ID, sobald ein neues Spiel erkannt wird
+  if(!state.achGid) state.achGid = Date.now() + Math.random();
+  if(A.g.id !== state.achGid) A.g = { id:state.achGid, run:0, wrun:0, gwr:0, grun:0, spent:0, spec:0, tok:{} };
+  return A.g;
 }
-function achOnResult(lr, ctx){
-  const A = achLoad(), ok = !!lr.ok;
+function achObserve(){
+  if(state.screen !== "game" || !state.settings) return;
+  if(state.qg){ achObserveQg(); return; }
+  if(!state.current) return;
+  const ctx = achCtx(); if(!ctx.counts) return;
+  const lr = state.lastResult, st = state.settings;
+  const rKey = state.phase === "feedback" && lr && Date.now() - (lr.ts || 0) < 20000 ? (lr.ts || 0) + ":" + (state.turnNo || 0) : "";
+  const hKey = ctx.mine && state.hint ? (state.current.id || "") + ":" + state.hint.kind + ":" + (state.turnNo || 0) : "";
+  const sKey = ctx.mine && state.special && state.phase !== "feedback" ? (state.current.id || "") + ":" + state.special.type + ":" + (state.turnNo || 0) : "";
+  const tKey = ctx.mine && st.tokens && st.mode !== "coop" ? (state.achGid || "") + ":" + (state.currentPlayer || 0) + ":" + state.tokens : "";
+  if((!rKey || rKey === ACH_SEEN) && (!hKey || hKey === ACH_HINT) && (!sKey || sKey === ACH_SPEC) && (!tKey || tKey === ACH_TOKLAST)) return;   // nichts Neues
+  ACH_TOKLAST = tKey;
+  const A = achLoad(), g = achGame(A);
+  if(rKey && rKey !== ACH_SEEN){ ACH_SEEN = rKey; achOnResult(A, g, lr, ctx); }
   if(ctx.mine){
-    const tot = (state.correctCount || 0) + (state.wrongCount || 0);
-    if(tot <= 1) A.c.run = 0;   // erstes Ergebnis des Spiels: neue Serie
+    if(hKey && hKey !== ACH_HINT){ ACH_HINT = hKey; A.c.hints = (A.c.hints || 0) + 1; achUnlock(A, "hint"); if(A.c.hints >= 25) achUnlock(A, "hint25"); achEv(A, "hint", 1); }
+    if(sKey && sKey !== ACH_SPEC){ ACH_SPEC = sKey; g.spec++; achUnlock(A, "special"); if(g.spec >= 3) achUnlock(A, "lucky"); }
+    if(st.tokens && st.mode !== "coop"){
+      const k = String(state.currentPlayer || 0);
+      if(k in g.tok && state.tokens < g.tok[k]) g.spent += g.tok[k] - state.tokens;
+      g.tok[k] = state.tokens;
+      if(st.maxTokens >= 3 && state.tokens >= st.maxTokens) achUnlock(A, "hamster");
+    }
+  }
+  achSave(A);
+}
+function achOnResult(A, g, lr, ctx){
+  const ok = !!lr.ok, song = lr.song;
+  if(ctx.mine){
     if(ok){
-      A.c.run = (A.c.run || 0) + 1; A.c.best = Math.max(A.c.best || 0, A.c.run); A.c.cards = (A.c.cards || 0) + 1;
-      if(A.c.run >= 5) achUnlock(A, "streak5"); if(A.c.run >= 10) achUnlock(A, "streak10"); if(A.c.run >= 20) achUnlock(A, "streak20");
+      g.run++; g.wrun = 0; A.c.best = Math.max(A.c.best || 0, g.run); A.c.cards = (A.c.cards || 0) + 1;
+      if(g.run >= 5) achUnlock(A, "streak5"); if(g.run >= 10) achUnlock(A, "streak10"); if(g.run >= 20) achUnlock(A, "streak20");
       if(A.c.cards >= 100) achUnlock(A, "cards100"); if(A.c.cards >= 1000) achUnlock(A, "cards1000");
       const all = new Set(SONGS.map(x => decadeOf(x.y))).size;
       if(state.timeline && new Set(state.timeline.map(c => decadeOf(c.y))).size >= all) achUnlock(A, "timetravel");
       if(jokerActive() && state.pendingGap2 != null) achUnlock(A, "joker");
-    } else A.c.run = 0;
-    if(lr.guessCheck && lr.guessCheck.both){ A.c.guess = (A.c.guess || 0) + 1; achUnlock(A, "guess1"); if(A.c.guess >= 25) achUnlock(A, "guess25"); }
+      achEv(A, "card", 1); achEv(A, "streakmax", g.run);
+      if(song && song.y){ achEv(A, "dec", 1, decadeOf(song.y)); if(achAddSong(A, song.id)){ achEv(A, "newsong", 1); } achCollectCheck(A); }
+    } else {
+      g.run = 0; g.wrun++; g.gwr = Math.max(g.gwr, g.wrun);
+      if(g.wrun >= 5) achUnlock(A, "unlucky");
+    }
+    if(lr.guessCheck && lr.guessCheck.both){ g.grun++; A.c.guess = (A.c.guess || 0) + 1; achUnlock(A, "guess1"); if(A.c.guess >= 25) achUnlock(A, "guess25"); if(g.grun >= 5) achUnlock(A, "memory"); achEv(A, "guess", 1); }
+    else g.grun = 0;
   }
-  if(lr.challenge && lr.challenge.success && ctx.team >= 0 && lr.challenge.caller === ctx.team) achUnlock(A, "ruf");
-  achSave(A);
+  if(lr.challenge && lr.challenge.success && (ctx.team < 0 || lr.challenge.caller === ctx.team)) achUnlock(A, "ruf");
+}
+function achObserveQg(){
+  const q = state.qg; if(!q || state.tutorial || q.phase !== "result" || !q.results || !q.reveal) return;
+  const key = "q:" + q.round + ":" + (q.songId || "") + ":" + q.results.length; if(key === ACH_QG) return; ACH_QG = key;
+  const online = !!state.online, seat = online ? netMySeat() : -1;
+  if(online && seat < 0) return;
+  const rows = q.results.filter(r => online ? r.i === seat : true), hit = rows.some(r => r.ok);
+  if(!hit) return;
+  const A = achLoad(); if(achAddSong(A, q.songId)){ achEv(A, "newsong", 1); } achCollectCheck(A); achSave(A);
+}
+function achHardCount(p, st){
+  const h = hcOf(p), g = st.turnLimit > 0 ? st.turnLimit : 0; let n = ({ pro:1, expert:1 }[p.diff] || 0);
+  if(hcTimeHarder(h.time, g)) n++; if(h.hide) n++; if(h.goal > 0) n++; if(h.tok < 0) n++; if(h.nobuy) n++; return n;
 }
 function achOnGameEnd(){
   if(!state.settings || state.tutorial || state.learn) return;
-  const A = achLoad(), st = state.settings, online = !!state.online, mpr = isMultiRound();
-  if(mpr && !online){ if(achLv() >= 5) achUnlock(A, "level5"); if(achLv() >= 10) achUnlock(A, "level10"); if(achLv() >= 25) achUnlock(A, "level25"); achSave(A); return; }
-  const my = mpr ? netMyTeam() : -1;
-  const won = mpr ? (my >= 0 && (state.winners || []).includes(my)) : !!state.won;
-  const wrongs = mpr && state.players[my] ? state.players[my].wrongCount : state.wrongCount;
-  const right = mpr && state.players[my] ? state.players[my].correctCount : state.correctCount;
-  const v = st.variant || "classic";
+  const A = achLoad(), g = achGame(A), st = state.settings, online = !!state.online, mpr = isMultiRound();
+  const v = st.variant || "classic", hour = new Date().getHours(), now = new Date();
+  let wi = -1, won;
+  if(mpr){ const ws = state.winners || []; wi = online ? netMyTeam() : (ws[0] != null ? ws[0] : -1); won = wi >= 0 && ws.includes(wi); }
+  else won = !!state.won;
+  const P = mpr && state.players[wi] ? state.players[wi] : null;
+  const wrongs = P ? P.wrongCount : state.wrongCount, right = P ? P.correctCount : state.correctCount;
+  const diff = P && st.handicap ? (P.diff || "normal") : st.difficulty;
   A.c.games = (A.c.games || 0) + 1;
-  if(won){ A.c.wins = (A.c.wins || 0) + 1; achUnlock(A, "win1"); if(A.c.wins >= 10) achUnlock(A, "win10");
-    if(wrongs === 0 && st.target >= 10 && st.target < 9999 && v === "classic" && !state.daily) achUnlock(A, "flawless");
-    if(st.mode === "coop") achUnlock(A, "coopwin"); if(online) achUnlock(A, "onlinewin"); }
-  if(online) achUnlock(A, "online1");
+  achEv(A, "game", 1); if(online){ achUnlock(A, "online1"); achEv(A, "online", 1); }
+  if(hour < 5) achUnlock(A, "nightowl");
+  const md = now.getMonth() + 1, dd = now.getDate(); if((md === 12 && [24, 25, 26, 31].includes(dd)) || (md === 1 && dd === 1)) achUnlock(A, "holiday");
+  if(won){
+    A.c.wins = (A.c.wins || 0) + 1; achUnlock(A, "win1"); if(A.c.wins >= 10) achUnlock(A, "win10"); achEv(A, "win", 1);
+    const real = v === "classic" && !state.daily && st.target >= 10 && st.target < 9999;
+    if(real && wrongs === 0) achUnlock(A, "flawless");
+    if(real && st.target >= 25) achUnlock(A, "marathon");
+    if(real && diff === "pro") achUnlock(A, "pro"); if(real && diff === "expert") achUnlock(A, "hardcore");
+    if(st.mode === "coop") achUnlock(A, "coopwin"); if(online) achUnlock(A, "onlinewin");
+    if(g.gwr >= 3) achUnlock(A, "comeback"); if(g.gwr >= 5) achUnlock(A, "phoenix");
+    if(real && st.tokens && st.mode !== "coop" && g.spent === 0) achUnlock(A, "sparfuchs");
+    if(P && st.handicap){ const h = hcOf(P); if(h.hide) achUnlock(A, "blindflug"); if(achHardCount(P, st) >= 3) achUnlock(A, "underdog"); }
+    let lim = st.turnLimit > 0 ? st.turnLimit : 0;
+    if(P && st.handicap){ const m = hcOf(P).time; if(/^s\d+$/.test(m)) lim = +m.slice(1); else if(m in HC_TIME_MULT) lim = lim > 0 ? lim * HC_TIME_MULT[m] : 0; else if(m === "off") lim = 0; }
+    if(real && lim > 0 && lim <= 20) achUnlock(A, "pressure");
+  }
   if(v === "blitz" && right >= 15) achUnlock(A, "blitz15");
   if(v === "endless" && right >= 25) achUnlock(A, "endless25");
   if(v === "sudden" && right >= 15) achUnlock(A, "sudden15");
-  if(state.daily){ achUnlock(A, "daily1"); try{ if((dailyLoad().streak || 0) >= 7) achUnlock(A, "daily7"); }catch(e){} if(state.dailyInfo && state.dailyInfo.score >= 10) achUnlock(A, "daily10"); }
-  const lv = achLv(); if(lv >= 5) achUnlock(A, "level5"); if(lv >= 10) achUnlock(A, "level10"); if(lv >= 25) achUnlock(A, "level25");
-  achSave(A);
+  if(state.daily){ achUnlock(A, "daily1"); achEv(A, "daily", 1); try{ if((dailyLoad().streak || 0) >= 7) achUnlock(A, "daily7"); }catch(e){} if(state.dailyInfo && state.dailyInfo.score >= 10) achUnlock(A, "daily10"); }
+  achLevelCheck(A); A.g = {}; achSave(A);
 }
 function achOnQuizEnd(){
   if(!state.qg || state.tutorial) return;
-  const A = achLoad(); achUnlock(A, "quiz1");
+  const A = achLoad(); achUnlock(A, "quiz1"); achEv(A, "quiz", 1); achEv(A, "game", 1); if(state.online) achEv(A, "online", 1);
   try{
-    const q = state.qg, rows = qgScores();
-    let mine = null;
-    if(state.online){ const seat = netMySeat(); mine = MP() ? (state.players[seat] || {}).correctCount : state.correctCount; } else if(!MP()) mine = state.correctCount;
+    const q = state.qg; let mine = null;
+    if(MP()){ mine = state.online ? (state.players[netMySeat()] || {}).correctCount : state.players.reduce((n, p) => n + (p.correctCount || 0), 0); } else if(!state.online || netMySeat() >= 0) mine = state.correctCount;
     if(q.kind === "artist" && q.total >= 5 && mine != null && mine === q.total) achUnlock(A, "artistperfect");
   }catch(e){}
-  const lv = achLv(); if(lv >= 5) achUnlock(A, "level5"); if(lv >= 10) achUnlock(A, "level10"); if(lv >= 25) achUnlock(A, "level25");
-  achSave(A);
+  achLevelCheck(A); achSave(A);
+}
+/* --- Nachträglich freischalten (Statistik, Highscores, Daily, Kartenprotokoll) --- */
+function achBackfill(){
+  const A = achLoad(); A.__n = 0;
+  try{
+    const sg = (stats && stats.games) || {};
+    A.c.cards = Math.max(A.c.cards || 0, stats.correct || 0);
+    A.c.best = Math.max(A.c.best || 0, stats.bestStreak || 0);
+    A.c.wins = Math.max(A.c.wins || 0, ((sg.solo || {}).won || 0) + ((sg.coop || {}).won || 0));
+    if(A.c.cards >= 100) achUnlock(A, "cards100", true); if(A.c.cards >= 1000) achUnlock(A, "cards1000", true);
+    if(A.c.best >= 5) achUnlock(A, "streak5", true); if(A.c.best >= 10) achUnlock(A, "streak10", true); if(A.c.best >= 20) achUnlock(A, "streak20", true);
+    if(A.c.wins >= 1) achUnlock(A, "win1", true); if(A.c.wins >= 10) achUnlock(A, "win10", true);
+    if(((sg.coop || {}).won || 0) >= 1) achUnlock(A, "coopwin", true);
+    if(((stats.ruf || {}).won || 0) >= 1) achUnlock(A, "ruf", true);
+  }catch(e){}
+  try{
+    const hs = JSON.parse(localStorage.getItem("chronohit_hs") || "{}") || {};
+    const bl = Math.max(0, ...Object.keys(hs).filter(k => k.startsWith("blitz")).map(k => hs[k] || 0));
+    if(bl >= 15) achUnlock(A, "blitz15", true); if((hs.endless || 0) >= 25) achUnlock(A, "endless25", true); if((hs.sudden || 0) >= 15) achUnlock(A, "sudden15", true);
+  }catch(e){}
+  try{
+    const D = dailyLoad(), keys = Object.keys(D.results || {}).sort();
+    if(keys.length) achUnlock(A, "daily1", true);
+    if(keys.some(k => (D.results[k].score || 0) >= 10)) achUnlock(A, "daily10", true);
+    let best = 0, run = 0, prev = null;
+    keys.forEach(k => { const t = new Date(k + "T12:00:00").getTime(); run = (prev !== null && Math.round((t - prev) / 864e5) === 1) ? run + 1 : 1; prev = t; best = Math.max(best, run); });
+    if(Math.max(best, D.streak || 0) >= 7) achUnlock(A, "daily7", true);
+  }catch(e){}
+  try{ achCollectCheck(A, true); }catch(e){}
+  try{ achLevelCheck(A, true); }catch(e){}
+  const n = A.__n || 0; delete A.__n; achSave(A);
+  if(n > 0) achToast("Abzeichen freigeschaltet", n + (n === 1 ? " Abzeichen" : " Abzeichen") + " aus deinen bisherigen Spielen.", `<span class="badge-ico tier-3"><span class="bi">🏅</span></span>`, () => openAch());
 }
 /* --- Online: Abzeichen neben dem Namen --- */
 function achCleanIds(a){ return Array.isArray(a) ? [...new Set(a.filter(id => typeof id === "string" && ACH_BY[id]))].slice(0, 3) : []; }
@@ -6416,6 +6625,7 @@ function render(){
 
   if(state.screen === "end") maybeRecordGameEnd();
   try{ achObserve(); }catch(e){}
+  if(!window.__achBf){ window.__achBf = 1; setTimeout(() => { try{ achBackfill(); }catch(e){} }, 1500); }
   confettiCheck();
   updateDocumentTitle();
   updateQuickMenu();
@@ -8214,7 +8424,7 @@ const NET_ACTIONS = ["playCurrent", "chooseGap", "changePosition", "revealCard",
 const NET_LOCAL_DEFAULTS = {
   showExitDialog:false, saveSlotDialogOpen:false, saveNameDraft:"", confirmDeleteSlot:null, openSlotSettings:null,
   infoOpen:null, confirmOverwriteSave:false, confirmDeleteOnFinish:false, pendingSpend:null, playersDrawerOpen:false,
-  openPlayerPanels:[], showWrongOnTimeline:false, suggestDialogOpen:false, hintOpen:false, statsRecorded:false, xpDone:false, xpGain:null, qgDone:false
+  openPlayerPanels:[], showWrongOnTimeline:false, suggestDialogOpen:false, hintOpen:false, achGid:0, statsRecorded:false, xpDone:false, xpGain:null, qgDone:false
 };
 const NET = {
   role: null, peer: null, status: "idle", error: "", notice: "",
@@ -8529,7 +8739,7 @@ function netGuestApplyState(msg){
   const prev = state;
   const keep = {};
   Object.keys(NET_LOCAL_DEFAULTS).forEach(k => { keep[k] = (k in prev) ? prev[k] : NET_LOCAL_DEFAULTS[k]; });
-  if((prev.screen === "end" || prev.screen === "timeline") && clean.screen !== "end") keep.statsRecorded = false; keep.xpDone = false; keep.xpGain = null; keep.qgDone = false;   // neues Spiel (Rematch)
+  if((prev.screen === "end" || prev.screen === "timeline") && clean.screen !== "end") keep.statsRecorded = false; keep.achGid = 0; keep.xpDone = false; keep.xpGain = null; keep.qgDone = false;   // neues Spiel (Rematch)
   const screen = clean.screen === "end" ? (prev.screen === "timeline" ? "timeline" : "end") : "game";
   const typing = prev.online && prev.phase === "revealed_pending" && clean.phase === "revealed_pending" && netMyTurn();
   state = Object.assign({}, keep, clean, {
