@@ -1386,6 +1386,8 @@
   @keyframes dailyWob{ 0%,100%{ transform:rotate(-2.5deg) translateX(-1px); } 50%{ transform:rotate(2.5deg) translateX(1px); } }
   html.reduce-motion .daily-pop{ animation:none; }
   .qp-row{ display:flex; align-items:center; gap:10px; width:100%; box-sizing:border-box; padding:8px 10px; border:1px solid var(--line); border-radius:var(--radius,12px); background:var(--panel-2); }
+  .qp-host{ display:flex; align-items:center; gap:6px; font-size:.85em; cursor:pointer; white-space:nowrap; flex:0 0 auto; }
+  .qp-host input{ width:18px; height:18px; accent-color:var(--accent); margin:0; }
   .qp-main{ flex:1 1 auto; min-width:0; }
   .qp-name{ font-weight:700; font-size:1.05em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .qp-sub{ font-size:.85em; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -3987,7 +3989,7 @@ function renderQuickplay(){
   app.innerHTML = `
     <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">⚡ Quickplay</h1></div>
     <div class="menu-card"><div class="menu-actions">
-      ${[0, 1, 2].map(i => Q[i] ? `<div class="qp-row"><button class="qp-btn qp-play" onclick="quickPlay(${i})" aria-label="Spiel starten" title="Starten">${QP_ICONS.play}</button><div class="qp-main"><div class="qp-name">${esc(Q[i].name)}</div><div class="qp-sub">${esc(quickSummary(Q[i].w))}</div></div><button class="qp-btn" onclick="quickSetup(${i}, true)" aria-label="Bearbeiten" title="Bearbeiten">${QP_ICONS.edit}</button><button class="qp-btn" onclick="quickDelete(${i})" aria-label="Löschen" title="Löschen">${QP_ICONS.trash}</button></div>` : `<button class="btn-ghost" onclick="quickSetup(${i})">＋ Slot ${i + 1} einrichten</button>`).join("")}
+      ${[0, 1, 2].map(i => Q[i] ? `<div class="qp-row"><button class="qp-btn qp-play" onclick="quickPlay(${i})" aria-label="Spiel starten" title="Starten">${QP_ICONS.play}</button><div class="qp-main"><div class="qp-name">${esc(Q[i].name)}</div><div class="qp-sub">${esc(quickSummary(Q[i].w))}${Q[i].host ? " · online hosten" : ""}</div></div><label class="qp-host" title="Spiel online hosten"><input type="checkbox" ${Q[i].host ? "checked" : ""} onchange="quickToggleHost(${i}, this.checked)"><span>Hosten</span></label><button class="qp-btn" onclick="quickSetup(${i}, true)" aria-label="Bearbeiten" title="Bearbeiten">${QP_ICONS.edit}</button><button class="qp-btn" onclick="quickDelete(${i})" aria-label="Löschen" title="Löschen">${QP_ICONS.trash}</button></div>` : `<button class="btn-ghost" onclick="quickSetup(${i})">＋ Slot ${i + 1} einrichten</button>`).join("")}
       <p style="margin:6px 0 0;font-size:calc(13px * var(--font-scale));color:var(--muted);">Quickplay-Spiele werden im nächsten freien der 4 Speicherplätze gespeichert. Sind alle belegt, wählst du einen zum Überschreiben.</p>
       <button class="btn-ghost" onclick="state.screen='menu'; render()">← Zurück zum Hauptmenü</button>
     </div></div>`;
@@ -4003,8 +4005,35 @@ function quickPlay(i){
   if(n) return quickStartIn(i, n);
   quickSlotPick(i);   // alle 4 Speicherplätze belegt: Auswahl
 }
+function quickToggleHost(i, on){ const Q = quickLoad(); if(!Q[i]) return; Q[i].host = !!on; quickSave(Q); renderQuickplay(); }
+function quickHostDialog(i, n){
+  closeQuickHost(); const Q = quickLoad(); if(!Q[i]) return;
+  let nm = ""; try{ nm = localStorage.getItem("chronohit_netname") || ""; }catch(e){}
+  const el = document.createElement("div"); el.id = "qp-host"; el.setAttribute("role", "dialog");
+  el.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:70;display:flex;align-items:center;justify-content:center;padding:16px;";
+  el.onclick = e => { if(e.target === el) closeQuickHost(); };
+  el.innerHTML = `<div class="menu-card" style="max-width:440px;width:100%;"><h3>Raum öffnen: ${esc(Q[i].name)}</h3><p style="margin:6px 0 10px;">Die Einstellungen kommen aus dem Quickplay-Slot. Lege Raumname und Passwort fest.</p>
+    <input id="qh-room" class="pl-search" maxlength="40" placeholder="Raumname" style="width:100%;box-sizing:border-box;margin-bottom:8px;" value="${esc(Q[i].name)}">
+    <input id="qh-name" class="pl-search" maxlength="20" placeholder="Dein Name" style="width:100%;box-sizing:border-box;margin-bottom:8px;" value="${esc(nm)}">
+    <input id="qh-pw" class="pl-search" type="password" maxlength="64" placeholder="Passwort (mindestens 8 Zeichen)" autocomplete="off" style="width:100%;box-sizing:border-box;margin-bottom:6px;">
+    <div id="qh-err" style="color:var(--wrong);min-height:1.4em;"></div>
+    <div class="menu-actions"><button class="btn-primary" onclick="quickHostGo(${i}, ${n})">Raum öffnen</button><button class="btn-ghost" onclick="closeQuickHost()">Abbrechen</button></div></div>`;
+  document.body.appendChild(el); document.getElementById("qh-room").focus();
+}
+function closeQuickHost(){ const el = document.getElementById("qp-host"); if(el) el.remove(); }
+function quickHostGo(i, n){
+  const room = document.getElementById("qh-room").value.trim(), name = document.getElementById("qh-name").value.trim(), pw = document.getElementById("qh-pw").value, err = document.getElementById("qh-err");
+  if(!room){ err.textContent = "Bitte gib einen Raumnamen ein."; return; }
+  if(!name){ err.textContent = "Bitte gib deinen Namen ein."; return; }
+  if(pw.length < 8){ err.textContent = "Das Passwort muss mindestens 8 Zeichen lang sein."; return; }
+  const Q = quickLoad(); if(!Q[i]) return; closeQuickHost();
+  startCreateWizard(true);
+  Object.assign(state.wizard, JSON.parse(JSON.stringify(Q[i].w)), { online:true, quick:null, quickPlay:false, slot:n, name:room, hostName:name, password:pw });
+  createGameFromWizard();
+}
 function quickStartIn(i, n){
   closeQuickPick(); const Q = quickLoad(); if(!Q[i]) return;
+  if(Q[i].host) return quickHostDialog(i, n);
   startCreateWizard(false);
   Object.assign(state.wizard, JSON.parse(JSON.stringify(Q[i].w)), { online:false, quick:null, quickPlay:false, slot:n, name:Q[i].name });
   createGameFromWizard();
@@ -4019,7 +4048,7 @@ function quickSlotPick(i){
   document.body.appendChild(el);
 }
 function closeQuickPick(){ const el = document.getElementById("qp-pick"); if(el) el.remove(); }
-document.addEventListener("keydown", e => { if(e.key === "Escape") closeQuickPick(); });
+document.addEventListener("keydown", e => { if(e.key === "Escape"){ closeQuickPick(); closeQuickHost(); } });
 function quickDelete(i){
   const Q = quickLoad(); if(!Q[i]) return; closeQuickDel();
   const el = document.createElement("div"); el.id = "qp-del"; el.setAttribute("role", "dialog");
@@ -4082,6 +4111,12 @@ function statsInsightsHtml(){
       <select class="dropdown" aria-label="Messwert" onchange="PLS.metric=this.value; statsChartUpdate()">${[["rate", "Trefferquote pro Tag (%)"], ["ok", "Richtige Karten pro Tag"], ["n", "Gespielte Karten pro Tag"], ["xp", "XP pro Tag"]].map(x => `<option value="${x[0]}" ${PLS.metric === x[0] ? "selected" : ""}>${x[1]}</option>`).join("")}</select>
       <div id="stats-chart">${statsChartSvg(PLS.metric)}</div></details>`;
 }
+function statsBar(i){
+  const d = PLS.days && PLS.days[i]; if(!d) return;
+  const r = document.getElementById("stats-readout"), none = d.v == null || (!d.v && PLS.metric !== "rate");
+  if(r) r.innerHTML = "<b>" + d.lab + "</b>: " + (none ? "keine Daten" : "<b>" + d.v + PLS.unit + "</b>");
+  document.querySelectorAll("#stats-chart [data-bar]").forEach(e => { e.style.opacity = +e.dataset.bar === i ? 1 : .45; });
+}
 function statsChartUpdate(){ const el = document.getElementById("stats-chart"); if(el) el.innerHTML = statsChartSvg(PLS.metric); }
 function niceMax(v){ if(v <= 4) return 4; const p = Math.pow(10, Math.floor(Math.log10(v))); for(const m of [1, 2, 2.5, 5, 10]) if(v <= m * p) return m * p; return 10 * p; }
 function statsChartSvg(metric){
@@ -4095,16 +4130,18 @@ function statsChartSvg(metric){
     g += `<line x1="${L0}" y1="${y}" x2="${W - R0}" y2="${y}" style="stroke:var(--line);stroke-width:${t ? 1 : 2};opacity:${t ? .55 : 1};"/><text x="${L0 - 8}" y="${y + 5}" text-anchor="end" style="fill:var(--text);font-size:16px;">${val}${unit}</text>`; }
   const bars = days.map((x, i) => {
     const cx = L0 + i * bw + bw / 2;
-    if(!x.v) return `<circle cx="${cx.toFixed(1)}" cy="${T0 + ch}" r="2" style="fill:var(--muted);"><title>${x.lab} – keine Daten</title></circle>`;
+    if(x.v == null || (!x.v && metric !== "rate")) return `<circle cx="${cx.toFixed(1)}" cy="${T0 + ch}" r="2" style="fill:var(--muted);"></circle>`;
     const h = Math.max(3, x.v / max * ch);
-    return `<rect x="${(cx - bw / 2 + 2).toFixed(1)}" y="${(T0 + ch - h).toFixed(1)}" width="${(bw - 4).toFixed(1)}" height="${h.toFixed(1)}" rx="2" style="fill:var(--accent);"><title>${x.lab}: ${x.v}${unit}</title></rect>`;
+    return `<rect x="${(cx - bw / 2 + 2).toFixed(1)}" y="${(T0 + ch - h).toFixed(1)}" width="${(bw - 4).toFixed(1)}" height="${h.toFixed(1)}" rx="2" data-bar="${i}" style="fill:var(--accent);"></rect>`;
   }).join("");
   const ticks = days.map((x, i) => (i % 5 === 4 || i === 0) ? `<text x="${(L0 + i * bw + bw / 2).toFixed(1)}" y="${H - 12}" text-anchor="middle" style="fill:var(--text);font-size:15px;">${x.lab}</text>` : "").join("");
-  const act = days.filter(x => x.v), sum = act.reduce((n, x) => n + x.v, 0), best = act.slice().sort((a, b) => b.v - a.v)[0];
+  PLS.days = days; PLS.unit = unit;
+  const hits = days.map((x, i) => `<rect x="${(L0 + i * bw).toFixed(1)}" y="${T0}" width="${bw.toFixed(1)}" height="${ch}" style="fill:transparent;cursor:pointer;" onmouseenter="statsBar(${i})" onclick="statsBar(${i})"></rect>`).join("");
+  const act = days.filter(x => x.v != null && (metric === "rate" || x.v > 0)), sum = act.reduce((n, x) => n + x.v, 0), best = act.slice().sort((a, b) => b.v - a.v)[0];
   const sumTxt = !act.length ? "Noch keine Daten in den letzten 30 Tagen – spiele ein paar Runden." : metric === "rate"
     ? `Ø ${Math.round(sum / act.length)} % an ${act.length} aktiven Tag(en) · Bester Tag: ${best.lab} (${best.v} %)`
     : `Summe ${sum} · Ø ${Math.round(sum / act.length * 10) / 10} pro aktivem Tag · Bester Tag: ${best.lab} (${best.v})`;
-  return `<div class="chart-title">${names[metric]}</div><svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;" role="img" aria-label="${names[metric]}, letzte 30 Tage">${g}${bars}${ticks}</svg><div class="stats-note">Jeder Balken ist ein Tag (Datum unten, Skala links). Ein Punkt bedeutet: an dem Tag nicht gespielt. ${sumTxt}</div>`;
+  return `<div class="chart-title">${names[metric]}</div><div id="stats-readout" style="min-height:1.5em;">Fahre über einen Balken oder tippe ihn an, um den genauen Wert zu sehen.</div><svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;" role="img" aria-label="${names[metric]}, letzte 30 Tage">${g}${bars}${ticks}${hits}</svg><div class="stats-note">Jeder Balken ist ein Tag (Datum unten, Skala links). Ein Punkt bedeutet: an dem Tag nicht gespielt. ${sumTxt}</div>`;
 }
 function statsCalHtml(){
   const now = new Date(), c = PLS.cal || (PLS.cal = { y:now.getFullYear(), m:now.getMonth() });
