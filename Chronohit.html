@@ -1365,6 +1365,7 @@
   .pl-search:focus{ outline:2px solid var(--accent); }
   .xp-bar{ height:8px; background:var(--panel-2); border:1px solid var(--line); border-radius:99px; overflow:hidden; margin:6px 0; }
   .xp-bar i{ display:block; height:100%; background:var(--accent); }
+  .qp-row{ display:flex; align-items:center; gap:8px; }
   .menu-row{ display:flex; gap:10px; flex-wrap:wrap; }
   .menu-row > *{ flex:1 1 140px; }
   .menu-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
@@ -2200,7 +2201,7 @@ const SAVE_KEY = "chronohit_solo_v1";
 const LEGACY_SAVE_KEYS = ["jahrgang_solo_v1"];   // Spielstände aus der Zeit vor der Umbenennung
 let memorySave = null;   // Fallback, falls localStorage blockiert ist
 async function saveState(){
-  if(window.__tutBoot || (state && (state.tutorial || state.daily))) return;
+  if(window.__tutBoot || (state && (state.tutorial || state.daily || state.quickGame))) return;
   if(state.online && typeof NET !== "undefined" && NET.role === "guest") return;
   const raw = JSON.stringify(state);
   memorySave = raw;
@@ -3571,7 +3572,7 @@ function renderCustomThemePanel(){
 /* ============ SEITENMENÜ (links oben, außer auf Start/Laden/Hauptmenü/Einstellungen) ============ */
 let quickMenuOpen = false;
 function quickMenuVisible(){
-  return !["splash", "loading", "menu", "play", "settings", "playlist", "stats", "online", "join", "lobby", "resume"].includes(state.screen);
+  return !["splash", "loading", "menu", "play", "quickplay", "settings", "playlist", "stats", "online", "join", "lobby", "resume"].includes(state.screen);
 }
 function renderQuickMenuContent(){
   const el = document.getElementById("qm-content");
@@ -3649,7 +3650,7 @@ function renderMenu(){
     ${xpBarHtml()}
     <div class="menu-card">
       <div class="menu-actions">
-        <button class="btn-primary" onclick="openPlay()">Spielen</button>
+        <div style="display:flex;gap:8px;"><button class="btn-primary" style="flex:1 1 auto;" onclick="openPlay()">Spielen</button><button class="btn-primary" style="flex:0 0 auto;padding-inline:16px;" onclick="openQuickplay()" aria-label="Quickplay" title="Quickplay">⚡ Quick</button></div>
         <div class="menu-row"><button class="btn-ghost" onclick="openStats()">Statistiken</button><button class="btn-ghost" onclick="openRecap()">Jahresrückblick</button></div>
         <button class="btn-ghost" onclick="openSettings()">Einstellungen</button>
       </div>
@@ -3733,7 +3734,7 @@ document.addEventListener("keydown", e => {
   else if(sc === "settings"){ if(state.settingsSub){ state.settingsSub = null; render(); } else backToMenuInstant(); }
   else if(sc === "loadgame"){ state.screen = "play"; render(); }
   else if(sc === "timeline"){ plStop(true); state.screen = "end"; render(); }
-  else if(["stats", "recap", "tutorial", "online", "play"].includes(sc)){ state.screen = "menu"; render(); }
+  else if(["stats", "recap", "tutorial", "online", "play", "quickplay"].includes(sc)){ state.screen = "menu"; render(); }
   else if(sc === "join"){ state.screen = "play"; render(); }
 });
 let apKey = "", apAt = 0;
@@ -3786,6 +3787,21 @@ function dailySeq(){
   const sc = state.correctCount || 0;
   return e.length === 10 ? e : "🟩".repeat(sc) + "🟥".repeat(Math.max(0, 10 - sc));
 }
+function resultSeq(max){
+  return (state.chronicle || []).filter(x => ["ok", "wrong", "timeout"].includes(x.k)).slice(-max).map(x => x.k === "ok" ? "🟩" : "🟥").join("");
+}
+function shareResult(){
+  let t;
+  if(state.daily && state.dailyInfo){ const [y, m, d] = state.daily.date.split("-"); t = "Chronohit Daily " + d + "." + m + "." + y + "\n" + state.dailyInfo.seq + " " + state.dailyInfo.score + "/10"; }
+  else if(state.settings.mode === "multiplayer" && state.players){
+    t = "Chronohit – Mehrspieler\n" + [...state.players].sort((a, b) => b.correctCount - a.correctCount).map((q, i) => (i + 1) + ". " + q.name + " – " + q.correctCount).join("\n");
+  } else {
+    const st = state.settings, tgt = st.target >= 9999 ? "" : " von " + st.target;
+    t = "Chronohit – " + modeLabel(st.mode) + (st.variant ? " · " + variantLabel(st.variant) : "") + "\n" + (state.correctCount || 0) + " richtig" + tgt + (resultSeq(30) ? "\n" + resultSeq(30) : "");
+  }
+  netCopy(t);
+}
+function dailyTitle(n){ return n === 0 ? "Das geht besser!" : n <= 3 ? "Nicht schlecht!" : n <= 5 ? "Gut!" : n <= 8 ? "Super!" : n === 9 ? "Richtig gut!" : "Perfekt!"; }
 function dailyCopy(){ const d = state.dailyInfo; if(!d) return; const [y, m, dd] = state.daily.date.split("-"); netCopy("Chronohit Daily " + dd + "." + m + "." + y + "\n" + d.seq + " " + d.score + "/10"); }
 function xpLoad(){ try{ return JSON.parse(localStorage.getItem("chronohit_xp") || "{}") || {}; }catch(e){ return {}; } }
 function xpLevel(total){ let lv = 1, need = 100, left = total || 0; while(left >= need){ left -= need; lv++; need = 100 + 40 * (lv - 1); } return { lv, cur:left, need }; }
@@ -3826,9 +3842,55 @@ function xpEndHtml(){
   return `<div style="width:100%;text-align:center;margin:6px 0;"><b>+${g.total} XP</b>${g.up ? " · 🎉 Level " + L.lv + "!" : ""}
     <div style="font-size:calc(13px * var(--font-scale));color:var(--muted);">${g.parts.map(x => esc(x[0]) + " +" + x[1]).join(" · ")}</div>
     <div class="xp-bar"><i style="width:${Math.round(L.cur / L.need * 100)}%"></i></div><small>Level ${L.lv} · ${L.cur} / ${L.need} XP</small>
-    ${d ? `<div style="margin-top:10px;">📅 Tägliche Challenge: <b>${d.score}/10</b><br>${d.seq}${d.first ? "" : "<br><small>Nur der erste Versuch des Tages zählt für XP und Serie.</small>"}</div><button class="btn-ghost" style="margin-top:6px;" onclick="dailyCopy()">📋 Ergebnis kopieren (ohne Spoiler)</button>` : ""}</div>`;
+    ${d ? `<div style="margin-top:10px;">📅 Tägliche Challenge: <b>${d.score}/10</b><br>${d.seq}${d.first ? "" : "<br><small>Nur der erste Versuch des Tages zählt für XP und Serie.</small>"}</div>` : ""}</div>`;
 }
 
+/* ============ QUICKPLAY (3 Slots) ============ */
+function quickLoad(){ let q = []; try{ q = JSON.parse(localStorage.getItem("chronohit_quick") || "[]") || []; }catch(e){} return [q[0] || null, q[1] || null, q[2] || null]; }
+function quickSave(q){ try{ localStorage.setItem("chronohit_quick", JSON.stringify(q)); }catch(e){} }
+function openQuickplay(){ state.screen = "quickplay"; render(); window.scrollTo(0, 0); }
+function quickSummary(w){
+  return modeLabel(w.mode) + (w.variant && w.variant !== "classic" ? " · " + variantLabel(w.variant) : "") + (w.mode === "multiplayer" ? " · " + (w.playerNames || []).length + " Spieler" : "")
+    + (w.variant === "blitz" ? " · " + (w.blitzSec || 60) + " s" : w.variant === "endless" ? "" : " · Ziel " + w.target);
+}
+function renderQuickplay(){
+  const Q = quickLoad();
+  app.innerHTML = `
+    <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">⚡ Quickplay</h1></div>
+    <div class="menu-card"><div class="menu-actions">
+      ${[0, 1, 2].map(i => Q[i] ? `<div class="qp-row"><button class="btn-primary" onclick="quickPlay(${i})" aria-label="Spiel starten">▶</button><div style="flex:1;min-width:0;"><b>${esc(Q[i].name)}</b><br><small>${esc(quickSummary(Q[i].w))}</small></div><button class="btn-ghost btn-small" onclick="quickSetup(${i}, true)" aria-label="Bearbeiten">✏️</button><button class="btn-ghost btn-small" onclick="quickDelete(${i})" aria-label="Löschen">🗑</button></div>` : `<button class="btn-ghost" onclick="quickSetup(${i})">＋ Slot ${i + 1} einrichten</button>`).join("")}
+      <p style="margin:6px 0 0;font-size:calc(13px * var(--font-scale));color:var(--muted);">Quickplay-Spiele sind lokal und werden nicht gespeichert.</p>
+      <button class="btn-ghost" onclick="state.screen='menu'; render()">← Zurück zum Hauptmenü</button>
+    </div></div>`;
+}
+function quickSetup(i, edit){
+  const Q = quickLoad(); startCreateWizard(false);
+  const w = state.wizard; if(edit && Q[i]) Object.assign(w, JSON.parse(JSON.stringify(Q[i].w)), { step:1, err:"" });
+  w.quick = i; w.online = false; render();
+}
+function quickPlay(i){
+  const Q = quickLoad(); if(!Q[i]) return;
+  startCreateWizard(false); Object.assign(state.wizard, JSON.parse(JSON.stringify(Q[i].w)), { online:false, quickPlay:true, quick:null });
+  createGameFromWizard();
+}
+function quickDelete(i){ const Q = quickLoad(); if(!Q[i] || !confirm("Quickplay-Slot „" + Q[i].name + "“ löschen?")) return; Q[i] = null; quickSave(Q); render(); }
+function quickNamePrompt(){
+  const w = state.wizard, i = w.quick, Q = quickLoad(); closeQuickName();
+  const el = document.createElement("div"); el.id = "qp-name"; el.setAttribute("role", "dialog");
+  el.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:70;display:flex;align-items:center;justify-content:center;padding:16px;";
+  el.innerHTML = `<div class="menu-card" style="max-width:420px;width:100%;"><h3>Quickplay-Slot benennen</h3><input id="qp-name-in" class="pl-search" maxlength="24" style="width:100%;box-sizing:border-box;margin:8px 0 12px;" value="${esc((Q[i] && Q[i].name) || "Quickplay " + (i + 1))}"><div class="menu-actions"><button class="btn-primary" onclick="quickCommit()">Speichern</button><button class="btn-ghost" onclick="closeQuickName()">Abbrechen</button></div></div>`;
+  document.body.appendChild(el);
+  const inp = document.getElementById("qp-name-in"); inp.focus(); inp.select();
+  inp.onkeydown = e => { if(e.key === "Enter") quickCommit(); else if(e.key === "Escape") closeQuickName(); };
+}
+function closeQuickName(){ const el = document.getElementById("qp-name"); if(el) el.remove(); }
+function quickCommit(){
+  const inp = document.getElementById("qp-name-in"), w = state.wizard; if(!w || w.quick == null) return closeQuickName();
+  const name = (inp && inp.value || "").trim().slice(0, 24) || "Quickplay " + (w.quick + 1);
+  const copy = JSON.parse(JSON.stringify(w)); ["step", "err", "quick", "slot", "quickPlay"].forEach(k => delete copy[k]); copy.online = false;
+  const Q = quickLoad(); Q[w.quick] = { name, w:copy }; quickSave(Q);
+  closeQuickName(); state.wizard = null; state.screen = "quickplay"; render();
+}
 /* ============ PLAYLIST ============ */
 const PL = { q:"", sort:"t", dir:1, f:{ genres:[], styles:[], decades:[], themes:[] }, open:false, playing:null, tm:0 };
 function openPlaylist(){ state.screen = "playlist"; PL.open = false; render(); window.scrollTo(0, 0); }
@@ -4047,8 +4109,8 @@ function startCreateWizard(online){
 }
 // Schritte: Slot, Modus, (Spieler nur bei Mehrspieler), Einstellungen, Songs
 function wizardStepKeys(){
-  const keys = ["slot"];
-  if(state.wizard.online) keys.push("online");
+  const keys = state.wizard.quick != null ? [] : ["slot"];
+  if(state.wizard.online && state.wizard.quick == null) keys.push("online");
   keys.push("mode");
   if(state.wizard.mode === "multiplayer" && !state.wizard.online) keys.push("players");
   const w = state.wizard;
@@ -4071,7 +4133,7 @@ function wizardNext(){
 }
 function wizardBack(){
   if(state.wizard.step > 1){ state.wizard.step--; state.infoOpen = null; render(); }
-  else { state.wizard = null; state.screen = "play"; render(); }
+  else { const q = state.wizard.quick != null; state.wizard = null; state.screen = q ? "quickplay" : "play"; render(); }
 }
 function wizardSetSlot(n){ state.wizard.slot = n; render(); }
 /* Weiches "Gleiten" bei Umsortierungen (FLIP): Positionen vor der Änderung merken, danach
@@ -4489,7 +4551,7 @@ function renderCreateGame(){
       <button class="btn-ghost" onclick="wizardBack()">${w.step===1?'Abbrechen':'← Zurück'}</button>
       ${w.step < total
         ? `<button class="btn-primary" onclick="wizardNext()">Weiter</button>`
-        : `<button class="btn-primary" onclick="createGameFromWizard()" ${wizardPoolSize() < wizardPoolNeeded() ? 'disabled' : ''}>${w.online ? 'Raum öffnen' : 'Spiel erstellen'}</button>`}
+        : `<button class="btn-primary" onclick="${w.quick != null ? 'quickNamePrompt()' : 'createGameFromWizard()'}" ${wizardPoolSize() < wizardPoolNeeded() ? 'disabled' : ''}>${w.quick != null ? 'Speichern' : (w.online ? 'Raum öffnen' : 'Spiel erstellen')}</button>`}
     </div>
   `;
 }
@@ -4534,6 +4596,7 @@ async function createGameFromWizard(){
     settings.playerCount = playerNames.length;
   }
   state.wizard = null;
+  if(w.quickPlay){ window.__tutBoot = true; newGame(settings, playerNames); window.__tutBoot = false; state.quickGame = true; state.hasSave = false; render(); return; }
   newGame(settings, playerNames);
   state.activeSlot = slotNum;
   state.activeSaveName = saveName;
@@ -4922,6 +4985,7 @@ function hsRecord(){
   if(state.hsNew){ all[k] = state.correctCount; try{ localStorage.setItem("chronohit_hs", JSON.stringify(all)); }catch(e){} }
 }
 function endTitle(){
+  if(state.daily) return dailyTitle(state.correctCount || 0);
   const v = state.settings.variant;
   if(v === "blitz") return "Zeit ist um!";
   if(v === "endless") return "Runde vorbei!";
@@ -4971,6 +5035,7 @@ function renderEnd(){
         <div class="rank-list">${rows}</div>
         <div class="menu-actions" style="margin-top:18px;">
           <button class="btn-primary" onclick="showFinalTimeline()">Finale Zeitleisten ansehen</button>
+          <button class="btn-ghost" onclick="shareResult()">📋 Ergebnis kopieren</button>
           ${endExtraHtml()}
           <button class="btn-ghost" onclick="abandonGame()">Hauptmenü</button>
         </div>
@@ -4984,9 +5049,9 @@ function renderEnd(){
       <div class="mark">RUNDE BEENDET</div>
     </div>
     <div class="menu-card win-card">
-      <div class="end-heading ${state.won || s.variant === 'blitz' || s.variant === 'endless' ? 'won' : 'lost'}">${endTitle()}</div>
+      <div class="end-heading ${state.won || state.daily || s.variant === 'blitz' || s.variant === 'endless' ? 'won' : 'lost'}">${endTitle()}</div>
       <div class="num">${state.correctCount}</div>
-      <p>richtig platzierte Karten auf deiner Zeitleiste</p>
+      <p>${state.daily ? 'von 10 Karten richtig platziert' : 'richtig platzierte Karten auf deiner Zeitleiste'}</p>
       ${s.variant ? `<p><b>${state.hsNew ? '🏆 Neuer Highscore!' : 'Highscore: ' + state.hsOld}</b> (${variantLabel(s.variant)}${s.variant === 'blitz' ? ', ' + s.blitzSec + ' s' : ''})</p>` : ``}
       <div class="win-stats">
         <div><div class="n">${state.wrongCount}</div><div class="l">Falsch platziert</div></div>
@@ -4995,6 +5060,7 @@ function renderEnd(){
       </div>
       <div class="menu-actions">
         <button class="btn-primary" onclick="showFinalTimeline()">Finale Zeitleiste ansehen</button>
+        <button class="btn-ghost" onclick="shareResult()">📋 Ergebnis kopieren</button>
         ${endExtraHtml()}
         <button class="btn-ghost" onclick="${s.variant && state.activeSlot ? 'requestDeleteOnFinish()' : 'abandonGame()'}">Hauptmenü</button>
       </div>
@@ -5126,6 +5192,7 @@ function render(){
   else if(state.screen === "loading") renderLoading();
   else if(state.screen === "menu") renderMenu();
   else if(state.screen === "play") renderPlay();
+  else if(state.screen === "quickplay") renderQuickplay();
   else if(state.screen === "loadgame") renderLoadGame();
   else if(state.screen === "tutorial") renderTutorial();
   else if(state.screen === "playlist") renderPlaylist();
@@ -6395,8 +6462,8 @@ function maybeRecordGameEnd(){
   hsRecord();
   xpAward();
   const good = mode === "multiplayer" || state.won || (state.settings.variant && state.hsNew);
-  sfx(good ? "win" : "lose", 0.7);
-  if(good) confettiBurst("big");
+  sfx(state.daily ? ((state.correctCount || 0) >= 4 ? "win" : "turn") : (good ? "win" : "lose"), 0.7);
+  if(good || (state.daily && (state.correctCount || 0) >= 9)) confettiBurst("big");
   saveStats();
 }
 function openStats(){ state.screen = "stats"; render(); }
@@ -7167,7 +7234,7 @@ function netGuestEffects(prev, cur, left){
 const __renderOrig = render;
 render = function(){
   // Reste einer früheren Online-Runde (z. B. nach "Speichern und zum Menü") nie in Menü/Beitritt mitschleppen
-  if(state.online && !NET.role && (state.screen === "menu" || state.screen === "play" || state.screen === "join" || state.screen === "online")){ state.online = false; state.net = null; }
+  if(state.online && !NET.role && (state.screen === "menu" || state.screen === "play" || state.screen === "quickplay" || state.screen === "join" || state.screen === "online")){ state.online = false; state.net = null; }
   // Gast ist verbunden, steht aber noch auf dem Beitritts-Bildschirm: in die Lobby wechseln
   if(NET.role === "guest" && NET.status === "connected" && !state.online && (state.screen === "join" || state.screen === "online")) state.screen = "lobby";
   __renderOrig.apply(this, arguments);
