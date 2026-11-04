@@ -1369,6 +1369,13 @@
   .menu-actions .menu-split > button{ width:auto !important; margin:0; }
   .menu-actions .menu-split > .main{ flex:1 1 0; min-width:0; }
   .menu-actions .menu-split > .side{ flex:0 0 auto; padding-inline:14px; }
+  .bar-wrap{ flex:1 1 auto; height:8px; background:var(--panel-2); border:1px solid var(--line); border-radius:99px; overflow:hidden; margin:0 10px; align-self:center; }
+  .bar-wrap i{ display:block; height:100%; background:var(--accent); }
+  .cal-grid{ display:grid; grid-template-columns:repeat(7, 1fr); gap:4px; }
+  .cal-h{ text-align:center; font-size:.8em; color:var(--muted); }
+  .cal-d{ position:relative; min-height:34px; display:flex; align-items:center; justify-content:center; border:1px solid var(--line); border-radius:var(--radius,8px); font-size:.9em; }
+  .cal-d.on{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+  .cal-s{ position:absolute; top:-3px; right:-1px; font-size:.7em; }
   .qp-row{ display:flex; align-items:center; gap:10px; width:100%; box-sizing:border-box; padding:8px 10px; border:1px solid var(--line); border-radius:var(--radius,12px); background:var(--panel-2); }
   .qp-main{ flex:1 1 auto; min-width:0; }
   .qp-name{ font-weight:700; font-size:1.05em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -2211,7 +2218,7 @@ const SAVE_KEY = "chronohit_solo_v1";
 const LEGACY_SAVE_KEYS = ["jahrgang_solo_v1"];   // Spielstände aus der Zeit vor der Umbenennung
 let memorySave = null;   // Fallback, falls localStorage blockiert ist
 async function saveState(){
-  if(window.__tutBoot || (state && (state.tutorial || state.daily || state.quickGame))) return;
+  if(window.__tutBoot || (state && (state.tutorial || state.daily || state.quickGame || state.learn))) return;
   if(state.online && typeof NET !== "undefined" && NET.role === "guest") return;
   const raw = JSON.stringify(state);
   memorySave = raw;
@@ -3642,6 +3649,7 @@ function renderPlay(){
     <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Spielen</h1></div>
     <div class="menu-card"><div class="menu-actions">
       <button class="btn-primary" onclick="startDaily()">📅 Tägliche Challenge${dailyBadge()}</button>
+      <button class="btn-ghost" onclick="startLearn()">🎓 Lernrunde${learnBadge()}</button>
       <div class="menu-row">
         <button class="btn-primary" onclick="startCreateWizard()">Spiel starten</button>
         <button class="btn-primary" onclick="startCreateWizard(true)">Spiel hosten</button>
@@ -3840,6 +3848,7 @@ function xpAward(){
   X.xp = (X.xp || 0) + total; try{ localStorage.setItem("chronohit_xp", JSON.stringify(X)); }catch(e){}
   const after = xpLevel(X.xp).lv;
   state.xpGain = { total, parts, up:after > before };
+  try{ cardsAddXp(total); }catch(e){}
   if(after > before){ try{ sfx("streak", 0.9); }catch(e){} }
 }
 function xpBarHtml(){
@@ -3933,6 +3942,88 @@ function quickCommit(){
   const copy = JSON.parse(JSON.stringify(w)); ["step", "err", "quick", "slot", "quickPlay"].forEach(k => delete copy[k]); copy.online = false;
   const Q = quickLoad(); Q[w.quick] = { name, w:copy }; quickSave(Q);
   closeQuickName(); state.wizard = null; state.screen = "quickplay"; render();
+}
+/* ============ AUSWERTUNG (Karten-Log), LERNRUNDE ============ */
+const PLS = { metric:"rate", cal:null };
+function cardsLoad(){ let L = {}; try{ L = JSON.parse(localStorage.getItem("chronohit_cards") || "{}") || {}; }catch(e){} L.songs = L.songs || {}; L.days = L.days || {}; return L; }
+function cardsSave(L){ try{ localStorage.setItem("chronohit_cards", JSON.stringify(L)); }catch(e){} }
+function cardLog(e){
+  if(state.tutorial || !["ok", "wrong", "timeout"].includes(e.k)) return;
+  const song = SONGS.find(x => x.t === e.t && x.a === e.a && x.y === e.y); if(!song || !song.id) return;
+  const L = cardsLoad(), r = L.songs[song.id] || (L.songs[song.id] = { n:0, w:0 }), k = dateKey(), d = L.days[k] || (L.days[k] = { n:0, ok:0, xp:0 });
+  r.n++; if(e.k !== "ok") r.w++; d.n++; if(e.k === "ok") d.ok++;
+  cardsSave(L);
+}
+function cardsAddXp(total){ const L = cardsLoad(), k = dateKey(), d = L.days[k] || (L.days[k] = { n:0, ok:0, xp:0 }); d.xp = (d.xp || 0) + total; cardsSave(L); }
+function statsAgg(keyFn){
+  const L = cardsLoad(), byId = new Map(SONGS.map(x => [x.id, x])), m = {};
+  for(const [id, r] of Object.entries(L.songs)){ const so = byId.get(id); if(!so) continue; for(const k of keyFn(so)){ const o = m[k] || (m[k] = { n:0, w:0 }); o.n += r.n; o.w += r.w; } }
+  return m;
+}
+function statsInsightsHtml(){
+  const dec = statsAgg(so => [decadeOf(so.y)]), gen = statsAgg(so => so.s || []);
+  const q = o => Math.round((o.n - o.w) / o.n * 100);
+  const lblDec = k => decadeLabel(Number(k)), lblGen = k => (LIB.styles.find(i => i.key === k) || { label:k }).label;
+  const rows = (m, lbl) => Object.entries(m).filter(([, o]) => o.n > 0).sort((a, b) => a[0].localeCompare(b[0], "de", { numeric:true }))
+    .map(([k, o]) => `<div class="stats-row"><span>${esc(lbl(k))}</span><span class="bar-wrap"><i style="width:${q(o)}%"></i></span><b>${q(o)} % (${o.n})</b></div>`).join("") || "<p>Noch keine Daten – sie sammeln sich ab jetzt mit jeder gespielten Karte.</p>";
+  const weak = (m, lbl) => { const c = Object.entries(m).filter(([, o]) => o.n >= 5).sort((a, b) => q(a[1]) - q(b[1]))[0]; return c ? esc(lbl(c[0])) + " (" + q(c[1]) + " %)" : "noch zu wenige Karten (mindestens 5 pro Gruppe)"; };
+  return `
+    <div class="menu-card">
+      <h3>Trefferquote nach Epoche</h3>${rows(dec, lblDec)}
+      <div class="stats-note"><b>Schwächste Epoche:</b> ${weak(dec, lblDec)}</div>
+    </div>
+    <div class="menu-card">
+      <h3>Trefferquote nach Genre</h3>${rows(gen, lblGen)}
+      <div class="stats-note"><b>Schwächstes Genre:</b> ${weak(gen, lblGen)}. In Klammern steht die Zahl gespielter Karten. Gezählt wird ab dem Update; Karten ohne Genre fehlen in dieser Liste.</div>
+    </div>
+    <div class="menu-card">
+      <h3>Verlauf (letzte 30 Tage)</h3>
+      <select class="dropdown" aria-label="Messwert" onchange="PLS.metric=this.value; statsChartUpdate()">${[["rate", "Trefferquote pro Tag (%)"], ["ok", "Richtige Karten pro Tag"], ["n", "Gespielte Karten pro Tag"], ["xp", "XP pro Tag"]].map(x => `<option value="${x[0]}" ${PLS.metric === x[0] ? "selected" : ""}>${x[1]}</option>`).join("")}</select>
+      <div id="stats-chart">${statsChartSvg(PLS.metric)}</div>
+    </div>
+    <div class="menu-card"><h3>Kalender</h3><div id="stats-cal">${statsCalHtml()}</div></div>`;
+}
+function statsChartUpdate(){ const el = document.getElementById("stats-chart"); if(el) el.innerHTML = statsChartSvg(PLS.metric); }
+function statsChartSvg(metric){
+  const L = cardsLoad(), days = [];
+  for(let i = 29; i >= 0; i--){ const d = new Date(Date.now() - i * 864e5), k = dateKey(d), r = L.days[k] || { n:0, ok:0, xp:0 };
+    days.push({ k, v: metric === "rate" ? (r.n ? Math.round(r.ok / r.n * 100) : null) : metric === "ok" ? r.ok : metric === "n" ? r.n : (r.xp || 0) }); }
+  const max = metric === "rate" ? 100 : Math.max(1, ...days.map(x => x.v || 0)), W = 600, H = 170, P = 26, bw = (W - P * 2) / 30, ch = H - P * 2;
+  const bars = days.map((x, i) => x.v == null ? "" : `<rect x="${(P + i * bw + 2).toFixed(1)}" y="${(H - P - x.v / max * ch).toFixed(1)}" width="${(bw - 4).toFixed(1)}" height="${(x.v / max * ch).toFixed(1)}" rx="2" style="fill:var(--accent)"><title>${x.k}: ${x.v}${metric === "rate" ? " %" : ""}</title></rect>`).join("");
+  const t = (x, y, txt, a) => `<text x="${x}" y="${y}" text-anchor="${a}" style="fill:var(--muted);font-size:11px;">${txt}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;max-height:220px;" role="img" aria-label="Verlaufsdiagramm"><line x1="${P}" y1="${H - P}" x2="${W - P}" y2="${H - P}" style="stroke:var(--line);"/>${bars}${t(P, 14, max + (metric === "rate" ? " %" : ""), "start")}${t(P, H - 8, days[0].k.slice(5), "start")}${t(W - P, H - 8, days[29].k.slice(5), "end")}</svg>`;
+}
+function statsCalHtml(){
+  const now = new Date(), c = PLS.cal || (PLS.cal = { y:now.getFullYear(), m:now.getMonth() });
+  const first = new Date(c.y, c.m, 1), nd = new Date(c.y, c.m + 1, 0).getDate(), off = (first.getDay() + 6) % 7, L = cardsLoad(), D = dailyLoad();
+  let cells = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map(x => `<div class="cal-h">${x}</div>`).join("") + '<div></div>'.repeat(off);
+  for(let d = 1; d <= nd; d++){
+    const k = c.y + "-" + String(c.m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0"), pl = L.days[k] && L.days[k].n > 0, ch = D.results[k];
+    cells += `<div class="cal-d ${pl ? "on" : ""}" title="${k}${pl ? ": " + L.days[k].n + " Karten" : ""}${ch ? ", Challenge " + ch.score + "/10" : ""}">${d}${ch ? '<span class="cal-s">⭐</span>' : ""}</div>`;
+  }
+  const y = dateKey(new Date(Date.now() - 864e5)), live = D.last === dateKey() || D.last === y ? (D.streak || 0) : 0;
+  return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><button class="btn-ghost btn-small" onclick="calMove(-1)" aria-label="Vorheriger Monat">‹</button><b>${esc(first.toLocaleDateString("de-DE", { month:"long", year:"numeric" }))}</b><button class="btn-ghost btn-small" onclick="calMove(1)" aria-label="Nächster Monat">›</button></div><div class="cal-grid">${cells}</div><div class="stats-note">Gefüllt = an dem Tag gespielt, ⭐ = Tägliche Challenge gespielt. Aktuelle Challenge-Serie: <b>${live}</b> Tag(e).</div>`;
+}
+function calMove(n){ const c = PLS.cal, d = new Date(c.y, c.m + n, 1); c.y = d.getFullYear(); c.m = d.getMonth(); const el = document.getElementById("stats-cal"); if(el) el.innerHTML = statsCalHtml(); }
+/* Lernrunde: Songs mit vielen Fehlern kommen häufiger */
+function learnSelect(){
+  const L = cardsLoad(), pool = SONGS.filter(x => x.id);
+  const wt = x => { const r = L.songs[x.id]; if(!r || !r.n) return 1; return 1 + 9 * (r.w / r.n) * Math.min(1, r.n / 3); };
+  const first = pool[Math.floor(Math.random() * pool.length)], out = [first], rest = pool.filter(x => x !== first);
+  while(out.length < 11 && rest.length){
+    let t = Math.random() * rest.reduce((n, x) => n + wt(x), 0), k = 0;
+    for(; k < rest.length - 1; k++){ t -= wt(rest[k]); if(t <= 0) break; }
+    out.push(rest[k]); rest.splice(k, 1);
+  }
+  return out;
+}
+function learnBadge(){ const L = cardsLoad(); const k = Object.values(L.songs).filter(r => r.w > 0).length; return k ? " · " + k + " knifflige Songs" : ""; }
+function startLearn(){
+  const sel = learnSelect();
+  const base = { tokens:false, target:10, maxTokens:5, startTokens:2, mode:"solo", difficulty:"normal", turnLimit:0, challenge:false, challengeMode:"manual", yearTol:0, genres:Object.fromEntries(LIB.langs.map(l => [l.key, true])) };
+  window.__tutBoot = true; newGame(base, null);
+  state.timeline = [{ ...sel[0], __starter:true }]; state.deck = sel.slice(1); state.turnNo = 0; state.current = null; drawNext();
+  window.__tutBoot = false; state.learn = true; state.hasSave = false; render();
 }
 /* ============ PLAYLIST ============ */
 const PL = { q:"", sort:"t", dir:1, f:{ genres:[], styles:[], decades:[], themes:[] }, open:false, playing:null, tm:0 };
@@ -4103,7 +4194,7 @@ function renderTutorial(){
 function renderTutorialRules(){
   app.innerHTML = `
     <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Regeln</h1></div>
-    <div class="menu-card"><div class="body"><details class="rules-sec" open><summary>🎵 Spielablauf</summary><div class="rules-body"><p><strong>1. Abspielen:</strong> Du ziehst eine Karte und klickst auf die Schallplatte. Der Song spielt unsichtbar im Hintergrund über Spotify, du siehst weder Titel noch Cover. Nochmal klicken pausiert/setzt fort. Mit Spotify Premium läuft der ganze Song, sonst die 30-Sekunden-Vorschau. Wird die Steuerung blockiert (z. B. durch einen Adblocker), springt das Spiel auf einen sichtbaren, zugeschnittenen Player um. Der Button ⟳ an der Schallplatte lädt den Player neu.</p><p style="font-size:calc(13px * var(--font-scale));">Hinweis: Bei „Bailando“ (Enrique Iglesias) lag nur ein Album-Link vor – dort öffnet sich stattdessen eine Spotify-Suche in neuem Tab.</p><p><strong>2. Platzieren:</strong> Ohne das Jahr zu kennen, klickst du auf die Lücke deiner Zeitleiste, die du für chronologisch richtig hältst (früher links, später rechts). Bis zum Aufdecken kannst du die Position noch ändern.</p><p><strong>3. Aufdecken:</strong> Liegt die Karte richtig, bleibt sie liegen und zählt einen Punkt (die Startkarte zählt nicht). Liegt sie falsch, kommt sie auf den Ablagestapel und bleibt dauerhaft draußen. Danach geht es mit „Weiter“ zur nächsten Karte.</p></div></details><details class="rules-sec" ><summary>🎯 Schwierigkeit</summary><div class="rules-body"><p><strong>Normal:</strong> nur die Position zählt.<br><strong>Profi:</strong> Titel &amp; Interpret müssen vor dem Aufdecken zusätzlich stimmen.<br><strong>Experte:</strong> zusätzlich das Erscheinungsjahr, mit einstellbarer Toleranz von bis zu ±5 Jahren.</p><p>Verglichen wird großzügig: Groß-/Kleinschreibung, Akzente, Umlaut-Schreibweisen und Tippfehler werden verziehen.</p></div></details><details class="rules-sec" ><summary>🪙 Chrono-Tokens</summary><div class="rules-body"><p>Wenn aktiviert (außerhalb von Koop), sind Start- und Maximalwert einstellbar.</p><p>&bull; <strong>Song unbekannt?</strong> Für 1 Token wirfst du die aktuelle Karte ab und ziehst eine neue, ohne zu platzieren.<br>&bull; <strong>Karte kaufen:</strong> Für 3 Tokens wird die nächste gezogene Karte garantiert richtig einsortiert, ohne Risiko.<br>&bull; <strong>Bonus-Token:</strong> Tippst du Titel und Interpret richtig ein, gibt es einen weiteren Token (in jedem Schwierigkeitsgrad).</p><p>Tastenkürzel: S = Überspringen, B = Kaufen.</p></div></details><details class="rules-sec" ><summary>🎮 Spielmodi</summary><div class="rules-body"><p><strong>Solo:</strong> Du spielst allein auf eine einstellbare Zielkartenzahl.</p><p><strong>Koop:</strong> Ihr startet gemeinsam mit einer festen Zahl Chrono-Tokens (1–10) und einer Startkarte. Jede falsch platzierte Karte kostet einen Token. Skip/Kaufen gibt es nicht, die Tokens sind eure gemeinsamen Leben. Bei 0 Tokens vor dem Ziel habt ihr verloren, sonst gewonnen.</p><p><strong>Mehrspieler:</strong> Jeder Spieler hat eine eigene Startkarte und Zeitleiste, ihr spielt reihum. Wer das Ziel erreicht, gewinnt; ist der Stapel leer, entscheidet die Zahl richtiger Karten (Gleichstand möglich).</p></div></details><details class="rules-sec" ><summary>📣 Chronohit!-Einspruch (Mehrspieler mit Tokens)</summary><div class="rules-body"><p>Bevor eine Karte aufgedeckt wird, kann ein Gegner mit einem Token „Chronohit!“ rufen und die Lücke wählen, wo die Karte seiner Meinung nach hingehört. Liegt der aktive Spieler falsch und der Rufer richtig, bekommt der Rufer die Karte. Der eingesetzte Token ist immer weg. Pro Zug zählt nur der erste Einspruch.</p><p><strong>Einspruchsfenster:</strong> Entweder beendet der aktive Spieler (online auch der Host) das Fenster per Klick, oder es schließt automatisch nach 5 bzw. 10 Sekunden oder (mit Zeitlimit) mit der Restzeit, mindestens 5 Sekunden. Ruft jemand, hat der Rufer mindestens 5 Sekunden für die Lückenwahl. Ohne gewählte Lücke wird der Ruf zurückgenommen und der Token kommt zurück.</p></div></details><details class="rules-sec" ><summary>🎲 Zufallsereignisse (Mehrspieler)</summary><div class="rules-body"><p>Optional, standardmäßig aus. Beim Spielerwechsel passiert mit etwa 22 % Wahrscheinlichkeit etwas: <strong>Doppelrunde</strong> (der Spieler ist zweimal hintereinander dran) oder <strong>Kartentausch</strong> (zwei Spieler tauschen je eine zufällige Karte, nie die Startkarte; sie werden nach Jahr neu einsortiert). Ein Banner zeigt das Ereignis an.</p></div></details><details class="rules-sec" ><summary>⚡ Solo-Varianten</summary><div class="rules-body"><p><strong>Klassisch:</strong> bis zum Ziel.<br><strong>Endlos:</strong> kein Ziel, die Runde endet nach einer einstellbaren Zahl Fehler (Leben, Standard 3). Dein Highscore ist die Zahl richtiger Karten.<br><strong>Blitz:</strong> x Sekunden (30–180) für so viele richtige Karten wie möglich. Die Uhr startet beim Abspielen der ersten Karte; Abspielen, Aufdecken und Weiter laufen automatisch. Nur die Position zählt, ohne Titel/Interpret und ohne Tokens.<br><strong>Sudden Death:</strong> ein Fehler und du bist raus.</p><p>Highscores werden pro Variante (Blitz pro Dauer) gespeichert.</p></div></details><details class="rules-sec" ><summary>⏱ Zeitlimit pro Zug</summary><div class="rules-body"><p>Optional. Pro Zug bleibt nur begrenzte Zeit zum Platzieren (und in Profi/Experte oder für den Bonus zum Raten von Titel/Interpret). Die Zeit läuft ab dem Start des Songs. Läuft sie ab, gilt der Zug als verloren: Die Karte wird verworfen und zählt als falsch (im Koop kostet das einen Token).</p></div></details><details class="rules-sec" ><summary>🎼 Songauswahl und Filter</summary><div class="rules-body"><p>Beim Erstellen eines Spiels filterst du die Songs nach <strong>Sprache</strong>, <strong>Genre</strong> (ein Song kann mehrere haben, ein Treffer genügt), <strong>Jahrzehnt</strong> und <strong>Kategorien</strong> (z. B. Filmmusik oder Balladen; „Sonstige“ sind Songs ohne besondere Kategorie). Die Zahlen an den Chips zeigen, wie viele Songs es gibt. Die Reihenfolge der Filtergruppen lässt sich ändern.</p></div></details><details class="rules-sec" ><summary>🌐 Online spielen</summary><div class="rules-body"><p>Über „Spiel hosten / beitreten“ eröffnet ein Host einen Raum (Raumname, optional Passwort), Mitspieler treten bei, Zuschauer können zusehen. Der Host steuert Einstellungen und Start. Im Online-Solo und -Koop dürfen alle Teilnehmer gleichzeitig tippen (und raten). Im <strong>Team-Modus</strong> (Mehrspieler online) bilden die Spieler Teams mit gemeinsamer Zeitleiste und gemeinsamen Tokens; jedes Teammitglied darf tippen und raten, die Teams sind reihum dran. Die Teams wählst du in der Lobby selbst, der Host kann sie ändern oder zufällig verteilen. Ein <strong>Rematch</strong> startet nur, wenn alle verbundenen Mitspieler zustimmen; wer ablehnt, bricht die Anfrage ab.</p></div></details><details class="rules-sec" ><summary>💾 Spielstände</summary><div class="rules-body"><p>Beim Erstellen eines Spiels wählst du einen von 4 Speicherplätzen und einen Namen. Über den 💾-Button im Spiel speicherst du jederzeit in diesen Slot. Über „Spiel laden“ machst du dort weiter.</p></div></details><details class="rules-sec" ><summary>📜 Spielende, Chronik und Statistik</summary><div class="rules-body"><p>Am Ende siehst du das Ergebnis (bei Varianten mit Highscore-Vergleich). „Finale Zeitleiste ansehen“ zeigt alle Karten mit einem ▶ darunter, das die 30-Sekunden-Vorschau spielt. Die <strong>Spielchronik</strong> listet jeden Zug samt dem, was geraten wurde (Platzierung, Titel, Interpret, Jahr). Statistiken und der Jahresrückblick im Hauptmenü zählen deine Runden; Tutorial-Runden zählen nicht.</p></div></details><details class="rules-sec" ><summary>📅 Tägliche Challenge, Level und XP</summary><div class="rules-body"><p><strong>Tägliche Challenge:</strong> Jeden Tag gibt es 10 feste Karten (aus dem Datum abgeleitet, für alle mit derselben Songliste gleich), ohne Tokens. Dein Ergebnis ist x/10. Du darfst beliebig oft spielen, aber nur der erste Versuch des Tages zählt für XP und Serie. Der Teilen-Text zeigt nur Datum und Farbquadrate (🟩 richtig, 🟥 falsch), keine Songs.</p><p><strong>XP:</strong> 10 pro richtig platzierter Karte, 5 pro richtig geratenem Titel oder Interpreten, 50 für einen Sieg, 25 für einen neuen Highscore, 100 für die Tägliche Challenge plus 10 pro Serientag (bis 7). Das Level steigt mit wachsendem Bedarf (100 XP für Level 2, danach je 40 mehr). Alles wird nur lokal gespeichert. Tutorial-Runden zählen nicht.</p></div></details><details class="rules-sec" ><summary>🎧 Playlist</summary><div class="rules-body"><p>Im Hauptmenü listet die Playlist alle Lieder mit Jahr, Sprache und Genre/Kategorie. Du kannst suchen, über „Filter“ nach Sprache, Genre, Jahrzehnt und Kategorien filtern, nach Titel, Interpret oder Jahr sortieren und mit ▶ die 30-Sekunden-Vorschau anspielen.</p></div></details><details class="rules-sec" ><summary>🎨 Themes und Darstellung</summary><div class="rules-body"><p>In den Einstellungen wählst du ein Theme. Jahreszeiten (Frühling bis Winter) und Feiertage (Valentinstag, Ostern, Halloween, Weihnachten, Silvester) sind aufklappbare Gruppen mit Hintergrund-Deko; Feiertags-Themes haben eigene Sounds. „Jahreszeiten-Themes nach Datum“ schaltet beim Start automatisch auf das passende Theme (Aus / Nur Feiertage / Feiertage &amp; Jahreszeiten). „Benutzerdefiniert“ erlaubt eigene Farben, Schrift und Stil. „Animationen reduzieren“ schaltet Deko-Animationen, Feuerwerk und Flattertiere aus.</p></div></details><details class="rules-sec" ><summary>⌨️ Bedienung per Tastatur</summary><div class="rules-body"><p>Wenn aktiviert: ←/→ oder A/D wählen die Lücke, Enter/Leertaste bestätigt (platzieren, aufdecken, weiter), Rücktaste ändert die Position, S überspringt, B kauft, P pausiert (nicht online). <strong>Esc</strong> geht in jedem Menü eine Ebene zurück.</p></div></details></div></div>
+    <div class="menu-card"><div class="body"><details class="rules-sec" open><summary>🎵 Spielablauf</summary><div class="rules-body"><p><strong>1. Abspielen:</strong> Du ziehst eine Karte und klickst auf die Schallplatte. Der Song spielt unsichtbar im Hintergrund über Spotify, du siehst weder Titel noch Cover. Nochmal klicken pausiert/setzt fort. Mit Spotify Premium läuft der ganze Song, sonst die 30-Sekunden-Vorschau. Wird die Steuerung blockiert (z. B. durch einen Adblocker), springt das Spiel auf einen sichtbaren, zugeschnittenen Player um. Der Button ⟳ an der Schallplatte lädt den Player neu.</p><p style="font-size:calc(13px * var(--font-scale));">Hinweis: Bei „Bailando“ (Enrique Iglesias) lag nur ein Album-Link vor – dort öffnet sich stattdessen eine Spotify-Suche in neuem Tab.</p><p><strong>2. Platzieren:</strong> Ohne das Jahr zu kennen, klickst du auf die Lücke deiner Zeitleiste, die du für chronologisch richtig hältst (früher links, später rechts). Bis zum Aufdecken kannst du die Position noch ändern.</p><p><strong>3. Aufdecken:</strong> Liegt die Karte richtig, bleibt sie liegen und zählt einen Punkt (die Startkarte zählt nicht). Liegt sie falsch, kommt sie auf den Ablagestapel und bleibt dauerhaft draußen. Danach geht es mit „Weiter“ zur nächsten Karte.</p></div></details><details class="rules-sec" ><summary>🎯 Schwierigkeit</summary><div class="rules-body"><p><strong>Normal:</strong> nur die Position zählt.<br><strong>Profi:</strong> Titel &amp; Interpret müssen vor dem Aufdecken zusätzlich stimmen.<br><strong>Experte:</strong> zusätzlich das Erscheinungsjahr, mit einstellbarer Toleranz von bis zu ±5 Jahren.</p><p>Verglichen wird großzügig: Groß-/Kleinschreibung, Akzente, Umlaut-Schreibweisen und Tippfehler werden verziehen.</p></div></details><details class="rules-sec" ><summary>🪙 Chrono-Tokens</summary><div class="rules-body"><p>Wenn aktiviert (außerhalb von Koop), sind Start- und Maximalwert einstellbar.</p><p>&bull; <strong>Song unbekannt?</strong> Für 1 Token wirfst du die aktuelle Karte ab und ziehst eine neue, ohne zu platzieren.<br>&bull; <strong>Karte kaufen:</strong> Für 3 Tokens wird die nächste gezogene Karte garantiert richtig einsortiert, ohne Risiko.<br>&bull; <strong>Bonus-Token:</strong> Tippst du Titel und Interpret richtig ein, gibt es einen weiteren Token (in jedem Schwierigkeitsgrad).</p><p>Tastenkürzel: S = Überspringen, B = Kaufen.</p></div></details><details class="rules-sec" ><summary>🎮 Spielmodi</summary><div class="rules-body"><p><strong>Solo:</strong> Du spielst allein auf eine einstellbare Zielkartenzahl.</p><p><strong>Koop:</strong> Ihr startet gemeinsam mit einer festen Zahl Chrono-Tokens (1–10) und einer Startkarte. Jede falsch platzierte Karte kostet einen Token. Skip/Kaufen gibt es nicht, die Tokens sind eure gemeinsamen Leben. Bei 0 Tokens vor dem Ziel habt ihr verloren, sonst gewonnen.</p><p><strong>Mehrspieler:</strong> Jeder Spieler hat eine eigene Startkarte und Zeitleiste, ihr spielt reihum. Wer das Ziel erreicht, gewinnt; ist der Stapel leer, entscheidet die Zahl richtiger Karten (Gleichstand möglich).</p></div></details><details class="rules-sec" ><summary>📣 Chronohit!-Einspruch (Mehrspieler mit Tokens)</summary><div class="rules-body"><p>Bevor eine Karte aufgedeckt wird, kann ein Gegner mit einem Token „Chronohit!“ rufen und die Lücke wählen, wo die Karte seiner Meinung nach hingehört. Liegt der aktive Spieler falsch und der Rufer richtig, bekommt der Rufer die Karte. Der eingesetzte Token ist immer weg. Pro Zug zählt nur der erste Einspruch.</p><p><strong>Einspruchsfenster:</strong> Entweder beendet der aktive Spieler (online auch der Host) das Fenster per Klick, oder es schließt automatisch nach 5 bzw. 10 Sekunden oder (mit Zeitlimit) mit der Restzeit, mindestens 5 Sekunden. Ruft jemand, hat der Rufer mindestens 5 Sekunden für die Lückenwahl. Ohne gewählte Lücke wird der Ruf zurückgenommen und der Token kommt zurück.</p></div></details><details class="rules-sec" ><summary>🎲 Zufallsereignisse (Mehrspieler)</summary><div class="rules-body"><p>Optional, standardmäßig aus. Beim Spielerwechsel passiert mit etwa 22 % Wahrscheinlichkeit etwas: <strong>Doppelrunde</strong> (der Spieler ist zweimal hintereinander dran) oder <strong>Kartentausch</strong> (zwei Spieler tauschen je eine zufällige Karte, nie die Startkarte; sie werden nach Jahr neu einsortiert). Ein Banner zeigt das Ereignis an.</p></div></details><details class="rules-sec" ><summary>⚡ Solo-Varianten</summary><div class="rules-body"><p><strong>Klassisch:</strong> bis zum Ziel.<br><strong>Endlos:</strong> kein Ziel, die Runde endet nach einer einstellbaren Zahl Fehler (Leben, Standard 3). Dein Highscore ist die Zahl richtiger Karten.<br><strong>Blitz:</strong> x Sekunden (30–180) für so viele richtige Karten wie möglich. Die Uhr startet beim Abspielen der ersten Karte; Abspielen, Aufdecken und Weiter laufen automatisch. Nur die Position zählt, ohne Titel/Interpret und ohne Tokens.<br><strong>Sudden Death:</strong> ein Fehler und du bist raus.</p><p>Highscores werden pro Variante (Blitz pro Dauer) gespeichert.</p></div></details><details class="rules-sec" ><summary>⏱ Zeitlimit pro Zug</summary><div class="rules-body"><p>Optional. Pro Zug bleibt nur begrenzte Zeit zum Platzieren (und in Profi/Experte oder für den Bonus zum Raten von Titel/Interpret). Die Zeit läuft ab dem Start des Songs. Läuft sie ab, gilt der Zug als verloren: Die Karte wird verworfen und zählt als falsch (im Koop kostet das einen Token).</p></div></details><details class="rules-sec" ><summary>🎼 Songauswahl und Filter</summary><div class="rules-body"><p>Beim Erstellen eines Spiels filterst du die Songs nach <strong>Sprache</strong>, <strong>Genre</strong> (ein Song kann mehrere haben, ein Treffer genügt), <strong>Jahrzehnt</strong> und <strong>Kategorien</strong> (z. B. Filmmusik oder Balladen; „Sonstige“ sind Songs ohne besondere Kategorie). Die Zahlen an den Chips zeigen, wie viele Songs es gibt. Die Reihenfolge der Filtergruppen lässt sich ändern.</p></div></details><details class="rules-sec" ><summary>🌐 Online spielen</summary><div class="rules-body"><p>Über „Spiel hosten / beitreten“ eröffnet ein Host einen Raum (Raumname, optional Passwort), Mitspieler treten bei, Zuschauer können zusehen. Der Host steuert Einstellungen und Start. Im Online-Solo und -Koop dürfen alle Teilnehmer gleichzeitig tippen (und raten). Im <strong>Team-Modus</strong> (Mehrspieler online) bilden die Spieler Teams mit gemeinsamer Zeitleiste und gemeinsamen Tokens; jedes Teammitglied darf tippen und raten, die Teams sind reihum dran. Die Teams wählst du in der Lobby selbst, der Host kann sie ändern oder zufällig verteilen. Ein <strong>Rematch</strong> startet nur, wenn alle verbundenen Mitspieler zustimmen; wer ablehnt, bricht die Anfrage ab.</p></div></details><details class="rules-sec" ><summary>💾 Spielstände</summary><div class="rules-body"><p>Beim Erstellen eines Spiels wählst du einen von 4 Speicherplätzen und einen Namen. Über den 💾-Button im Spiel speicherst du jederzeit in diesen Slot. Über „Spiel laden“ machst du dort weiter.</p></div></details><details class="rules-sec" ><summary>📜 Spielende, Chronik und Statistik</summary><div class="rules-body"><p>Am Ende siehst du das Ergebnis (bei Varianten mit Highscore-Vergleich). „Finale Zeitleiste ansehen“ zeigt alle Karten mit einem ▶ darunter, das die 30-Sekunden-Vorschau spielt. Die <strong>Spielchronik</strong> listet jeden Zug samt dem, was geraten wurde (Platzierung, Titel, Interpret, Jahr). Statistiken und der Jahresrückblick im Hauptmenü zählen deine Runden; Tutorial-Runden zählen nicht.</p></div></details><details class="rules-sec" ><summary>📅 Tägliche Challenge, Level und XP</summary><div class="rules-body"><p><strong>Tägliche Challenge:</strong> Jeden Tag gibt es 10 feste Karten (aus dem Datum abgeleitet, für alle mit derselben Songliste gleich), ohne Tokens. Dein Ergebnis ist x/10. Du darfst beliebig oft spielen, aber nur der erste Versuch des Tages zählt für XP und Serie. Der Teilen-Text zeigt nur Datum und Farbquadrate (🟩 richtig, 🟥 falsch), keine Songs.</p><p><strong>XP:</strong> 10 pro richtig platzierter Karte, 5 pro richtig geratenem Titel oder Interpreten, 50 für einen Sieg, 25 für einen neuen Highscore, 100 für die Tägliche Challenge plus 10 pro Serientag (bis 7). Das Level steigt mit wachsendem Bedarf (100 XP für Level 2, danach je 40 mehr). Alles wird nur lokal gespeichert. Tutorial-Runden zählen nicht.</p></div></details><details class="rules-sec" ><summary>🎓 Lernrunde und Auswertungen</summary><div class="rules-body"><p><strong>Auswertung:</strong> Ab dem Update merkt sich Chronohit lokal im Browser jede platzierte Karte (Song, richtig/falsch, Tag). Daraus entstehen in den Statistiken die Trefferquote pro Epoche und Genre mit schwächster Epoche/Genre (ab 5 Karten pro Gruppe), ein Verlaufsdiagramm der letzten 30 Tage (Trefferquote, richtige oder gespielte Karten, XP) und ein Kalender mit Spieltagen und Challenge-Tagen. Bei Online-Spielen als Gast werden Karten nicht mitgeschrieben, nur beim Host und lokal.</p><p><strong>Lernrunde:</strong> 10 Karten, bei denen Songs mit vielen bisherigen Fehlern häufiger vorkommen. Ohne bisherige Daten sind es zufällige Songs. Die Runde wird nicht gespeichert, zählt aber für XP und Statistik.</p></div></details><details class="rules-sec" ><summary>🎧 Playlist</summary><div class="rules-body"><p>Im Hauptmenü listet die Playlist alle Lieder mit Jahr, Sprache und Genre/Kategorie. Du kannst suchen, über „Filter“ nach Sprache, Genre, Jahrzehnt und Kategorien filtern, nach Titel, Interpret oder Jahr sortieren und mit ▶ die 30-Sekunden-Vorschau anspielen.</p></div></details><details class="rules-sec" ><summary>🎨 Themes und Darstellung</summary><div class="rules-body"><p>In den Einstellungen wählst du ein Theme. Jahreszeiten (Frühling bis Winter) und Feiertage (Valentinstag, Ostern, Halloween, Weihnachten, Silvester) sind aufklappbare Gruppen mit Hintergrund-Deko; Feiertags-Themes haben eigene Sounds. „Jahreszeiten-Themes nach Datum“ schaltet beim Start automatisch auf das passende Theme (Aus / Nur Feiertage / Feiertage &amp; Jahreszeiten). „Benutzerdefiniert“ erlaubt eigene Farben, Schrift und Stil. „Animationen reduzieren“ schaltet Deko-Animationen, Feuerwerk und Flattertiere aus.</p></div></details><details class="rules-sec" ><summary>⌨️ Bedienung per Tastatur</summary><div class="rules-body"><p>Wenn aktiviert: ←/→ oder A/D wählen die Lücke, Enter/Leertaste bestätigt (platzieren, aufdecken, weiter), Rücktaste ändert die Position, S überspringt, B kauft, P pausiert (nicht online). <strong>Esc</strong> geht in jedem Menü eine Ebene zurück.</p></div></details></div></div>
     <div class="menu-actions">
       <button class="btn-ghost" onclick="state.tutRules=false; render()">← Zurück zum Tutorial</button>
     </div>
@@ -5028,7 +5119,7 @@ function hsRecord(){
   if(state.hsNew){ all[k] = state.correctCount; try{ localStorage.setItem("chronohit_hs", JSON.stringify(all)); }catch(e){} }
 }
 function endTitle(){
-  if(state.daily) return dailyTitle(state.correctCount || 0);
+  if(state.daily || state.learn) return dailyTitle(state.correctCount || 0);
   const v = state.settings.variant;
   if(v === "blitz") return "Zeit ist um!";
   if(v === "endless") return "Runde vorbei!";
@@ -5093,9 +5184,9 @@ function renderEnd(){
       <div class="mark">RUNDE BEENDET</div>
     </div>
     <div class="menu-card win-card">
-      <div class="end-heading ${state.won || state.daily || s.variant === 'blitz' || s.variant === 'endless' ? 'won' : 'lost'}">${endTitle()}</div>
+      <div class="end-heading ${state.won || state.daily || state.learn || s.variant === 'blitz' || s.variant === 'endless' ? 'won' : 'lost'}">${endTitle()}</div>
       <div class="num">${state.correctCount}</div>
-      <p>${state.daily ? 'von 10 Karten richtig platziert' : 'richtig platzierte Karten auf deiner Zeitleiste'}</p>
+      <p>${state.daily || state.learn ? 'von 10 Karten richtig platziert' : 'richtig platzierte Karten auf deiner Zeitleiste'}</p>
       ${s.variant ? `<p><b>${state.hsNew ? '🏆 Neuer Highscore!' : 'Highscore: ' + state.hsOld}</b> (${variantLabel(s.variant)}${s.variant === 'blitz' ? ', ' + s.blitzSec + ' s' : ''})</p>` : ``}
       <div class="win-stats">
         <div><div class="n">${state.wrongCount}</div><div class="l">Falsch platziert</div></div>
@@ -6355,6 +6446,7 @@ function chronGuessHtml(e){
   return `<div class="chron-k">Geraten: ${parts.join(" · ")}</div>`;
 }
 function chronicleAdd(e){
+  try{ cardLog(e); }catch(err){}
   if(!state.chronicle) state.chronicle = [];
   state.chronicle.push(e);
   if(state.chronicle.length > 300) state.chronicle.shift();
@@ -6506,8 +6598,8 @@ function maybeRecordGameEnd(){
   hsRecord();
   xpAward();
   const good = mode === "multiplayer" || state.won || (state.settings.variant && state.hsNew);
-  sfx(state.daily ? ((state.correctCount || 0) >= 4 ? "win" : "turn") : (good ? "win" : "lose"), 0.7);
-  if(good || (state.daily && (state.correctCount || 0) >= 9)) confettiBurst("big");
+  sfx((state.daily || state.learn) ? ((state.correctCount || 0) >= 4 ? "win" : "turn") : (good ? "win" : "lose"), 0.7);
+  if(good || ((state.daily || state.learn) && (state.correctCount || 0) >= 9)) confettiBurst("big");
   saveStats();
 }
 function openStats(){ state.screen = "stats"; render(); }
@@ -6550,6 +6642,7 @@ function renderStats(){
         Serie: richtige Karten in Folge (ohne Mehrspieler). Die Werte liegen nur in diesem Browser.
       </div>
     </div>
+    ${statsInsightsHtml()}
     <div class="menu-actions">
       <button class="btn-danger" onclick="requestResetStats()">Statistiken zurücksetzen</button>
       <button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button>
@@ -6581,6 +6674,7 @@ function cancelResetStats(){
 function confirmResetStats(){
   cancelResetStats();
   stats = freshStats();
+  try{ localStorage.removeItem("chronohit_cards"); }catch(e){}
   saveStats();
   if(state.screen === "stats") render();
 }
