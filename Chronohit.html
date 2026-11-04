@@ -1365,7 +1365,17 @@
   .pl-search:focus{ outline:2px solid var(--accent); }
   .xp-bar{ height:8px; background:var(--panel-2); border:1px solid var(--line); border-radius:99px; overflow:hidden; margin:6px 0; }
   .xp-bar i{ display:block; height:100%; background:var(--accent); }
-  .qp-row{ display:flex; align-items:center; gap:8px; }
+  .menu-actions .menu-split{ display:flex; gap:8px; width:100%; }
+  .menu-actions .menu-split > button{ width:auto !important; margin:0; }
+  .menu-actions .menu-split > .main{ flex:1 1 0; min-width:0; }
+  .menu-actions .menu-split > .side{ flex:0 0 auto; padding-inline:14px; }
+  .qp-row{ display:flex; align-items:center; gap:10px; width:100%; box-sizing:border-box; padding:8px 10px; border:1px solid var(--line); border-radius:var(--radius,12px); background:var(--panel-2); }
+  .qp-main{ flex:1 1 auto; min-width:0; }
+  .qp-name{ font-weight:700; font-size:1.05em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .qp-sub{ font-size:.85em; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .menu-actions .qp-btn, .qp-btn{ flex:0 0 auto; width:40px !important; height:40px; padding:0; margin:0; display:inline-flex; align-items:center; justify-content:center; background:transparent; color:var(--text); border:1px solid var(--line); border-radius:var(--radius,10px); cursor:pointer; }
+  .qp-btn:hover{ border-color:var(--accent); color:var(--accent); }
+  .qp-btn.qp-play{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
   .menu-row{ display:flex; gap:10px; flex-wrap:wrap; }
   .menu-row > *{ flex:1 1 140px; }
   .menu-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
@@ -3650,7 +3660,7 @@ function renderMenu(){
     ${xpBarHtml()}
     <div class="menu-card">
       <div class="menu-actions">
-        <div style="display:flex;gap:8px;"><button class="btn-primary" style="flex:1 1 auto;" onclick="openPlay()">Spielen</button><button class="btn-primary" style="flex:0 0 auto;padding-inline:16px;" onclick="openQuickplay()" aria-label="Quickplay" title="Quickplay">⚡ Quick</button></div>
+        <div class="menu-split"><button class="btn-primary main" onclick="openPlay()">Spielen</button><button class="btn-primary side" onclick="openQuickplay()" aria-label="Quickplay" title="Quickplay">⚡ Quick</button></div>
         <div class="menu-row"><button class="btn-ghost" onclick="openStats()">Statistiken</button><button class="btn-ghost" onclick="openRecap()">Jahresrückblick</button></div>
         <button class="btn-ghost" onclick="openSettings()">Einstellungen</button>
       </div>
@@ -3853,13 +3863,18 @@ function quickSummary(w){
   return modeLabel(w.mode) + (w.variant && w.variant !== "classic" ? " · " + variantLabel(w.variant) : "") + (w.mode === "multiplayer" ? " · " + (w.playerNames || []).length + " Spieler" : "")
     + (w.variant === "blitz" ? " · " + (w.blitzSec || 60) + " s" : w.variant === "endless" ? "" : " · Ziel " + w.target);
 }
+const QP_ICONS = {
+  play: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5l12 7-12 7z" fill="currentColor"/></svg>',
+  edit: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3z"/><path d="M13.5 6.5l3 3"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/><path d="M10 11v6M14 11v6"/></svg>'
+};
 function renderQuickplay(){
   const Q = quickLoad();
   app.innerHTML = `
     <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">⚡ Quickplay</h1></div>
     <div class="menu-card"><div class="menu-actions">
-      ${[0, 1, 2].map(i => Q[i] ? `<div class="qp-row"><button class="btn-primary" onclick="quickPlay(${i})" aria-label="Spiel starten">▶</button><div style="flex:1;min-width:0;"><b>${esc(Q[i].name)}</b><br><small>${esc(quickSummary(Q[i].w))}</small></div><button class="btn-ghost btn-small" onclick="quickSetup(${i}, true)" aria-label="Bearbeiten">✏️</button><button class="btn-ghost btn-small" onclick="quickDelete(${i})" aria-label="Löschen">🗑</button></div>` : `<button class="btn-ghost" onclick="quickSetup(${i})">＋ Slot ${i + 1} einrichten</button>`).join("")}
-      <p style="margin:6px 0 0;font-size:calc(13px * var(--font-scale));color:var(--muted);">Quickplay-Spiele sind lokal und werden nicht gespeichert.</p>
+      ${[0, 1, 2].map(i => Q[i] ? `<div class="qp-row"><button class="qp-btn qp-play" onclick="quickPlay(${i})" aria-label="Spiel starten" title="Starten">${QP_ICONS.play}</button><div class="qp-main"><div class="qp-name">${esc(Q[i].name)}</div><div class="qp-sub">${esc(quickSummary(Q[i].w))}</div></div><button class="qp-btn" onclick="quickSetup(${i}, true)" aria-label="Bearbeiten" title="Bearbeiten">${QP_ICONS.edit}</button><button class="qp-btn" onclick="quickDelete(${i})" aria-label="Löschen" title="Löschen">${QP_ICONS.trash}</button></div>` : `<button class="btn-ghost" onclick="quickSetup(${i})">＋ Slot ${i + 1} einrichten</button>`).join("")}
+      <p style="margin:6px 0 0;font-size:calc(13px * var(--font-scale));color:var(--muted);">Quickplay-Spiele werden im nächsten freien der 4 Speicherplätze gespeichert. Sind alle belegt, wählst du einen zum Überschreiben.</p>
       <button class="btn-ghost" onclick="state.screen='menu'; render()">← Zurück zum Hauptmenü</button>
     </div></div>`;
 }
@@ -3870,10 +3885,38 @@ function quickSetup(i, edit){
 }
 function quickPlay(i){
   const Q = quickLoad(); if(!Q[i]) return;
-  startCreateWizard(false); Object.assign(state.wizard, JSON.parse(JSON.stringify(Q[i].w)), { online:false, quickPlay:true, quick:null });
+  let n = 0; for(let k = 1; k <= 4; k++){ if(!slotsCache[k - 1]){ n = k; break; } }
+  if(n) return quickStartIn(i, n);
+  quickSlotPick(i);   // alle 4 Speicherplätze belegt: Auswahl
+}
+function quickStartIn(i, n){
+  closeQuickPick(); const Q = quickLoad(); if(!Q[i]) return;
+  startCreateWizard(false);
+  Object.assign(state.wizard, JSON.parse(JSON.stringify(Q[i].w)), { online:false, quick:null, quickPlay:false, slot:n, name:Q[i].name });
   createGameFromWizard();
 }
-function quickDelete(i){ const Q = quickLoad(); if(!Q[i] || !confirm("Quickplay-Slot „" + Q[i].name + "“ löschen?")) return; Q[i] = null; quickSave(Q); render(); }
+function quickSlotPick(i){
+  closeQuickPick();
+  const el = document.createElement("div"); el.id = "qp-pick"; el.setAttribute("role", "dialog");
+  el.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:70;display:flex;align-items:center;justify-content:center;padding:16px;";
+  el.onclick = e => { if(e.target === el) closeQuickPick(); };
+  const nm = k => { const c = slotsCache[k - 1]; return (c && (c.name || c.saveName)) || "Spielstand"; };
+  el.innerHTML = `<div class="menu-card" style="max-width:440px;width:100%;"><h3>Speicherplatz wählen</h3><p style="margin:6px 0 12px;">Alle 4 Speicherplätze sind belegt. Der gewählte Spielstand wird durch dieses Quickplay-Spiel überschrieben.</p><div class="menu-actions">${[1, 2, 3, 4].map(k => `<button class="btn-ghost" onclick="quickStartIn(${i}, ${k})">Slot ${k}: ${esc(nm(k))}</button>`).join("")}<button class="btn-ghost" onclick="closeQuickPick()">Abbrechen</button></div></div>`;
+  document.body.appendChild(el);
+}
+function closeQuickPick(){ const el = document.getElementById("qp-pick"); if(el) el.remove(); }
+document.addEventListener("keydown", e => { if(e.key === "Escape") closeQuickPick(); });
+function quickDelete(i){
+  const Q = quickLoad(); if(!Q[i]) return; closeQuickDel();
+  const el = document.createElement("div"); el.id = "qp-del"; el.setAttribute("role", "dialog");
+  el.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:70;display:flex;align-items:center;justify-content:center;padding:16px;";
+  el.onclick = e => { if(e.target === el) closeQuickDel(); };
+  el.innerHTML = `<div class="menu-card" style="max-width:420px;width:100%;"><h3>Quickplay-Slot löschen?</h3><p style="margin:6px 0 12px;">„${esc(Q[i].name)}“ mit seinen Einstellungen wird endgültig gelöscht.</p><div class="menu-actions"><button class="btn-primary" style="background:var(--wrong);border-color:var(--wrong);color:#fff;" onclick="quickDeleteNow(${i})">Löschen</button><button class="btn-ghost" onclick="closeQuickDel()">Abbrechen</button></div></div>`;
+  document.body.appendChild(el);
+}
+function closeQuickDel(){ const el = document.getElementById("qp-del"); if(el) el.remove(); }
+function quickDeleteNow(i){ const Q = quickLoad(); Q[i] = null; quickSave(Q); closeQuickDel(); render(); }
+document.addEventListener("keydown", e => { if(e.key === "Escape"){ closeQuickDel(); closeQuickName(); } });
 function quickNamePrompt(){
   const w = state.wizard, i = w.quick, Q = quickLoad(); closeQuickName();
   const el = document.createElement("div"); el.id = "qp-name"; el.setAttribute("role", "dialog");
@@ -5012,6 +5055,7 @@ function blitzTick(){
 }
 setInterval(blitzTick, 200);
 function renderEnd(){
+  maybeRecordGameEnd();
   const s = state.settings;
   if(isMultiRound()){
     const ranking = rankedPlayers();
