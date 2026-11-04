@@ -1375,7 +1375,11 @@
   .cal-h{ text-align:center; font-size:.8em; color:var(--muted); }
   .cal-d{ position:relative; min-height:34px; display:flex; align-items:center; justify-content:center; border:1px solid var(--line); border-radius:var(--radius,8px); font-size:.9em; }
   .cal-d.on{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
-  .cal-s{ position:absolute; top:-3px; right:-1px; font-size:.7em; }
+  .cal-s{ font-size:.7em; margin-left:2px; }
+  .chart-title{ font-weight:700; margin:10px 0 4px; }
+  .daily-pop{ position:fixed; top:12px; right:12px; z-index:40; padding:6px 12px; border-radius:99px; border:2px solid var(--accent); background:var(--panel); color:var(--text); font:inherit; font-size:.85em; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.3); animation:dailyWob 1.8s ease-in-out infinite; }
+  @keyframes dailyWob{ 0%,100%{ transform:rotate(-2.5deg) translateX(-1px); } 50%{ transform:rotate(2.5deg) translateX(1px); } }
+  html.reduce-motion .daily-pop{ animation:none; }
   .qp-row{ display:flex; align-items:center; gap:10px; width:100%; box-sizing:border-box; padding:8px 10px; border:1px solid var(--line); border-radius:var(--radius,12px); background:var(--panel-2); }
   .qp-main{ flex:1 1 auto; min-width:0; }
   .qp-name{ font-weight:700; font-size:1.05em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -2218,7 +2222,12 @@ const SAVE_KEY = "chronohit_solo_v1";
 const LEGACY_SAVE_KEYS = ["jahrgang_solo_v1"];   // Spielstände aus der Zeit vor der Umbenennung
 let memorySave = null;   // Fallback, falls localStorage blockiert ist
 async function saveState(){
-  if(window.__tutBoot || (state && (state.tutorial || state.daily || state.quickGame || state.learn))) return;
+  if(window.__tutBoot) return;
+  if(state && state.daily){   // eigener Dauer-Speicher nur für den ersten Versuch des Tages
+    if(state.daily.first && state.screen === "game"){ try{ localStorage.setItem("chronohit_daily_run", JSON.stringify(state)); }catch(e){} }
+    return;
+  }
+  if(state && (state.tutorial || state.quickGame || state.learn)) return;
   if(state.online && typeof NET !== "undefined" && NET.role === "guest") return;
   const raw = JSON.stringify(state);
   memorySave = raw;
@@ -3491,7 +3500,12 @@ function themeGroupsHtml(){
   const custom = by("custom");
   return `<div class="theme-list">${rest.map(themeSwatchHtml).join("")}</div>${grp("🌱 Jahreszeiten", THEME_SEASONS)}${grp("🎉 Feiertage", THEME_HOLIDAYS)}${custom ? `<div class="theme-list" style="margin-top:10px;">${themeSwatchHtml(custom)}</div>` : ""}`;
 }
-const SETTINGS_SUBS = [["language","🌐 Sprache"],["themes","🎨 Themes"],["display","👁️ Darstellung & Barrierefreiheit"],["save","💾 Speichern"],["play","🎮 Spielen"],["sound","🔊 Sound"]];
+const SETTINGS_SUBS = [["language","🌐 Sprache"],["themes","🎨 Themes"],["display","👁️ Darstellung & Barrierefreiheit"],["save","💾 Speichern"],["play","🎮 Spielen"],["sound","🔊 Sound"],["experimental","🧪 Experimentelles"]];
+function renderExperimentalCard(){
+  return `<div class="menu-card"><h3>Experimentelles</h3>
+    <div class="setting-row"><div><div class="label">Mehrspieler bis zu 100 Leute</div><div class="hint">Erhöht die Spielerzahl in Online-Räumen von 10 auf 100. Gilt für Räume, die du hostest. Bei vielen Spielern kann das Spiel je nach Gerät und Verbindung des Hosts langsam werden. Standard: aus.</div></div>${prefSwitchHtml("bigRooms")}</div>
+  </div>`;
+}
 function renderSettings(){
   const sub = state.settingsSub || null;
   const swatches = THEME_INFO.map(t => `
@@ -3534,6 +3548,7 @@ function renderSettings(){
     ${sub === 'play' ? renderPlayCard() : ``}
 
     ${sub === 'sound' ? renderSoundCard() : ``}
+    ${sub === 'experimental' ? renderExperimentalCard() : ``}
 
     <div class="menu-actions">
       ${sub ? `<button class="btn-ghost" onclick="state.settingsSub=null; render(); window.scrollTo(0, 0)">← Zurück zu den Einstellungen</button>` : `<button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button>`}
@@ -3648,7 +3663,7 @@ function renderPlay(){
   app.innerHTML = `
     <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Spielen</h1></div>
     <div class="menu-card"><div class="menu-actions">
-      <button class="btn-primary" onclick="startDaily()">📅 Tägliche Challenge${dailyBadge()}</button>
+      <div class="menu-split"><button class="btn-primary main" onclick="startDaily()">📅 Tägliche Challenge${dailyBadge()}</button><button class="btn-ghost side" onclick="dailyCopyToday()" aria-label="Heutiges Ergebnis kopieren" title="Heutiges Ergebnis kopieren">📋</button></div>
       <button class="btn-ghost" onclick="startLearn()">🎓 Lernrunde${learnBadge()}</button>
       <div class="menu-row">
         <button class="btn-primary" onclick="startCreateWizard()">Spiel starten</button>
@@ -3665,6 +3680,7 @@ function renderMenu(){
       <h1>Chronohit</h1>
     </div>
     ${NET.notice ? `<div class="planned-notice" style="margin-bottom:12px;">${esc(NET.notice)} <button class="btn-ghost btn-small" onclick="NET.notice=''; render()">OK</button></div>` : ``}
+    ${dailyLoad().results[dateKey()] ? `` : `<button class="daily-pop" onclick="startDaily()" aria-label="Tägliche Challenge starten" title="Tägliche Challenge ist heute noch offen">📅 Daily</button>`}
     ${xpBarHtml()}
     <div class="menu-card">
       <div class="menu-actions">
@@ -3787,18 +3803,30 @@ function dailySongs(key){
   for(const x of pool){ if(out.length >= 11) break; if(!out.includes(x)) out.push(x); }
   return out;
 }
+function dailyRunLoad(){
+  try{ const r = JSON.parse(localStorage.getItem("chronohit_daily_run") || "null"); if(r && r.daily && r.daily.date === dateKey() && !dailyLoad().results[r.daily.date]) return r; }catch(e){}
+  try{ localStorage.removeItem("chronohit_daily_run"); }catch(e){}
+  return null;
+}
 function startDaily(){
+  const run = dailyRunLoad();
+  if(run){   // angefangenen Lauf von heute fortsetzen
+    pauseSpotifyPlayback(); state = run;
+    state.pendingSpend = null; state.turnDeadline = null; state.chDeadline = null; state.showExitDialog = false; state.infoOpen = null; state.activeSlot = null;
+    state.screen = "game"; render(); return;
+  }
   const key = dateKey(), sel = dailySongs(key);
   const base = { tokens:false, target:10, maxTokens:5, startTokens:2, mode:"solo", difficulty:"normal", turnLimit:0, challenge:false, challengeMode:"manual", yearTol:0, genres:Object.fromEntries(LIB.langs.map(l => [l.key, true])) };
   window.__tutBoot = true;
   newGame(base, null);
   state.timeline = [{ ...sel[0], __starter:true }]; state.deck = sel.slice(1); state.turnNo = 0; state.current = null; drawNext();
   window.__tutBoot = false;
-  state.daily = { date:key }; state.hasSave = false; render();
+  state.daily = { date:key, first:!dailyLoad().results[key] }; state.hasSave = false; render();
+  saveState();
 }
 function dailyBadge(){
   const D = dailyLoad(), k = dateKey(), r = D.results[k], y = dateKey(new Date(Date.now() - 864e5));
-  return (r ? " · heute " + r.score + "/10" : "") + (D.streak && (D.last === k || D.last === y) ? " · 🔥 " + D.streak : "");
+  return (r ? " · heute " + r.score + "/10" : (dailyRunLoad() ? " · fortsetzen" : "")) + (D.streak && (D.last === k || D.last === y) ? " · 🔥 " + D.streak : "");
 }
 function dailySeq(){
   const e = (state.chronicle || []).filter(x => ["ok", "wrong", "timeout"].includes(x.k)).slice(-10).map(x => x.k === "ok" ? "🟩" : "🟥").join("");
@@ -3807,6 +3835,12 @@ function dailySeq(){
 }
 function resultSeq(max){
   return (state.chronicle || []).filter(x => ["ok", "wrong", "timeout"].includes(x.k)).slice(-max).map(x => x.k === "ok" ? "🟩" : "🟥").join("");
+}
+function dailyText(key, seq, score){ const [y, m, d] = key.split("-"); return "Chronohit Daily " + d + "." + m + "." + y + "\n" + seq + " " + score + "/10"; }
+function dailyCopyToday(){
+  const r = dailyLoad().results[dateKey()];
+  if(!r){ toast("Heute noch nicht gespielt."); return; }
+  netCopy(dailyText(dateKey(), r.seq, r.score));
 }
 function shareResult(){
   let t;
@@ -3818,6 +3852,8 @@ function shareResult(){
     t = "Chronohit – " + modeLabel(st.mode) + (st.variant ? " · " + variantLabel(st.variant) : "") + "\n" + (state.correctCount || 0) + " richtig" + tgt + (resultSeq(30) ? "\n" + resultSeq(30) : "");
   }
   netCopy(t);
+  const b = document.getElementById("share-btn");
+  if(b){ if(!b.dataset.o) b.dataset.o = b.textContent; b.textContent = "✓ Ergebnis kopiert"; clearTimeout(window.__shT); window.__shT = setTimeout(() => { const c = document.getElementById("share-btn"); if(c) c.textContent = c.dataset.o; }, 2500); }
 }
 function dailyTitle(n){ return n === 0 ? "Das geht besser!" : n <= 3 ? "Nicht schlecht!" : n <= 5 ? "Gut!" : n <= 8 ? "Super!" : n === 9 ? "Richtig gut!" : "Perfekt!"; }
 function dailyCopy(){ const d = state.dailyInfo; if(!d) return; const [y, m, dd] = state.daily.date.split("-"); netCopy("Chronohit Daily " + dd + "." + m + "." + y + "\n" + d.seq + " " + d.score + "/10"); }
@@ -3839,7 +3875,7 @@ function xpAward(){
     const D = dailyLoad(), key = state.daily.date, score = state.correctCount || 0, seq = dailySeq(), first = !D.results[key];
     state.dailyInfo = { score, seq, first };
     if(first){
-      D.results[key] = { score, seq };
+      D.results[key] = { score, seq }; try{ localStorage.removeItem("chronohit_daily_run"); }catch(e){}
       D.streak = D.last === dateKey(new Date(new Date(key + "T12:00:00").getTime() - 864e5)) ? (D.streak || 0) + 1 : 1; D.last = key; dailySave(D);
       parts.push(["Tägliche Challenge", 100]); parts.push(["Serie " + D.streak + " Tag(e)", Math.min(D.streak, 7) * 10]);
     }
@@ -3858,6 +3894,7 @@ function xpBarHtml(){
 function xpEndHtml(){
   const g = state.xpGain; if(!g) return "";
   const L = xpLevel(xpLoad().xp || 0), d = state.dailyInfo;
+  if(d && !state.autoCopied){ state.autoCopied = true; setTimeout(() => { if(state.screen === "end") shareResult(); }, 400); }
   return `<div style="width:100%;text-align:center;margin:6px 0;"><b>+${g.total} XP</b>${g.up ? " · 🎉 Level " + L.lv + "!" : ""}
     <div style="font-size:calc(13px * var(--font-scale));color:var(--muted);">${g.parts.map(x => esc(x[0]) + " +" + x[1]).join(" · ")}</div>
     <div class="xp-bar"><i style="width:${Math.round(L.cur / L.need * 100)}%"></i></div><small>Level ${L.lv} · ${L.cur} / ${L.need} XP</small>
@@ -3984,14 +4021,28 @@ function statsInsightsHtml(){
     <div class="menu-card"><h3>Kalender</h3><div id="stats-cal">${statsCalHtml()}</div></div>`;
 }
 function statsChartUpdate(){ const el = document.getElementById("stats-chart"); if(el) el.innerHTML = statsChartSvg(PLS.metric); }
+function niceMax(v){ if(v <= 4) return 4; const p = Math.pow(10, Math.floor(Math.log10(v))); for(const m of [1, 2, 2.5, 5, 10]) if(v <= m * p) return m * p; return 10 * p; }
 function statsChartSvg(metric){
-  const L = cardsLoad(), days = [];
-  for(let i = 29; i >= 0; i--){ const d = new Date(Date.now() - i * 864e5), k = dateKey(d), r = L.days[k] || { n:0, ok:0, xp:0 };
-    days.push({ k, v: metric === "rate" ? (r.n ? Math.round(r.ok / r.n * 100) : null) : metric === "ok" ? r.ok : metric === "n" ? r.n : (r.xp || 0) }); }
-  const max = metric === "rate" ? 100 : Math.max(1, ...days.map(x => x.v || 0)), W = 600, H = 170, P = 26, bw = (W - P * 2) / 30, ch = H - P * 2;
-  const bars = days.map((x, i) => x.v == null ? "" : `<rect x="${(P + i * bw + 2).toFixed(1)}" y="${(H - P - x.v / max * ch).toFixed(1)}" width="${(bw - 4).toFixed(1)}" height="${(x.v / max * ch).toFixed(1)}" rx="2" style="fill:var(--accent)"><title>${x.k}: ${x.v}${metric === "rate" ? " %" : ""}</title></rect>`).join("");
-  const t = (x, y, txt, a) => `<text x="${x}" y="${y}" text-anchor="${a}" style="fill:var(--muted);font-size:11px;">${txt}</text>`;
-  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;max-height:220px;" role="img" aria-label="Verlaufsdiagramm"><line x1="${P}" y1="${H - P}" x2="${W - P}" y2="${H - P}" style="stroke:var(--line);"/>${bars}${t(P, 14, max + (metric === "rate" ? " %" : ""), "start")}${t(P, H - 8, days[0].k.slice(5), "start")}${t(W - P, H - 8, days[29].k.slice(5), "end")}</svg>`;
+  const L = cardsLoad(), days = [], names = { rate:"Trefferquote pro Tag (%)", ok:"Richtige Karten pro Tag", n:"Gespielte Karten pro Tag", xp:"XP pro Tag" };
+  for(let i = 29; i >= 0; i--){ const k = dateKey(new Date(Date.now() - i * 864e5)), r = L.days[k] || { n:0, ok:0, xp:0 };
+    days.push({ k, lab:k.slice(8) + "." + k.slice(5, 7) + ".", v: metric === "rate" ? (r.n ? Math.round(r.ok / r.n * 100) : null) : metric === "ok" ? r.ok : metric === "n" ? r.n : (r.xp || 0) }); }
+  const max = metric === "rate" ? 100 : niceMax(Math.max(...days.map(x => x.v || 0))), unit = metric === "rate" ? " %" : "";
+  const W = 640, H = 260, L0 = 56, R0 = 10, T0 = 14, B0 = 38, cw = W - L0 - R0, ch = H - T0 - B0, bw = cw / 30;
+  let g = "";
+  for(let t = 0; t <= 4; t++){ const y = T0 + ch - ch * t / 4, val = Math.round(max * t / 4 * 10) / 10;
+    g += `<line x1="${L0}" y1="${y}" x2="${W - R0}" y2="${y}" style="stroke:var(--line);stroke-width:${t ? 1 : 2};opacity:${t ? .55 : 1};"/><text x="${L0 - 8}" y="${y + 5}" text-anchor="end" style="fill:var(--text);font-size:16px;">${val}${unit}</text>`; }
+  const bars = days.map((x, i) => {
+    const cx = L0 + i * bw + bw / 2;
+    if(!x.v) return `<circle cx="${cx.toFixed(1)}" cy="${T0 + ch}" r="2" style="fill:var(--muted);"><title>${x.lab} – keine Daten</title></circle>`;
+    const h = Math.max(3, x.v / max * ch);
+    return `<rect x="${(cx - bw / 2 + 2).toFixed(1)}" y="${(T0 + ch - h).toFixed(1)}" width="${(bw - 4).toFixed(1)}" height="${h.toFixed(1)}" rx="2" style="fill:var(--accent);"><title>${x.lab}: ${x.v}${unit}</title></rect>`;
+  }).join("");
+  const ticks = days.map((x, i) => (i % 5 === 4 || i === 0) ? `<text x="${(L0 + i * bw + bw / 2).toFixed(1)}" y="${H - 12}" text-anchor="middle" style="fill:var(--text);font-size:15px;">${x.lab}</text>` : "").join("");
+  const act = days.filter(x => x.v), sum = act.reduce((n, x) => n + x.v, 0), best = act.slice().sort((a, b) => b.v - a.v)[0];
+  const sumTxt = !act.length ? "Noch keine Daten in den letzten 30 Tagen – spiele ein paar Runden." : metric === "rate"
+    ? `Ø ${Math.round(sum / act.length)} % an ${act.length} aktiven Tag(en) · Bester Tag: ${best.lab} (${best.v} %)`
+    : `Summe ${sum} · Ø ${Math.round(sum / act.length * 10) / 10} pro aktivem Tag · Bester Tag: ${best.lab} (${best.v})`;
+  return `<div class="chart-title">${names[metric]}</div><svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;" role="img" aria-label="${names[metric]}, letzte 30 Tage">${g}${bars}${ticks}</svg><div class="stats-note">Jeder Balken ist ein Tag (Datum unten, Skala links). Ein Punkt bedeutet: an dem Tag nicht gespielt. ${sumTxt}</div>`;
 }
 function statsCalHtml(){
   const now = new Date(), c = PLS.cal || (PLS.cal = { y:now.getFullYear(), m:now.getMonth() });
@@ -4088,6 +4139,11 @@ function renderPlaylist(){
 }
 
 /* ============ TUTORIAL ============ */
+function topBack(){ state.settingsSub = null; state.tutRules = false; backToMenuInstant(); }
+function topBackBar(){
+  if(!["stats", "recap", "settings", "tutorial", "play", "quickplay", "loadgame"].includes(state.screen)) return;
+  app.insertAdjacentHTML("afterbegin", `<div class="topback" style="position:sticky;top:0;z-index:6;padding:8px 0;background:var(--body-bg-image, none), radial-gradient(1200px 600px at 50% -10%, var(--bg-highlight) 0%, var(--bg) 55%);background-attachment:fixed;"><button class="btn-ghost btn-small" onclick="topBack()">← Hauptmenü</button></div>`);
+}
 let tutPrev = null;
 const TUT_YEARS = [1990, 2008, 1978, 2000, 1985, 2015, 1995, 2011, 1980, 2005, 1992, 2018, 1983, 2013, 1998, 2003];   // feste Übungs-Reihenfolge (immer dieselben Songs)
 const TUT_KINDS = [
@@ -4179,7 +4235,7 @@ function tutBubble(){
   } else { b.style.left = "50%"; b.style.bottom = "16px"; b.style.transform = "translateX(-50%)"; }
   if(el) b.style.transform = "none";
 }
-{ const r0 = render; render = function(){ if(state.screen === "online") state.screen = "play"; r0(); try{ tutBubble(); }catch(e){} }; }
+{ const r0 = render; render = function(){ if(state.screen === "online") state.screen = "play"; r0(); try{ topBackBar(); }catch(e){} try{ tutBubble(); }catch(e){} }; }
 function renderTutorial(){
   if(state.tutRules) return renderTutorialRules();
   app.innerHTML = `
@@ -5170,7 +5226,7 @@ function renderEnd(){
         <div class="rank-list">${rows}</div>
         <div class="menu-actions" style="margin-top:18px;">
           <button class="btn-primary" onclick="showFinalTimeline()">Finale Zeitleisten ansehen</button>
-          <button class="btn-ghost" onclick="shareResult()">📋 Ergebnis kopieren</button>
+          <button class="btn-ghost" id="share-btn" onclick="shareResult()">📋 Ergebnis kopieren</button>
           ${endExtraHtml()}
           <button class="btn-ghost" onclick="abandonGame()">Hauptmenü</button>
         </div>
@@ -5195,7 +5251,7 @@ function renderEnd(){
       </div>
       <div class="menu-actions">
         <button class="btn-primary" onclick="showFinalTimeline()">Finale Zeitleiste ansehen</button>
-        <button class="btn-ghost" onclick="shareResult()">📋 Ergebnis kopieren</button>
+        <button class="btn-ghost" id="share-btn" onclick="shareResult()">📋 Ergebnis kopieren</button>
         ${endExtraHtml()}
         <button class="btn-ghost" onclick="${s.variant && state.activeSlot ? 'requestDeleteOnFinish()' : 'abandonGame()'}">Hauptmenü</button>
       </div>
@@ -6856,7 +6912,7 @@ document.addEventListener("click", e => {
 
 /* ============ DARSTELLUNG & BARRIEREFREIHEIT ============ */
 const PREFS_KEY = "chronohit_prefs";
-const PREF_DEFAULTS = { autoPlay: false, soundDesign: "theme", reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, autoSave: "turn", autoSaveSec: 30, seasonal: "off", fontFamily: "theme", cardSize: "m", density: "normal", autoNextSec: 0, keys: true, sound: true, soundVolume: 0.5, soundGroups: null };
+const PREF_DEFAULTS = { bigRooms: false, autoPlay: false, soundDesign: "theme", reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, autoSave: "turn", autoSaveSec: 30, seasonal: "off", fontFamily: "theme", cardSize: "m", density: "normal", autoNextSec: 0, keys: true, sound: true, soundVolume: 0.5, soundGroups: null };
 let prefs = { ...PREF_DEFAULTS, reduceMotion: false, soundGroups: defaultSoundGroups() };
 function loadPrefs(){
   let saved = {};
@@ -7013,7 +7069,8 @@ function renderAccessibilityCard(){
    per HMAC-Challenge, dass er das Passwort kennt. Der HMAC deckt die DTLS-Fingerabdrücke beider
    Seiten mit ab: schiebt sich jemand (z. B. ein Vermittlungsserver) dazwischen, passen die
    Fingerabdrücke nicht und die Anmeldung scheitert. Das Passwort selbst wird nie gesendet. */
-const NET_MAX_PLAYERS = 10;
+const NET_MAX_PLAYERS = 100;   // Obergrenze beim Verarbeiten von Daten
+function netJoinCap(){ return prefs && prefs.bigRooms ? 100 : 10; }   // Beitrittsgrenze (Standard 10; „Experimentelles“ erlaubt 100)
 const NET_PBKDF2_ITER = 300000;
 // Leer = öffentlicher PeerJS-Cloud-Server. Eigener Server z. B.: { host:"mein.server", port:443, path:"/", secure:true }
 const NET_PEER_OPTIONS = { debug: 0 };
@@ -7559,7 +7616,7 @@ async function netHostAuth(entry, d){
     }
   } else {
     if(NET.started || NET.resume) return netDeny(entry, "started");
-    if(NET.seats.length >= NET_MAX_PLAYERS) return netDeny(entry, "full");
+    if(NET.seats.length >= netJoinCap()) return netDeny(entry, "full");
     NET.seats.push({ name, connected: false });
     seat = NET.seats.length - 1;
   }
@@ -7861,7 +7918,7 @@ function renderOnlineHub(){
     <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Online spielen</h1></div>
     <div class="menu-card">
       <p style="color:var(--muted); font-size:calc(14px * var(--font-scale)); line-height:1.6; margin-bottom:14px;">
-        Spiele direkt mit Freunden: Der Host legt Raumname und Passwort fest, die anderen treten damit bei. Bis zu ${NET_MAX_PLAYERS} Spieler.
+        Spiele direkt mit Freunden: Der Host legt Raumname und Passwort fest, die anderen treten damit bei. Bis zu ${netJoinCap()} Spieler.
         Gespeicherte Online-Spiele öffnest du über „Spiel laden“.
       </p>
       <div class="menu-actions">
@@ -8002,7 +8059,7 @@ function renderLobby(){
           <button class="btn-ghost btn-small" onclick="netCopy('Chronohit – Raum: ' + NET.roomLabel + '  Passwort: ' + NET.hostPw)">Einladung kopieren</button>
         </div>` : ``}
       <div class="lobby-list">${rows}</div>
-      <div class="hint" style="color:var(--muted); font-size:calc(13px * var(--font-scale)); margin-top:10px;">${connected} / ${NET_MAX_PLAYERS} Spieler verbunden</div>
+      <div class="hint" style="color:var(--muted); font-size:calc(13px * var(--font-scale)); margin-top:10px;">${connected} / ${netJoinCap()} Spieler verbunden</div>
       ${statusText ? `<div class="planned-notice" style="margin-top:12px;">${statusText}</div>` : ``}
       ${NET.error ? `<div class="planned-notice" style="border-color:var(--wrong); margin-top:12px;">${esc(NET.error)}</div>` : ``}
       ${!host && NET.status === "connected" ? `<div class="planned-notice" style="margin-top:12px;">${NET.started ? 'Das Spiel läuft – Spielstand wird geladen …' : 'Warte darauf, dass der Host das Spiel startet …'}</div>` : ``}
