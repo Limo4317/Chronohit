@@ -971,6 +971,26 @@
   .hc-more summary{ cursor:pointer; color:var(--muted); }
   .hc-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin:6px 0; }
   .hc-sum{ font-size:calc(12px * var(--font-scale)); color:var(--muted); margin:-2px 0 8px 36px; }
+  .badge-ico{ --tier-c:#b08d57; display:inline-flex; align-items:center; justify-content:center; flex:none; width:52px; height:52px; border-radius:50%; font-size:28px; line-height:1; background:radial-gradient(circle at 30% 25%, rgba(255,255,255,.3), rgba(0,0,0,.15)), var(--tier-c); box-shadow:0 2px 6px rgba(0,0,0,.3), inset 0 0 0 3px rgba(255,255,255,.28); }
+  .badge-ico.tier-2, .badge-chip.tier-2{ --tier-c:#b8c0c8; }
+  .badge-ico.tier-3, .badge-chip.tier-3{ --tier-c:#e0b030; }
+  .badge-ico.big{ width:84px; height:84px; font-size:46px; }
+  .badge-ico.mini{ width:30px; height:30px; font-size:17px; margin-left:4px; }
+  .badge-ico.locked{ background:rgba(128,128,128,.22); box-shadow:inset 0 0 0 2px rgba(128,128,128,.35); }
+  .badge-ico.locked .bi{ filter:brightness(0); opacity:.35; }
+  .ach-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(96px, 1fr)); gap:10px; }
+  .ach-tile{ display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px 6px; border-radius:12px; border:1px solid rgba(128,128,128,.3); background:transparent; color:inherit; font:inherit; cursor:pointer; }
+  .ach-tile:hover{ border-color:var(--accent); }
+  .ach-tile.locked .ach-name{ color:var(--muted); }
+  .ach-name{ font-size:calc(12px * var(--font-scale)); text-align:center; font-weight:600; }
+  .ach-prog{ font-size:calc(11px * var(--font-scale)); color:var(--muted); }
+  .ach-bar{ height:8px; border-radius:6px; background:rgba(128,128,128,.25); overflow:hidden; margin:6px 0 10px; }
+  .ach-bar > div{ height:100%; background:var(--accent); }
+  .ach-feat{ display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin-top:6px; }
+  .badge-chips{ display:inline-flex; gap:3px; margin-left:6px; vertical-align:middle; }
+  .badge-chip{ --tier-c:#b08d57; width:22px; height:22px; border-radius:50%; font-size:13px; line-height:1; padding:0; border:0; cursor:pointer; background:var(--tier-c); box-shadow:inset 0 0 0 2px rgba(255,255,255,.3); }
+  .ach-toast{ position:fixed; left:50%; transform:translateX(-50%); z-index:9999; display:flex; align-items:center; gap:12px; padding:10px 16px; border-radius:14px; background:var(--panel, #222); color:var(--text, #fff); border:1px solid var(--accent); box-shadow:0 6px 24px rgba(0,0,0,.45); cursor:pointer; max-width:92vw; }
+  .ach-toast .badge-ico{ width:40px; height:40px; font-size:22px; }
   .dec-legend{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
   .dec-legend span{ display:inline-flex; align-items:center; gap:4px; font-size:calc(12px * var(--font-scale)); }
   .dec-legend i{ display:inline-block; width:12px; height:12px; border-radius:3px; border:1px solid rgba(0,0,0,.25); }
@@ -2755,6 +2775,10 @@ function advancePlayer(){
 function finalizeMultiplayer(){
   if(!isMulti()) return;
   syncActiveToPlayer();
+  if(state.settings.handicap){   // Handicap-Modus: immer genau ein Gewinner
+    state.winners = [state.players.map((_, i) => i).sort(hcCompare)[0]];
+    state.won = true; return;
+  }
   const counts = state.players.map(p => p.correctCount);
   const max = Math.max(...counts);
   state.winners = counts.map((c, i) => c === max ? i : -1).filter(i => i >= 0);
@@ -2876,29 +2900,37 @@ function rollSpecial(){
   state.special = { type: (turnLimitMs() > 0 && Math.random() < .5) ? "freeze" : "joker" };
   try{ sfx("token"); }catch(e){}
 }
-const HC_TIME = [["std", "Spiel-Standard"], ["off", "Kein Zeitlimit"], ["half", "Halbe Zeit"], ["s20", "20 s"], ["s40", "40 s"]];
+const HC_TIME = [["std", "Spiel-Standard"], ["off", "Kein Zeitlimit"], ["x25", "¼ der Zeit"], ["x50", "Halbe Zeit"], ["x75", "¾ der Zeit"], ["x150", "1,5-fache Zeit"], ["x200", "Doppelte Zeit"],
+  ["s10", "10 s"], ["s15", "15 s"], ["s20", "20 s"], ["s30", "30 s"], ["s40", "40 s"], ["s45", "45 s"], ["s60", "60 s"], ["s90", "90 s"]];
+const HC_TIME_MULT = { x25:.25, x50:.5, x75:.75, x150:1.5, x200:2 };
+function hcTimeHarder(m, g){   // g = Zeitlimit des Spiels in Sekunden (0 = keins)
+  if(m in HC_TIME_MULT) return g > 0 && HC_TIME_MULT[m] < 1;
+  if(/^s\d+$/.test(m)){ const v = +m.slice(1); return g === 0 || v < g; }
+  return false;
+}
 function hcClean(h){
   h = h && typeof h === "object" ? h : {};
   const b = v => (v === 1 || v === "1" || v === true) ? 1 : 0, n = (v, lo, hi) => Math.max(lo, Math.min(hi, parseInt(v, 10) || 0));
-  return { time: HC_TIME.some(x => x[0] === h.time) ? h.time : "std", hide: b(h.hide), goal: n(h.goal, 0, 3), tok: n(h.tok, -2, 2), nobuy: b(h.nobuy), card: b(h.card) };
+  const tm = h.time === "half" ? "x50" : h.time;
+  return { time: HC_TIME.some(x => x[0] === tm) ? tm : "std", hide: b(h.hide), goal: n(h.goal, -3, 3), tok: n(h.tok, -2, 2), nobuy: b(h.nobuy), card: b(h.card) };
 }
 function hcOf(p){ return hcClean(p && p.hc); }
 function hcCur(){ return state && state.settings && state.settings.handicap && state.players && state.players[state.currentPlayer] ? hcOf(state.players[state.currentPlayer]) : hcClean(); }
 function hcCount(h){ return (h.time !== "std" ? 1 : 0) + h.hide + (h.goal ? 1 : 0) + (h.tok ? 1 : 0) + h.nobuy + h.card; }
 function hcSummary(h){
-  const t = { off:"kein Zeitlimit", half:"halbe Zeit", s20:"20 s", s40:"40 s" }, a = [];
-  if(h.time !== "std") a.push("⏱ " + t[h.time]); if(h.hide) a.push("Jahre verdeckt"); if(h.goal) a.push("+" + h.goal + " bis zum Sieg");
+  const a = [];
+  if(h.time !== "std") a.push("⏱ " + (HC_TIME.find(x => x[0] === h.time) || ["", h.time])[1]); if(h.hide) a.push("Jahre verdeckt"); if(h.goal) a.push((h.goal > 0 ? "+" : "−") + Math.abs(h.goal) + " bis zum Sieg");
   if(h.tok) a.push((h.tok > 0 ? "+" : "") + h.tok + " Start-Tokens"); if(h.nobuy) a.push("kein Überspringen/Kaufen"); if(h.card) a.push("Extra-Startkarte");
   return a.join(" · ");
 }
-function hcEditorHtml(h, setter, open){
+function hcEditorHtml(h, setter, open, g){
   const opt = (arr, cur) => arr.map(([v, l]) => `<option value="${v}" ${String(v) === String(cur) ? "selected" : ""}>${l}</option>`).join("");
   const sel = (key, label, arr) => `<label class="hc-row"><span>${label}</span><select class="dropdown" onchange="${setter}'${key}', this.value)">${opt(arr, h[key])}</select></label>`;
   const n = hcCount(h);
   return `<details class="hc-more" ${open ? "open" : ""}><summary>Weitere Handicaps${n ? " (" + n + " aktiv)" : ""}</summary>
-    ${sel("time", "Zeitlimit", HC_TIME)}
+    ${(() => { const list = HC_TIME.filter(x => g > 0 || x[0] === "std" || /^s\d+$/.test(x[0])); const cur = list.some(x => x[0] === h.time) ? h.time : "std"; return `<label class="hc-row"><span>Zeitlimit</span><select class="dropdown" onchange="${setter}'time', this.value)">${opt(list, cur)}</select></label>`; })()}
     ${sel("hide", "Jahre auf eigener Zeitleiste", [[0, "Sichtbar"], [1, "Verdeckt"]])}
-    ${sel("goal", "Bis zum Sieg", [[0, "Normal"], [1, "+1 Karte"], [2, "+2 Karten"], [3, "+3 Karten"]])}
+    ${sel("goal", "Karten bis zum Sieg", [[-3, "−3 Karten"], [-2, "−2 Karten"], [-1, "−1 Karte"], [0, "Normal"], [1, "+1 Karte"], [2, "+2 Karten"], [3, "+3 Karten"]])}
     ${sel("tok", "Start-Tokens", [[-2, "−2"], [-1, "−1"], [0, "Normal"], [1, "+1"], [2, "+2"]])}
     ${sel("nobuy", "Überspringen und Kaufen", [[0, "Erlaubt"], [1, "Gesperrt"]])}
     ${sel("card", "Startkarten", [[0, "Normal"], [1, "1 Extra-Startkarte"]])}
@@ -2920,8 +2952,24 @@ function hcApplyStart(){
   loadActiveFromPlayer();
 }
 
-const HC_MULT = { normal:1, pro:1.5, expert:2 };
-function handicapScore(p){ return p.correctCount * (HC_MULT[p.diff || "normal"] || 1); }
+/* Handicap-Modus: keine Punktewertung. Jeder Spieler hat ein eigenes Ziel (Spielziel ± Handicap), gewonnen hat, wer sein Ziel zuerst erreicht.
+   Rangfolge: Fortschritt in % des eigenen Ziels, dann weniger Fehler, dann das höhere (schwerere) Ziel. */
+function playerTarget(i){
+  const st = state.settings;
+  if(st && st.handicap && state.players && state.players[i]) return Math.max(1, st.target + hcOf(state.players[i]).goal);
+  return st ? st.target : 0;
+}
+function hcCompare(a, b){   // a, b: Spieler-Indizes; negativ = a liegt vorne
+  const pa = state.players[a], pb = state.players[b];
+  const fa = pa.correctCount / playerTarget(a), fb = pb.correctCount / playerTarget(b);
+  return (fb - fa) || (pa.wrongCount - pb.wrongCount) || (playerTarget(b) - playerTarget(a)) || (a - b);
+}
+function hcBonusFactor(p){   // XP-Zuschlag für schwerere Handicaps
+  const h = hcOf(p), g = state.settings && state.settings.turnLimit > 0 ? state.settings.turnLimit : 0;
+  let f = { normal:0, pro:.5, expert:1 }[p.diff || "normal"] || 0;
+  if(hcTimeHarder(h.time, g)) f += .1; if(h.hide) f += .1; if(h.goal > 0) f += .1; if(h.tok < 0) f += .1; if(h.nobuy) f += .1;
+  return f;
+}
 function applyHandicap(){
   const st = state.settings; if(!st || !st.handicap || !state.players || !state.players[state.currentPlayer]) return;
   st.difficulty = state.players[state.currentPlayer].diff || "normal";
@@ -2931,11 +2979,7 @@ function hcApplyLocal(w){
   state.players.forEach(p => { p.diff = map[p.name] || "normal"; p.hc = map2[p.name] || hcClean(); }); applyHandicap(); hcApplyStart();
 }
 function hcApplyNet(){ state.players.forEach((p, i) => { const q = NET.seats[i]; p.diff = (q && q.diff) || "normal"; p.hc = hcClean(q && q.hc); }); applyHandicap(); hcApplyStart(); }
-function hcEndHtml(){
-  if(!state.settings.handicap || !state.players) return "";
-  const L = { normal:"Normal", pro:"Profi ×1,5", expert:"Experte ×2" };
-  return `<div style="width:100%;text-align:left;margin:6px 0;"><b>Handicap-Wertung</b>${state.players.slice().sort((a, b) => handicapScore(b) - handicapScore(a)).map(p => `<div>${esc(p.name)}: ${p.correctCount} Karten (${L[p.diff || "normal"]}) = <b>${handicapScore(p)}</b> Punkte</div>`).join("")}</div>`;
-}
+function hcEndHtml(){ return ""; }   // keine Punktewertung mehr im Handicap-Modus
 function drawNext(){
   applyHandicap();
   pauseSpotifyPlayback();
@@ -3395,7 +3439,7 @@ function nextTurn(){
 function checkWin(){
   if(state.settings.handicap && isMulti()){
     syncActiveToPlayer();
-    if(state.players.some(p => handicapScore(p) >= state.settings.target + hcOf(p).goal)){ pauseSpotifyPlayback(); state.won = true; finalizeMultiplayer(); state.screen = "end"; render(); saveState(); return true; }
+    if(state.players.some((p, i) => p.correctCount >= playerTarget(i))){ pauseSpotifyPlayback(); state.won = true; finalizeMultiplayer(); state.screen = "end"; render(); saveState(); return true; }
     return false;
   }
   // Die Startkarte zählt nicht mit: bei Ziel 10 müssen 10 Karten
@@ -3740,6 +3784,7 @@ function autoThemeCheck(){
 }
 function renderExperimentalCard(){
   return `<div class="menu-card"><h3>Experimentelles</h3>
+    <div class="setting-row"><div><div class="label">Spielziel bis zu 100 Karten</div><div class="hint">Erhöht das Maximum für das Spielziel (Karten bis zum Sieg) von 25 auf 100. Ab 25 geht es in 5er-Schritten. Solche Runden dauern sehr lange und brauchen viele Songs im Stapel.</div></div>${prefSwitchHtml('bigTarget')}</div>
     <div class="setting-row"><div><div class="label">Mehrspieler bis zu 100 Leute</div><div class="hint">Erhöht die Spielerzahl von 10 auf 100: im lokalen Mehrspieler-Spiel und in Online-Räumen, die du hostest. Bei vielen Spielern kann das Spiel je nach Gerät und Verbindung des Hosts langsam werden.</div></div>${prefSwitchHtml("bigRooms")}</div>
     <div class="setting-row"><div><div class="label">Sprachchat (online)</div><div class="hint">Zeigt in Online-Räumen unten links einen Button „Sprachchat beitreten“. Dabei sprechen alle Teilnehmenden direkt miteinander (Peer-to-Peer, ohne Server). Das Mikrofon wird erst nach deiner Freigabe aktiv. Ohne Relay (siehe unten) sehen sich die Teilnehmenden dabei gegenseitig ihre IP-Adressen, und bei mehr als 6 bis 8 Sprechenden wird es instabil.</div></div>${prefSwitchHtml("voiceChat")}</div>
     <div class="setting-row"><div><div class="label">IP-Adressen verbergen (TURN-Relay)</div><div class="hint">Leitet alle Online-Verbindungen (Spiel und Sprachchat) über einen TURN-Server, sodass sich die Spielenden nicht direkt sehen. Dafür brauchst du die Adresse eines TURN-Servers (zum Beispiel ein eigener coturn oder ein Anbieter), alle Teilnehmenden müssen dieselbe Einstellung nutzen. Ganz unsichtbar bist du trotzdem nicht: der TURN-Betreiber und der PeerJS-Vermittlungsserver sehen deine IP. Ist der Server nicht erreichbar, scheitert die Verbindung.</div></div>${prefSwitchHtml("relayOnly")}</div>
@@ -3932,7 +3977,7 @@ function renderMenu(){
     <div class="menu-card">
       <div class="menu-actions">
         <div class="menu-split"><button class="btn-primary main" onclick="openPlay()">Spielen</button><button class="btn-primary side" onclick="openQuickplay()" aria-label="Quickplay" title="Quickplay">⚡ Quick</button></div>
-        <div class="menu-row"><button class="btn-ghost" onclick="openStats()">Statistiken</button><button class="btn-ghost" onclick="openRecap()">Jahresrückblick</button></div>
+        <div class="menu-row"><button class="btn-ghost" onclick="openStats()">Statistiken</button><button class="btn-ghost" onclick="openRecap()">Jahresrückblick</button><button class="btn-ghost" onclick="openAch()">🏅 Errungenschaften</button></div>
         <button class="btn-ghost" onclick="openSettings()">Einstellungen</button>
       </div>
     </div>
@@ -4259,7 +4304,9 @@ async function shareResult(auto){
   let t;
   if(state.daily && state.dailyInfo){ const [y, m, d] = state.daily.date.split("-"); t = "Chronohit Daily " + d + "." + m + "." + y + "\n" + state.dailyInfo.seq + " " + state.dailyInfo.score + "/10"; }
   else if(state.settings.mode === "multiplayer" && state.players){
-    t = "Chronohit – Mehrspieler\n" + [...state.players].sort((a, b) => b.correctCount - a.correctCount).map((q, i) => (i + 1) + ". " + q.name + " – " + q.correctCount).join("\n");
+    t = "Chronohit – Mehrspieler\n" + (state.settings.handicap
+      ? rankedPlayers().map((r, i) => (i + 1) + ". " + r.v.name + " – " + r.v.correctCount + " / " + playerTarget(r.i)).join("\n")
+      : [...state.players].sort((a, b) => b.correctCount - a.correctCount).map((q, i) => (i + 1) + ". " + q.name + " – " + q.correctCount).join("\n"));
   } else {
     const st = state.settings, tgt = st.target >= 9999 ? "" : " von " + st.target;
     t = "Chronohit – " + modeLabel(st.mode) + (st.variant ? " · " + variantLabel(st.variant) : "") + "\n" + (state.correctCount || 0) + " richtig" + tgt + (resultSeq(30) ? "\n" + resultSeq(30) : "");
@@ -4277,10 +4324,14 @@ function xpAward(){
   if(state.learn){ try{ localStorage.removeItem("chronohit_learn_run"); }catch(e){} }
   const st = state.settings, parts = []; let correct = 0, won = false;
   if(st.mode === "multiplayer" && state.players){
-    if(state.online){ const my = state.players[netMyTeam()], mx = Math.max(...state.players.map(q => q.correctCount)); correct = my ? my.correctCount : 0; won = !!my && my.correctCount === mx; }
+    if(state.online){ const my = state.players[netMyTeam()], mx = Math.max(...state.players.map(q => q.correctCount)); correct = my ? my.correctCount : 0; won = !!my && (st.handicap ? (state.winners || []).includes(netMyTeam()) : my.correctCount === mx); }
     else correct = state.players.reduce((n, q) => n + q.correctCount, 0);
   } else { correct = state.correctCount || 0; won = !!state.won; }
   if(correct) parts.push(["Richtige Karten (" + correct + ")", correct * 10]);
+  if(st.handicap && state.players){   // Handicap-Bonus: schwerere Stufe und erschwerende Handicaps bringen mehr XP
+    let hb = 0; state.players.forEach((q, i) => { if(!state.online || i === netMyTeam()) hb += (q.correctCount || 0) * 10 * hcBonusFactor(q); });
+    hb = Math.round(hb); if(hb > 0) parts.push(["Handicap-Bonus", hb]);
+  }
   if(won) parts.push(["Sieg", 50]);
   const gc = (state.chronicle || []).reduce((n, e) => n + (e.g && e.g.to ? 1 : 0) + (e.g && e.g.ao ? 1 : 0), 0);
   if(gc) parts.push(["Richtig geraten (" + gc + ")", gc * 5]);
@@ -4649,12 +4700,31 @@ function netCleanQg(q){
     results:(Array.isArray(q.results) ? q.results : []).slice(0, 100).map(r => ({ i:netInt(r && r.i, 0, 0, 100), name:cl(r && r.name, 20), v:cl(r && r.v, 60), diff:netInt(r && r.diff, 0, -1, 5000), pts:netInt(r && r.pts, 0, 0, 20), ok:!!(r && r.ok) })) };
 }
 function qgScores(){ return MP() ? state.players.map(p => ({ name:p.name, pts:p.correctCount })) : [{ name:"Du", pts:state.correctCount || 0 }]; }
+function exitDialogHtml(){
+  if(!state.showExitDialog) return ``;
+  const online = !!state.online;
+  return `
+      <div class="modal-backdrop" onclick="if(event.target===this) closeExitDialog()">
+        <div class="modal-box">
+          <h3>Spiel verlassen?</h3>
+          <p>${online ? (NET.role === 'host' ? 'Online-Raum: Beim Verlassen wird der Raum für alle geschlossen. „Speichern“ sichert den Stand lokal — du kannst ihn später unter „Spiel laden“ wieder hosten.' : 'Du kannst jederzeit mit Raumname, Passwort und deinem Namen zurückkehren.') : 'Du hast eine laufende Runde. Was möchtest du tun?'}</p>
+          <div class="modal-actions">
+            ${online && NET.role === "guest" ? `<button class="btn-danger" onclick="netLeave()">Raum verlassen</button>` : `<button class="btn-primary" onclick="saveAndMenu()">Speichern und zum Menü</button>
+            <button class="btn-danger" onclick="discardAndMenu()">Ohne Speichern zum Menü</button>`}
+            <button class="btn-ghost" onclick="closeExitDialog()">Zurück zum Spiel</button>
+          </div>
+        </div>
+      </div>`;
+}
 function renderQg(){
   const q = state.qg, online = !!state.online, mySeat = online ? netMySeat() : -1, P = state.qgPriv || { answers:{}, localIdx:0 };
   if(QG.round !== q.round){ QG.round = q.round; QG.playing = false; }
   const names = i => (online && NET.seats[i]) ? NET.seats[i].name : qgName(i);
   const scores = qgScores().map(x => `<div class="stat">${esc(x.name)} <b>${x.pts}</b></div>`).join("");
-  const head = `<div class="topbar"><div class="stat">${q.kind === "year" ? "Jahr-Schätzen" : "Interpret-Quiz"} <b>Runde ${q.round} / ${q.total}</b></div>${scores}</div>`;
+  const head = `<div class="topbar"><div class="stat">${q.kind === "year" ? "Jahr-Schätzen" : "Interpret-Quiz"} <b>Runde ${q.round} / ${q.total}</b></div>${scores}
+    ${online && NET.role === "host" ? `<button class="btn-ghost btn-small" onclick="netShowInvite()">🔑 Passwort</button>` : ``}
+    ${online && NET.role === "guest" ? `` : `<button class="btn-ghost btn-small" onclick="requestOverwriteSave()">💾 Speichern</button>`}
+    <button class="btn-ghost btn-small" onclick="openExitDialog()">${online && NET.role === "guest" ? "Raum verlassen" : "Zurück zum Menü"}</button></div>${online ? netBannerHtml() : ``}`;
   let body = `<button class="btn-ghost" onclick="qgPlay()">${QG.playing ? "⏸ Pausieren" : "▶ Song abspielen"}</button>`;
   if(q.phase === "guess"){
     const answered = q.answered || [];
@@ -4679,7 +4749,11 @@ function renderQg(){
     body += `<div class="menu-card" style="margin-top:12px;"><h3>${esc(q.reveal.t)}</h3><p>${esc(q.reveal.a)} · ${q.reveal.y}</p>${rows}</div>
       ${(!online || NET.role === "host") ? `<button class="btn-primary" onclick="qgNextClick()">${q.round >= q.total ? "Ergebnis ansehen" : "Nächste Runde"}</button>` : `<p style="color:var(--muted);">Warte auf den Host …</p>`}`;
   }
-  app.innerHTML = `${head}<div class="menu-card" style="margin-top:12px;">${body}</div>`;
+  app.innerHTML = `${head}<div class="menu-card" style="margin-top:12px;">${body}</div>
+    ${exitDialogHtml()}
+    ${state.saveSlotDialogOpen ? renderSaveSlotModal() : ``}
+    ${state.confirmOverwriteSave ? renderOverwriteConfirmModal() : ``}
+    ${state.confirmDeleteSlot ? renderDeleteSlotModal() : ``}`;
 }
 function renderQgEnd(){
   const rows = qgScores().map((x, i) => ({ ...x, i })).sort((a, b) => b.pts - a.pts), mx = rows.length ? rows[0].pts : 0;
@@ -4691,7 +4765,204 @@ function renderQgEnd(){
     </div>
     ${state.confirmDeleteOnFinish ? renderDeleteOnFinishModal() : ``}`;
 }
-function qgFinish(){ if(state.qgDone) return; state.qgDone = true; state.statsRecorded = true; try{ qgXpAward(); }catch(e){} try{ sfx("win", 0.7); confettiBurst("big"); }catch(e){} }
+function qgFinish(){ if(state.qgDone) return; state.qgDone = true; state.statsRecorded = true; try{ qgXpAward(); }catch(e){} try{ achOnQuizEnd(); }catch(e){} try{ sfx("win", 0.7); confettiBurst("big"); }catch(e){} }
+/* ============ ERRUNGENSCHAFTEN & ABZEICHEN ============ */
+const ACH_LS = "chronohit_ach_v1";
+const ACH_CATS = [["streak", "🔥 Serien"], ["collect", "🃏 Sammeln"], ["win", "🏆 Siege"], ["guess", "🎧 Raten"], ["special", "🌟 Besonderes"], ["mode", "🎮 Spielarten"], ["daily", "📅 Daily & Level"], ["online", "🌐 Online & Quiz"]];
+const ACH_DEFS = [
+  { id:"streak5", cat:"streak", tier:1, icon:"🔥", name:"Auf Kurs", desc:"5 richtige Karten in Folge.", prog:A => [A.c.best || 0, 5] },
+  { id:"streak10", cat:"streak", tier:2, icon:"🏅", name:"Reihenmeister", desc:"10 richtige Karten in Folge.", prog:A => [A.c.best || 0, 10] },
+  { id:"streak20", cat:"streak", tier:3, icon:"🚀", name:"Unaufhaltsam", desc:"20 richtige Karten in Folge.", prog:A => [A.c.best || 0, 20] },
+  { id:"cards100", cat:"collect", tier:1, icon:"🃏", name:"Sammler", desc:"Insgesamt 100 richtige Karten.", prog:A => [A.c.cards || 0, 100] },
+  { id:"cards1000", cat:"collect", tier:3, icon:"📚", name:"Archivar", desc:"Insgesamt 1000 richtige Karten.", prog:A => [A.c.cards || 0, 1000] },
+  { id:"win1", cat:"win", tier:1, icon:"🏆", name:"Erster Sieg", desc:"Ein Spiel gewinnen." },
+  { id:"win10", cat:"win", tier:2, icon:"👑", name:"Seriensieger", desc:"10 Spiele gewinnen.", prog:A => [A.c.wins || 0, 10] },
+  { id:"flawless", cat:"win", tier:3, icon:"✨", name:"Makellos", desc:"Ein Spiel mit Ziel ab 10 ohne einen einzigen Fehler gewinnen." },
+  { id:"coopwin", cat:"win", tier:1, icon:"🤝", name:"Teamgeist", desc:"Ein Koop-Spiel gewinnen." },
+  { id:"guess1", cat:"guess", tier:1, icon:"💡", name:"Gutes Ohr", desc:"Titel und Interpret in einer Runde richtig raten." },
+  { id:"guess25", cat:"guess", tier:2, icon:"🎧", name:"Musikkenner", desc:"25-mal Titel und Interpret richtig raten.", prog:A => [A.c.guess || 0, 25] },
+  { id:"timetravel", cat:"special", tier:3, icon:"⏳", name:"Zeitreisender", desc:"Karten aus allen Jahrzehnten (50er bis 2020er) auf einer Zeitleiste." },
+  { id:"ruf", cat:"special", tier:2, icon:"⚡", name:"Einspruch!", desc:"Einen Chronohit!-Einspruch gewinnen." },
+  { id:"joker", cat:"special", tier:2, icon:"🎴", name:"Doppelt hält besser", desc:"Mit einer Joker-Karte richtig platzieren." },
+  { id:"special", cat:"special", tier:1, icon:"🍀", name:"Glückskind", desc:"Eine Spezialkarte ziehen." },
+  { id:"hint", cat:"special", tier:1, icon:"🔎", name:"Hinweisjäger", desc:"Einen Hinweis im Hinweisshop kaufen." },
+  { id:"blitz15", cat:"mode", tier:2, icon:"⏱️", name:"Blitzmerker", desc:"Im Blitz-Modus 15 Karten schaffen." },
+  { id:"endless25", cat:"mode", tier:2, icon:"♾️", name:"Dauerläufer", desc:"Im Endlos-Modus 25 Karten schaffen." },
+  { id:"sudden15", cat:"mode", tier:3, icon:"🧊", name:"Nervenstark", desc:"Bei Sudden Death 15 Karten schaffen." },
+  { id:"daily1", cat:"daily", tier:1, icon:"📅", name:"Tagesstart", desc:"Die tägliche Challenge abschließen." },
+  { id:"daily7", cat:"daily", tier:2, icon:"🗓️", name:"Wochenserie", desc:"7 Tage in Folge die tägliche Challenge abschließen." },
+  { id:"daily10", cat:"daily", tier:3, icon:"🎯", name:"Tagessieger", desc:"Die tägliche Challenge mit 10 von 10 abschließen." },
+  { id:"level5", cat:"daily", tier:1, icon:"⭐", name:"Aufsteiger", desc:"Level 5 erreichen.", prog:A => [achLv(), 5] },
+  { id:"level10", cat:"daily", tier:2, icon:"🎖️", name:"Veteran", desc:"Level 10 erreichen.", prog:A => [achLv(), 10] },
+  { id:"level25", cat:"daily", tier:3, icon:"💎", name:"Legende", desc:"Level 25 erreichen.", prog:A => [achLv(), 25] },
+  { id:"online1", cat:"online", tier:1, icon:"🌐", name:"Netzwerker", desc:"Ein Online-Spiel beenden." },
+  { id:"onlinewin", cat:"online", tier:2, icon:"🥇", name:"Online-Champion", desc:"Ein Online-Spiel gewinnen." },
+  { id:"quiz1", cat:"online", tier:1, icon:"🎤", name:"Quizfreund", desc:"Ein Interpret-Quiz oder Jahr-Schätzen beenden." },
+  { id:"artistperfect", cat:"online", tier:3, icon:"🎶", name:"Treffsicher", desc:"Ein Interpret-Quiz mit mindestens 5 Runden komplett richtig beenden." }
+];
+const ACH_BY = {}; ACH_DEFS.forEach(d => { ACH_BY[d.id] = d; });
+function achLv(){ try{ return xpLevel(xpLoad().xp || 0).lv; }catch(e){ return 0; } }
+function achLoad(){
+  try{ const o = JSON.parse(localStorage.getItem(ACH_LS) || "{}") || {}; return { u: (o.u && typeof o.u === "object") ? o.u : {}, c: (o.c && typeof o.c === "object") ? o.c : {}, f: Array.isArray(o.f) ? o.f.filter(id => ACH_BY[id]).slice(0, 3) : [] }; }
+  catch(e){ return { u:{}, c:{}, f:[] }; }
+}
+function achSave(A){ try{ localStorage.setItem(ACH_LS, JSON.stringify(A)); }catch(e){} }
+function achUnlock(A, id){
+  if(!ACH_BY[id] || A.u[id]) return false;
+  A.u[id] = Date.now();
+  if(A.f.length < 3) A.f.push(id);   // die ersten drei werden automatisch angezeigt (änderbar)
+  achNotify(id); return true;
+}
+function achBadge(d, locked, extra){ return `<span class="badge-ico tier-${d.tier} ${locked ? "locked" : ""} ${extra || ""}"><span class="bi">${d.icon}</span></span>`; }
+function achNotify(id){
+  const d = ACH_BY[id]; if(!d) return;
+  try{ sfx("streak", 0.2); }catch(e){}
+  const el = document.createElement("div"); el.className = "ach-toast";
+  el.style.top = (12 + document.querySelectorAll(".ach-toast").length * 74) + "px";
+  el.innerHTML = `${achBadge(d, false)}<span><b>Neue Errungenschaft!</b><br>${esc(d.name)}</span>`;
+  el.onclick = () => { el.remove(); achPop(id); };
+  document.body.appendChild(el);
+  setTimeout(() => { try{ el.remove(); }catch(e){} }, 6000);
+}
+function achPopClose(){ const el = document.getElementById("ach-pop"); if(el) el.remove(); }
+document.addEventListener("keydown", e => { if(e.key === "Escape") achPopClose(); });
+function achPop(id, owner){   // owner: Name eines anderen Spielers (dann nur Ansicht)
+  achPopClose(); const d = ACH_BY[id]; if(!d) return;
+  const A = achLoad(), other = typeof owner === "string" && owner !== "", got = other || !!A.u[id], secret = !!d.secret && !got;
+  const pg = !other && !got && d.prog ? d.prog(A) : null;
+  const date = !other && A.u[id] ? new Date(A.u[id]).toLocaleDateString("de-DE") : "";
+  const isF = A.f.includes(id);
+  const el = document.createElement("div"); el.id = "ach-pop"; el.className = "modal-backdrop";
+  el.onclick = e => { if(e.target === el) achPopClose(); };
+  el.innerHTML = `<div class="modal-box" role="dialog" aria-label="Abzeichen" style="text-align:center;">
+    ${achBadge(d, !got, "big")}
+    <h3 style="margin:10px 0 4px;">${secret ? "???" : esc(d.name)}</h3>
+    ${other ? `<p style="color:var(--muted);margin:0 0 6px;">Abzeichen von ${esc(owner)}</p>` : ``}
+    <p>${secret ? "Geheimes Abzeichen." : esc(d.desc)}</p>
+    ${pg ? `<p style="color:var(--muted);">Fortschritt: ${Math.min(pg[0], pg[1])} / ${pg[1]}</p>` : ``}
+    ${date ? `<p style="color:var(--muted);">Erhalten am ${date}</p>` : ``}
+    <div class="modal-actions">
+      ${!other && got ? `<button class="btn-primary" onclick="achToggleFeatured('${id}')">${isF ? "Nicht mehr anzeigen" : "⭐ Online anzeigen"}</button>` : ``}
+      <button class="btn-ghost" onclick="achPopClose()">Schließen</button>
+    </div></div>`;
+  document.body.appendChild(el);
+}
+function achShowOther(id, name){ achPop(id, name || "Spieler"); }
+function achToggleFeatured(id){
+  const A = achLoad(); if(!A.u[id]) return;
+  if(A.f.includes(id)) A.f = A.f.filter(x => x !== id);
+  else { if(A.f.length >= 3){ toast("Du kannst bis zu 3 Abzeichen anzeigen. Entferne zuerst eins."); return; } A.f.push(id); }
+  achSave(A); achPopClose(); try{ achAnnounce(); }catch(e){} if(state.screen === "achievements") render();
+}
+function achChipsHtml(name){
+  const ids = (NET.badges && NET.badges[netKey(name)]) || [];
+  if(!ids.length) return "";
+  return `<span class="badge-chips">${ids.map(id => ACH_BY[id] ? `<button class="badge-chip tier-${ACH_BY[id].tier}" data-n="${esc(name)}" onclick="event.stopPropagation(); achShowOther('${id}', this.dataset.n)" title="${esc(ACH_BY[id].name)}" aria-label="Abzeichen ${esc(ACH_BY[id].name)}">${ACH_BY[id].icon}</button>` : "").join("")}</span>`;
+}
+function openAch(){ state.screen = "achievements"; render(); }
+function renderAch(){
+  const A = achLoad(), n = ACH_DEFS.filter(d => A.u[d.id]).length, tot = ACH_DEFS.length;
+  const tile = d => { const got = !!A.u[d.id], pg = !got && d.prog ? d.prog(A) : null;
+    return `<button class="ach-tile ${got ? "got" : "locked"}" onclick="achPop('${d.id}')">${achBadge(d, !got)}<span class="ach-name">${(d.secret && !got) ? "???" : esc(d.name)}</span>${pg ? `<span class="ach-prog">${Math.min(pg[0], pg[1])} / ${pg[1]}</span>` : (got && A.f.includes(d.id) ? `<span class="ach-prog">⭐</span>` : ``)}</button>`; };
+  app.innerHTML = `
+    <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Errungenschaften</h1></div>
+    <div class="menu-card">
+      <h3>Abzeichensammlung</h3>
+      <p style="margin:4px 0;"><b>${n} / ${tot}</b> Abzeichen erhalten</p>
+      <div class="ach-bar"><div style="width:${Math.round(n / tot * 100)}%"></div></div>
+      <p style="color:var(--muted);font-size:calc(13px * var(--font-scale));">Tippe ein Abzeichen an. Bis zu 3 erhaltene Abzeichen kannst du mit ⭐ auswählen, sie erscheinen in Online-Spielen neben deinem Namen und sind dort anklickbar.</p>
+      <div class="ach-feat"><span>⭐ Angezeigt:</span> ${A.f.length ? A.f.map(id => achBadge(ACH_BY[id], false, "mini")).join("") : `<span style="color:var(--muted);">noch keins</span>`}</div>
+    </div>
+    ${ACH_CATS.map(([k, label]) => `<div class="menu-card"><h3>${label}</h3><div class="ach-grid">${ACH_DEFS.filter(d => d.cat === k).map(tile).join("")}</div></div>`).join("")}
+    <div class="menu-actions"><button class="btn-ghost" onclick="backToMenu()">Zurück</button></div>`;
+}
+/* --- Erfassen --- */
+let ACH_SEEN = "", ACH_HINT = "", ACH_SPEC = "";
+function achCtx(){
+  if(!state.settings || state.tutorial || state.learn || state.qg) return { counts:false };
+  const online = !!state.online, mp = state.settings.mode === "multiplayer" && state.players && state.players.length > 0;
+  if(mp && !online && state.players.length > 1) return { counts:false };   // Hot-Seat: kein „ich“
+  if(!mp) return { counts:true, mine:true, team:-1 };
+  const t = online ? netMyTeam() : 0;
+  return { counts: t >= 0, mine: state.currentPlayer === t, team: t };
+}
+function achObserve(){
+  if(state.screen !== "game" || !state.current) return;
+  const ctx = achCtx(); if(!ctx.counts) return;
+  const lr = state.lastResult;
+  if(state.phase === "feedback" && lr && Date.now() - (lr.ts || 0) < 20000){
+    const key = (lr.ts || 0) + ":" + (state.turnNo || 0);
+    if(key !== ACH_SEEN){ ACH_SEEN = key; achOnResult(lr, ctx); }
+  }
+  if(ctx.mine && state.hint){ const k = (state.current.id || "") + ":" + state.hint.kind + ":" + (state.turnNo || 0); if(k !== ACH_HINT){ ACH_HINT = k; const A = achLoad(); achUnlock(A, "hint"); achSave(A); } }
+  if(ctx.mine && state.special && state.phase !== "feedback"){ const k = (state.current.id || "") + ":" + state.special.type + ":" + (state.turnNo || 0); if(k !== ACH_SPEC){ ACH_SPEC = k; const A = achLoad(); achUnlock(A, "special"); achSave(A); } }
+}
+function achOnResult(lr, ctx){
+  const A = achLoad(), ok = !!lr.ok;
+  if(ctx.mine){
+    const tot = (state.correctCount || 0) + (state.wrongCount || 0);
+    if(tot <= 1) A.c.run = 0;   // erstes Ergebnis des Spiels: neue Serie
+    if(ok){
+      A.c.run = (A.c.run || 0) + 1; A.c.best = Math.max(A.c.best || 0, A.c.run); A.c.cards = (A.c.cards || 0) + 1;
+      if(A.c.run >= 5) achUnlock(A, "streak5"); if(A.c.run >= 10) achUnlock(A, "streak10"); if(A.c.run >= 20) achUnlock(A, "streak20");
+      if(A.c.cards >= 100) achUnlock(A, "cards100"); if(A.c.cards >= 1000) achUnlock(A, "cards1000");
+      const all = new Set(SONGS.map(x => decadeOf(x.y))).size;
+      if(state.timeline && new Set(state.timeline.map(c => decadeOf(c.y))).size >= all) achUnlock(A, "timetravel");
+      if(jokerActive() && state.pendingGap2 != null) achUnlock(A, "joker");
+    } else A.c.run = 0;
+    if(lr.guessCheck && lr.guessCheck.both){ A.c.guess = (A.c.guess || 0) + 1; achUnlock(A, "guess1"); if(A.c.guess >= 25) achUnlock(A, "guess25"); }
+  }
+  if(lr.challenge && lr.challenge.success && ctx.team >= 0 && lr.challenge.caller === ctx.team) achUnlock(A, "ruf");
+  achSave(A);
+}
+function achOnGameEnd(){
+  if(!state.settings || state.tutorial || state.learn) return;
+  const A = achLoad(), st = state.settings, online = !!state.online, mpr = isMultiRound();
+  if(mpr && !online){ if(achLv() >= 5) achUnlock(A, "level5"); if(achLv() >= 10) achUnlock(A, "level10"); if(achLv() >= 25) achUnlock(A, "level25"); achSave(A); return; }
+  const my = mpr ? netMyTeam() : -1;
+  const won = mpr ? (my >= 0 && (state.winners || []).includes(my)) : !!state.won;
+  const wrongs = mpr && state.players[my] ? state.players[my].wrongCount : state.wrongCount;
+  const right = mpr && state.players[my] ? state.players[my].correctCount : state.correctCount;
+  const v = st.variant || "classic";
+  A.c.games = (A.c.games || 0) + 1;
+  if(won){ A.c.wins = (A.c.wins || 0) + 1; achUnlock(A, "win1"); if(A.c.wins >= 10) achUnlock(A, "win10");
+    if(wrongs === 0 && st.target >= 10 && st.target < 9999 && v === "classic" && !state.daily) achUnlock(A, "flawless");
+    if(st.mode === "coop") achUnlock(A, "coopwin"); if(online) achUnlock(A, "onlinewin"); }
+  if(online) achUnlock(A, "online1");
+  if(v === "blitz" && right >= 15) achUnlock(A, "blitz15");
+  if(v === "endless" && right >= 25) achUnlock(A, "endless25");
+  if(v === "sudden" && right >= 15) achUnlock(A, "sudden15");
+  if(state.daily){ achUnlock(A, "daily1"); try{ if((dailyLoad().streak || 0) >= 7) achUnlock(A, "daily7"); }catch(e){} if(state.dailyInfo && state.dailyInfo.score >= 10) achUnlock(A, "daily10"); }
+  const lv = achLv(); if(lv >= 5) achUnlock(A, "level5"); if(lv >= 10) achUnlock(A, "level10"); if(lv >= 25) achUnlock(A, "level25");
+  achSave(A);
+}
+function achOnQuizEnd(){
+  if(!state.qg || state.tutorial) return;
+  const A = achLoad(); achUnlock(A, "quiz1");
+  try{
+    const q = state.qg, rows = qgScores();
+    let mine = null;
+    if(state.online){ const seat = netMySeat(); mine = MP() ? (state.players[seat] || {}).correctCount : state.correctCount; } else if(!MP()) mine = state.correctCount;
+    if(q.kind === "artist" && q.total >= 5 && mine != null && mine === q.total) achUnlock(A, "artistperfect");
+  }catch(e){}
+  const lv = achLv(); if(lv >= 5) achUnlock(A, "level5"); if(lv >= 10) achUnlock(A, "level10"); if(lv >= 25) achUnlock(A, "level25");
+  achSave(A);
+}
+/* --- Online: Abzeichen neben dem Namen --- */
+function achCleanIds(a){ return Array.isArray(a) ? [...new Set(a.filter(id => typeof id === "string" && ACH_BY[id]))].slice(0, 3) : []; }
+function achCleanMap(m){ const out = {}; if(m && typeof m === "object") Object.entries(m).slice(0, 100).forEach(([k, v]) => { const ids = achCleanIds(v); if(ids.length) out[String(k).slice(0, 60)] = ids; }); return out; }
+function achBroadcast(){ if(NET.role === "host") netBroadcast({ t:"badges", m: NET.badges || {} }); }
+function achAnnounce(){
+  if(!NET.role || !NET.peer) return; const ids = achLoad().f;
+  if(NET.role === "host"){ NET.badges = NET.badges || {}; const k = netKey((NET.seats[0] && NET.seats[0].name) || ""); if(ids.length) NET.badges[k] = ids; else delete NET.badges[k]; achBroadcast(); }
+  else if(NET.role === "guest") netSendHost({ t:"bdg", ids });
+}
+function netHostBadges(entry, d){
+  NET.badges = NET.badges || {}; const ids = achCleanIds(d && d.ids);
+  if(ids.length) NET.badges[entry.key] = ids; else delete NET.badges[entry.key];
+  achBroadcast(); netUiUpdate();
+}
+
 /* ============ PROFILBILD (lokal) ============ */
 const AV_RE = /^data:image\/png;base64,[A-Za-z0-9+\/=]{20,14000}$/;
 function avLoad(){ try{ return localStorage.getItem("chronohit_avatar") || ""; }catch(e){ return ""; } }
@@ -4732,8 +5003,8 @@ function avCleanMap(m){ const out = {}; if(m && typeof m === "object") Object.en
 function avEnsure(){
   if(!NET.role || !NET.peer) return;
   const id = NET.peer.id;
-  if(NET.avFor !== id && (NET.role === "host" || (NET.hostConn && NET.hostConn.open))){ NET.avFor = id; avAnnounce(); }
-  if(NET.role === "host" && NET.avSeats !== NET.seats.length){ NET.avSeats = NET.seats.length; avBroadcast(); }
+  if(NET.avFor !== id && (NET.role === "host" || (NET.hostConn && NET.hostConn.open))){ NET.avFor = id; avAnnounce(); achAnnounce(); }
+  if(NET.role === "host" && NET.avSeats !== NET.seats.length){ NET.avSeats = NET.seats.length; avBroadcast(); achBroadcast(); }
 }
 function avatarHtml(x){
   const d = NET.avatars && NET.avatars[netKey(x.name)];
@@ -4935,7 +5206,7 @@ function renderTutorial(){
 function renderTutorialRules(){
   app.innerHTML = `
     <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Regeln</h1></div>
-    <div class="menu-card"><div class="body"><details class="rules-sec" open><summary>🎵 Spielablauf</summary><div class="rules-body"><p><strong>1. Abspielen:</strong> Du ziehst eine Karte und klickst auf die Schallplatte. Der Song spielt unsichtbar im Hintergrund über Spotify, du siehst weder Titel noch Cover. Nochmal klicken pausiert/setzt fort. Mit Spotify Premium läuft der ganze Song, sonst die 30-Sekunden-Vorschau. Wird die Steuerung blockiert (z. B. durch einen Adblocker), springt das Spiel auf einen sichtbaren, zugeschnittenen Player um. Der Button ⟳ an der Schallplatte lädt den Player neu.</p><p style="font-size:calc(13px * var(--font-scale));">Hinweis: Bei „Bailando“ (Enrique Iglesias) lag nur ein Album-Link vor – dort öffnet sich stattdessen eine Spotify-Suche in neuem Tab.</p><p><strong>2. Platzieren:</strong> Ohne das Jahr zu kennen, klickst du auf die Lücke deiner Zeitleiste, die du für chronologisch richtig hältst (früher links, später rechts). Bis zum Aufdecken kannst du die Position noch ändern.</p><p><strong>3. Aufdecken:</strong> Liegt die Karte richtig, bleibt sie liegen und zählt einen Punkt (die Startkarte zählt nicht). Liegt sie falsch, kommt sie auf den Ablagestapel und bleibt dauerhaft draußen. Danach geht es mit „Weiter“ zur nächsten Karte.</p></div></details><details class="rules-sec" ><summary>🎯 Schwierigkeit</summary><div class="rules-body"><p><strong>Normal:</strong> nur die Position zählt.<br><strong>Profi:</strong> Titel &amp; Interpret müssen vor dem Aufdecken zusätzlich stimmen.<br><strong>Experte:</strong> zusätzlich das Erscheinungsjahr, mit einstellbarer Toleranz von bis zu ±5 Jahren.</p><p>Verglichen wird großzügig: Groß-/Kleinschreibung, Akzente, Umlaut-Schreibweisen und Tippfehler werden verziehen.</p></div></details><details class="rules-sec" ><summary>🪙 Chrono-Tokens</summary><div class="rules-body"><p>Wenn aktiviert (außerhalb von Koop), sind Start- und Maximalwert einstellbar.</p><p>&bull; <strong>Song unbekannt?</strong> Für 1 Token wirfst du die aktuelle Karte ab und ziehst eine neue, ohne zu platzieren.<br>&bull; <strong>Karte kaufen:</strong> Für 3 Tokens wird die nächste gezogene Karte garantiert richtig einsortiert, ohne Risiko.<br>&bull; <strong>Bonus-Token:</strong> Tippst du Titel und Interpret richtig ein, gibt es einen weiteren Token (in jedem Schwierigkeitsgrad).</p><p><strong>Seltene Spezialkarten</strong> (optional, Schalter beim Spiel-Erstellen): Beim Ziehen ist etwa jede 12. Karte eine Spezialkarte, die nur für diesen Song gilt. <em>🃏 Joker:</em> Du wählst zwei Positionen, der Song zählt, wenn er in eine davon passt. <em>⏸️ Zeit anhalten:</em> In diesem Zug läuft kein Zeitlimit (wird nur mit Zeitlimit gezogen).</p><p><strong>Hinweisshop</strong> (optional, nicht im Koop): Mit Tokens kaufst du über den Button „Hinweisshop“ einen Hinweis zur aktuellen Karte: erst nach dem Abspielen des Songs, bis zum Aufdecken, auch nach dem Platzieren. Pro Karte ist nur 1 Hinweis möglich. <em>1 Token:</em> Sprache &amp; Genre oder die Anfangsbuchstaben von Titel und Interpret. <em>2 Tokens:</em> das Jahrzehnt oder ein Jahresfenster von 11 Jahren (±5 um die Mitte), in dem das Jahr liegt.</p><p>Tastenkürzel: S = Überspringen, B = Kaufen.</p></div></details><details class="rules-sec" ><summary>🎮 Spielmodi</summary><div class="rules-body"><p><strong>Solo:</strong> Du spielst allein auf eine einstellbare Zielkartenzahl.</p><p><strong>Koop:</strong> Ihr startet gemeinsam mit einer festen Zahl Chrono-Tokens (1–10) und einer Startkarte. Jede falsch platzierte Karte kostet einen Token. Skip/Kaufen gibt es nicht, die Tokens sind eure gemeinsamen Leben. Bei 0 Tokens vor dem Ziel habt ihr verloren, sonst gewonnen.</p><p><strong>Mehrspieler:</strong> Jeder Spieler hat eine eigene Startkarte und Zeitleiste, ihr spielt reihum. Wer das Ziel erreicht, gewinnt; ist der Stapel leer, entscheidet die Zahl richtiger Karten (Gleichstand möglich).</p></div></details><details class="rules-sec" ><summary>📣 Chronohit!-Einspruch (Mehrspieler mit Tokens)</summary><div class="rules-body"><p>Bevor eine Karte aufgedeckt wird, kann ein Gegner mit einem Token „Chronohit!“ rufen und die Lücke wählen, wo die Karte seiner Meinung nach hingehört. Liegt der aktive Spieler falsch und der Rufer richtig, bekommt der Rufer die Karte. Der eingesetzte Token ist immer weg. Pro Zug zählt nur der erste Einspruch.</p><p><strong>Einspruchsfenster:</strong> Entweder beendet der aktive Spieler (online auch der Host) das Fenster per Klick, oder es schließt automatisch nach 5 bzw. 10 Sekunden oder (mit Zeitlimit) mit der Restzeit, mindestens 5 Sekunden. Ruft jemand, hat der Rufer mindestens 5 Sekunden für die Lückenwahl. Ohne gewählte Lücke wird der Ruf zurückgenommen und der Token kommt zurück.</p></div></details><details class="rules-sec" ><summary>🎲 Zufallsereignisse (Mehrspieler)</summary><div class="rules-body"><p>Optional, standardmäßig aus. Beim Spielerwechsel passiert mit etwa 22 % Wahrscheinlichkeit etwas: <strong>Doppelrunde</strong> (der Spieler ist zweimal hintereinander dran) oder <strong>Kartentausch</strong> (zwei Spieler tauschen je eine zufällige Karte, nie die Startkarte; sie werden nach Jahr neu einsortiert). Ein Banner zeigt das Ereignis an.</p></div></details><details class="rules-sec" ><summary>⚡ Solo-Varianten</summary><div class="rules-body"><p><strong>Klassisch:</strong> bis zum Ziel.<br><strong>Endlos:</strong> kein Ziel, die Runde endet nach einer einstellbaren Zahl Fehler (Leben, Standard 3). Dein Highscore ist die Zahl richtiger Karten.<br><strong>Blitz:</strong> x Sekunden (30–180) für so viele richtige Karten wie möglich. Die Uhr startet beim Abspielen der ersten Karte; Abspielen, Aufdecken und Weiter laufen automatisch. Nur die Position zählt, ohne Titel/Interpret und ohne Tokens.<br><strong>Sudden Death:</strong> ein Fehler und du bist raus.</p><p>Highscores werden pro Variante (Blitz pro Dauer) gespeichert.</p></div></details><details class="rules-sec" ><summary>⏱ Zeitlimit pro Zug</summary><div class="rules-body"><p>Optional. Pro Zug bleibt nur begrenzte Zeit zum Platzieren (und in Profi/Experte oder für den Bonus zum Raten von Titel/Interpret). Die Zeit läuft ab dem Start des Songs. Läuft sie ab, gilt der Zug als verloren: Die Karte wird verworfen und zählt als falsch (im Koop kostet das einen Token).</p></div></details><details class="rules-sec" ><summary>🎼 Songauswahl und Filter</summary><div class="rules-body"><p>Beim Erstellen eines Spiels filterst du die Songs nach <strong>Sprache</strong>, <strong>Genre</strong> (ein Song kann mehrere haben, ein Treffer genügt), <strong>Jahrzehnt</strong> und <strong>Kategorien</strong> (z. B. Filmmusik oder Balladen; „Sonstige“ sind Songs ohne besondere Kategorie). Die Zahlen an den Chips zeigen, wie viele Songs es gibt. Die Reihenfolge der Filtergruppen lässt sich ändern.</p></div></details><details class="rules-sec" ><summary>🌐 Online spielen</summary><div class="rules-body"><p>Über „Spiel hosten / beitreten“ eröffnet ein Host einen Raum (Raumname, optional Passwort), Mitspieler treten bei, Zuschauer können zusehen. Der Host steuert Einstellungen und Start. Im Online-Solo und -Koop dürfen alle Teilnehmer gleichzeitig tippen (und raten). Im <strong>Team-Modus</strong> (Mehrspieler online) bilden die Spieler Teams mit gemeinsamer Zeitleiste und gemeinsamen Tokens; jedes Teammitglied darf tippen und raten, die Teams sind reihum dran. Die Teams wählst du in der Lobby selbst, der Host kann sie ändern oder zufällig verteilen. Ein <strong>Rematch</strong> startet nur, wenn alle verbundenen Mitspieler zustimmen; wer ablehnt, bricht die Anfrage ab.</p></div></details><details class="rules-sec" ><summary>💾 Spielstände</summary><div class="rules-body"><p>Beim Erstellen eines Spiels wählst du einen von 4 Speicherplätzen und einen Namen. Über den 💾-Button im Spiel speicherst du jederzeit in diesen Slot. Über „Spiel laden“ machst du dort weiter.</p></div></details><details class="rules-sec" ><summary>📜 Spielende, Chronik und Statistik</summary><div class="rules-body"><p>Am Ende siehst du das Ergebnis (bei Varianten mit Highscore-Vergleich). „Finale Zeitleiste ansehen“ zeigt alle Karten mit einem ▶ darunter, das die 30-Sekunden-Vorschau spielt. Die <strong>Spielchronik</strong> listet jeden Zug samt dem, was geraten wurde (Platzierung, Titel, Interpret, Jahr). Statistiken und der Jahresrückblick im Hauptmenü zählen deine Runden; Tutorial-Runden zählen nicht.</p></div></details><details class="rules-sec" ><summary>📅 Tägliche Challenge, Level und XP</summary><div class="rules-body"><p><strong>Tägliche Challenge:</strong> Jeden Tag gibt es 10 feste Karten (aus dem Datum abgeleitet, für alle mit derselben Songliste gleich), ohne Tokens. Dein Ergebnis ist x/10. Du darfst beliebig oft spielen, aber nur der erste Versuch des Tages zählt für XP und Serie. Der Teilen-Text zeigt nur Datum und Farbquadrate (🟩 richtig, 🟥 falsch), keine Songs.</p><p><strong>XP:</strong> 10 pro richtig platzierter Karte, 5 pro richtig geratenem Titel oder Interpreten, 50 für einen Sieg, 25 für einen neuen Highscore, 100 für die Tägliche Challenge plus 10 pro Serientag (bis 7). Das Level steigt mit wachsendem Bedarf (100 XP für Level 2, danach je 40 mehr). XP gibt es in allen Spielarten (Solo, Koop, Mehrspieler, Endlos, Blitz, Sudden Death, Lernrunde, Jahr-Schätzen, Interpret-Quiz); die Werte der beiden Quiz-Spielarten stehen unter „Spielarten und Handicap“. Alles wird nur lokal gespeichert. Tutorial-Runden zählen nicht.</p></div></details><details class="rules-sec" ><summary>🎯 Spielarten und Handicap</summary><div class="rules-body"><p><strong>Jahr-Schätzen</strong> (Mehrspieler, lokal oder online): Zu jedem Song tippen alle ein Jahr. Lokal gibst du das Gerät reihum weiter, online tippen alle gleichzeitig. Die kleinste Abweichung gewinnt die Runde: 3 / 2 / 1 Punkte für die drei Besten (gleiche Abweichung teilt sich den Platz), Volltreffer +2 Punkte. <strong>Interpret-Quiz</strong> (Solo, reihum oder online): nur den Interpreten raten, per Freitext (mit Toleranz bei Schreibweise) oder mit 4 Auswahlmöglichkeiten. Richtig gibt 1 Punkt, reihum wechseln die Spieler pro Song. Beide Spielarten laufen über die gewählte Rundenzahl (3 bis 30), zählen für XP (Jahr-Schätzen: 3 XP pro Punkt, Interpret-Quiz: 10 XP pro richtigem Interpreten, dazu 50 XP für den Sieg bei mehreren Spielern), aber nicht für die Statistik, und haben keine Tokens. <strong>Handicap-Modus</strong> (Klassisch, Mehrspieler; dazu pro Spieler „Weitere Handicaps“: eigenes Zeitlimit [Spiel-Standard, kein Limit, halbe Zeit, 20 s, 40 s], Jahre auf der eigenen Zeitleiste verdeckt, +1 bis +3 Karten bis zum Sieg, −2 bis +2 Start-Tokens, kein Überspringen und Kaufen, 1 Extra-Startkarte): Jeder Spieler hat seine eigene Schwierigkeit (Normal, Profi, Experte). Profi zählt ×1,5, Experte ×2 für Ziel und Wertung.</p></div></details><details class="rules-sec" ><summary>💬 Schnellchat, Diagnose und Zugänglichkeit</summary><div class="rules-body"><p><strong>Schnellchat:</strong> In Online-Räumen gibt es unten links einen 💬-Button mit vorgefertigten Sätzen. Alle sehen die Nachricht kurz mit deinem Namen (höchstens eine alle 1,5 Sekunden). <strong>Beitreten:</strong> Füge den kopierten Einladungstext des Hosts ein, dann werden Raumname und Passwort ausgefüllt. <strong>Verbindungsdiagnose</strong> (Einstellungen oder Beitreten-Seite) prüft Internet, Vermittlungsserver, Netzwerkart, Mikrofon, Kopieren und Spotify. <strong>Zugänglichkeit:</strong> Farbsehschwäche-Voreinstellungen, Screenreader-Modus und Linkshändermodus (alle standardmäßig aus) sowie „Automatisch hell/dunkel“ nach System oder Uhrzeit unter Themes.</p></div></details><details class="rules-sec" ><summary>🎓 Lernrunde und Auswertungen</summary><div class="rules-body"><p><strong>Auswertung:</strong> Ab dem Update merkt sich Chronohit lokal im Browser jede platzierte Karte (Song, richtig/falsch, Tag). Daraus entstehen in den Statistiken die Trefferquote pro Epoche und Genre mit schwächster Epoche/Genre (ab 5 Karten pro Gruppe), ein Verlaufsdiagramm der letzten 30 Tage (Trefferquote, richtige oder gespielte Karten, XP) und ein Kalender mit Spieltagen und Challenge-Tagen. Bei Online-Spielen als Gast werden Karten nicht mitgeschrieben, nur beim Host und lokal.</p><p><strong>Lernrunde:</strong> 10 Karten, bei denen Songs mit vielen bisherigen Fehlern häufiger vorkommen. Ohne bisherige Daten sind es zufällige Songs. Die Runde wird nicht gespeichert, zählt aber für XP und Statistik.</p></div></details><details class="rules-sec" ><summary>🎧 Playlist</summary><div class="rules-body"><p>Im Hauptmenü listet die Playlist alle Lieder mit Jahr, Sprache und Genre/Kategorie. Du kannst suchen, über „Filter“ nach Sprache, Genre, Jahrzehnt und Kategorien filtern, nach Titel, Interpret oder Jahr sortieren und mit ▶ die 30-Sekunden-Vorschau anspielen.</p></div></details><details class="rules-sec" ><summary>🎨 Themes und Darstellung</summary><div class="rules-body"><p>In den Einstellungen wählst du ein Theme. Jahreszeiten (Frühling bis Winter) und Feiertage (Valentinstag, Ostern, Halloween, Weihnachten, Silvester) sind aufklappbare Gruppen mit Hintergrund-Deko; Feiertags-Themes haben eigene Sounds. „Jahreszeiten-Themes nach Datum“ schaltet beim Start automatisch auf das passende Theme (Aus / Nur Feiertage / Feiertage &amp; Jahreszeiten). „Benutzerdefiniert“ erlaubt eigene Farben, Schrift und Stil. „Animationen reduzieren“ schaltet Deko-Animationen, Feuerwerk und Flattertiere aus. Unter „Darstellung &amp; Barrierefreiheit“ färbt „Kartenrückseiten nach Jahrzehnt“ aufgedeckte Karten nach ihrem Jahrzehnt (reine Optik, keine Spielhilfe).</p></div></details><details class="rules-sec" ><summary>⌨️ Bedienung per Tastatur</summary><div class="rules-body"><p>Wenn aktiviert: ←/→ oder A/D wählen die Lücke, Enter/Leertaste bestätigt (platzieren, aufdecken, weiter), Rücktaste ändert die Position, S überspringt, B kauft, P pausiert (nicht online). <strong>Esc</strong> geht in jedem Menü eine Ebene zurück.</p></div></details></div></div>
+    <div class="menu-card"><div class="body"><details class="rules-sec" open><summary>🎵 Spielablauf</summary><div class="rules-body"><p><strong>1. Abspielen:</strong> Du ziehst eine Karte und klickst auf die Schallplatte. Der Song spielt unsichtbar im Hintergrund über Spotify, du siehst weder Titel noch Cover. Nochmal klicken pausiert/setzt fort. Mit Spotify Premium läuft der ganze Song, sonst die 30-Sekunden-Vorschau. Wird die Steuerung blockiert (z. B. durch einen Adblocker), springt das Spiel auf einen sichtbaren, zugeschnittenen Player um. Der Button ⟳ an der Schallplatte lädt den Player neu.</p><p style="font-size:calc(13px * var(--font-scale));">Hinweis: Bei „Bailando“ (Enrique Iglesias) lag nur ein Album-Link vor – dort öffnet sich stattdessen eine Spotify-Suche in neuem Tab.</p><p><strong>2. Platzieren:</strong> Ohne das Jahr zu kennen, klickst du auf die Lücke deiner Zeitleiste, die du für chronologisch richtig hältst (früher links, später rechts). Bis zum Aufdecken kannst du die Position noch ändern.</p><p><strong>3. Aufdecken:</strong> Liegt die Karte richtig, bleibt sie liegen und zählt einen Punkt (die Startkarte zählt nicht). Liegt sie falsch, kommt sie auf den Ablagestapel und bleibt dauerhaft draußen. Danach geht es mit „Weiter“ zur nächsten Karte.</p></div></details><details class="rules-sec" ><summary>🎯 Schwierigkeit</summary><div class="rules-body"><p><strong>Normal:</strong> nur die Position zählt.<br><strong>Profi:</strong> Titel &amp; Interpret müssen vor dem Aufdecken zusätzlich stimmen.<br><strong>Experte:</strong> zusätzlich das Erscheinungsjahr, mit einstellbarer Toleranz von bis zu ±5 Jahren.</p><p>Verglichen wird großzügig: Groß-/Kleinschreibung, Akzente, Umlaut-Schreibweisen und Tippfehler werden verziehen.</p></div></details><details class="rules-sec" ><summary>🪙 Chrono-Tokens</summary><div class="rules-body"><p>Wenn aktiviert (außerhalb von Koop), sind Start- und Maximalwert einstellbar.</p><p>&bull; <strong>Song unbekannt?</strong> Für 1 Token wirfst du die aktuelle Karte ab und ziehst eine neue, ohne zu platzieren.<br>&bull; <strong>Karte kaufen:</strong> Für 3 Tokens wird die nächste gezogene Karte garantiert richtig einsortiert, ohne Risiko.<br>&bull; <strong>Bonus-Token:</strong> Tippst du Titel und Interpret richtig ein, gibt es einen weiteren Token (in jedem Schwierigkeitsgrad).</p><p><strong>Seltene Spezialkarten</strong> (optional, Schalter beim Spiel-Erstellen): Beim Ziehen ist etwa jede 12. Karte eine Spezialkarte, die nur für diesen Song gilt. <em>🃏 Joker:</em> Du wählst zwei Positionen, der Song zählt, wenn er in eine davon passt. <em>⏸️ Zeit anhalten:</em> In diesem Zug läuft kein Zeitlimit (wird nur mit Zeitlimit gezogen).</p><p><strong>Hinweisshop</strong> (optional, nicht im Koop): Mit Tokens kaufst du über den Button „Hinweisshop“ einen Hinweis zur aktuellen Karte: erst nach dem Abspielen des Songs, bis zum Aufdecken, auch nach dem Platzieren. Pro Karte ist nur 1 Hinweis möglich. <em>1 Token:</em> Sprache &amp; Genre oder die Anfangsbuchstaben von Titel und Interpret. <em>2 Tokens:</em> das Jahrzehnt oder ein Jahresfenster von 11 Jahren (±5 um die Mitte), in dem das Jahr liegt.</p><p>Tastenkürzel: S = Überspringen, B = Kaufen.</p></div></details><details class="rules-sec" ><summary>🎮 Spielmodi</summary><div class="rules-body"><p><strong>Solo:</strong> Du spielst allein auf eine einstellbare Zielkartenzahl.</p><p><strong>Koop:</strong> Ihr startet gemeinsam mit einer festen Zahl Chrono-Tokens (1–10) und einer Startkarte. Jede falsch platzierte Karte kostet einen Token. Skip/Kaufen gibt es nicht, die Tokens sind eure gemeinsamen Leben. Bei 0 Tokens vor dem Ziel habt ihr verloren, sonst gewonnen.</p><p><strong>Mehrspieler:</strong> Jeder Spieler hat eine eigene Startkarte und Zeitleiste, ihr spielt reihum. Wer das Ziel erreicht, gewinnt; ist der Stapel leer, entscheidet die Zahl richtiger Karten (Gleichstand möglich).</p></div></details><details class="rules-sec" ><summary>📣 Chronohit!-Einspruch (Mehrspieler mit Tokens)</summary><div class="rules-body"><p>Bevor eine Karte aufgedeckt wird, kann ein Gegner mit einem Token „Chronohit!“ rufen und die Lücke wählen, wo die Karte seiner Meinung nach hingehört. Liegt der aktive Spieler falsch und der Rufer richtig, bekommt der Rufer die Karte. Der eingesetzte Token ist immer weg. Pro Zug zählt nur der erste Einspruch.</p><p><strong>Einspruchsfenster:</strong> Entweder beendet der aktive Spieler (online auch der Host) das Fenster per Klick, oder es schließt automatisch nach 5 bzw. 10 Sekunden oder (mit Zeitlimit) mit der Restzeit, mindestens 5 Sekunden. Ruft jemand, hat der Rufer mindestens 5 Sekunden für die Lückenwahl. Ohne gewählte Lücke wird der Ruf zurückgenommen und der Token kommt zurück.</p></div></details><details class="rules-sec" ><summary>🎲 Zufallsereignisse (Mehrspieler)</summary><div class="rules-body"><p>Optional, standardmäßig aus. Beim Spielerwechsel passiert mit etwa 22 % Wahrscheinlichkeit etwas: <strong>Doppelrunde</strong> (der Spieler ist zweimal hintereinander dran) oder <strong>Kartentausch</strong> (zwei Spieler tauschen je eine zufällige Karte, nie die Startkarte; sie werden nach Jahr neu einsortiert). Ein Banner zeigt das Ereignis an.</p></div></details><details class="rules-sec" ><summary>⚡ Solo-Varianten</summary><div class="rules-body"><p><strong>Klassisch:</strong> bis zum Ziel.<br><strong>Endlos:</strong> kein Ziel, die Runde endet nach einer einstellbaren Zahl Fehler (Leben, Standard 3). Dein Highscore ist die Zahl richtiger Karten.<br><strong>Blitz:</strong> x Sekunden (30–180) für so viele richtige Karten wie möglich. Die Uhr startet beim Abspielen der ersten Karte; Abspielen, Aufdecken und Weiter laufen automatisch. Nur die Position zählt, ohne Titel/Interpret und ohne Tokens.<br><strong>Sudden Death:</strong> ein Fehler und du bist raus.</p><p>Highscores werden pro Variante (Blitz pro Dauer) gespeichert.</p></div></details><details class="rules-sec" ><summary>⏱ Zeitlimit pro Zug</summary><div class="rules-body"><p>Optional. Pro Zug bleibt nur begrenzte Zeit zum Platzieren (und in Profi/Experte oder für den Bonus zum Raten von Titel/Interpret). Die Zeit läuft ab dem Start des Songs. Läuft sie ab, gilt der Zug als verloren: Die Karte wird verworfen und zählt als falsch (im Koop kostet das einen Token).</p></div></details><details class="rules-sec" ><summary>🎼 Songauswahl und Filter</summary><div class="rules-body"><p>Beim Erstellen eines Spiels filterst du die Songs nach <strong>Sprache</strong>, <strong>Genre</strong> (ein Song kann mehrere haben, ein Treffer genügt), <strong>Jahrzehnt</strong> und <strong>Kategorien</strong> (z. B. Filmmusik oder Balladen; „Sonstige“ sind Songs ohne besondere Kategorie). Die Zahlen an den Chips zeigen, wie viele Songs es gibt. Die Reihenfolge der Filtergruppen lässt sich ändern.</p></div></details><details class="rules-sec" ><summary>🌐 Online spielen</summary><div class="rules-body"><p>Über „Spiel hosten / beitreten“ eröffnet ein Host einen Raum (Raumname, optional Passwort), Mitspieler treten bei, Zuschauer können zusehen. Der Host steuert Einstellungen und Start. Im Online-Solo und -Koop dürfen alle Teilnehmer gleichzeitig tippen (und raten). Im <strong>Team-Modus</strong> (Mehrspieler online) bilden die Spieler Teams mit gemeinsamer Zeitleiste und gemeinsamen Tokens; jedes Teammitglied darf tippen und raten, die Teams sind reihum dran. Die Teams wählst du in der Lobby selbst, der Host kann sie ändern oder zufällig verteilen. Ein <strong>Rematch</strong> startet nur, wenn alle verbundenen Mitspieler zustimmen; wer ablehnt, bricht die Anfrage ab.</p></div></details><details class="rules-sec" ><summary>💾 Spielstände</summary><div class="rules-body"><p>Beim Erstellen eines Spiels wählst du einen von 4 Speicherplätzen und einen Namen. Über den 💾-Button im Spiel speicherst du jederzeit in diesen Slot. Über „Spiel laden“ machst du dort weiter.</p></div></details><details class="rules-sec" ><summary>📜 Spielende, Chronik und Statistik</summary><div class="rules-body"><p>Am Ende siehst du das Ergebnis (bei Varianten mit Highscore-Vergleich). „Finale Zeitleiste ansehen“ zeigt alle Karten mit einem ▶ darunter, das die 30-Sekunden-Vorschau spielt. Die <strong>Spielchronik</strong> listet jeden Zug samt dem, was geraten wurde (Platzierung, Titel, Interpret, Jahr). Statistiken und der Jahresrückblick im Hauptmenü zählen deine Runden; Tutorial-Runden zählen nicht.</p></div></details><details class="rules-sec" ><summary>📅 Tägliche Challenge, Level und XP</summary><div class="rules-body"><p><strong>Tägliche Challenge:</strong> Jeden Tag gibt es 10 feste Karten (aus dem Datum abgeleitet, für alle mit derselben Songliste gleich), ohne Tokens. Dein Ergebnis ist x/10. Du darfst beliebig oft spielen, aber nur der erste Versuch des Tages zählt für XP und Serie. Der Teilen-Text zeigt nur Datum und Farbquadrate (🟩 richtig, 🟥 falsch), keine Songs.</p><p><strong>XP:</strong> 10 pro richtig platzierter Karte, 5 pro richtig geratenem Titel oder Interpreten, 50 für einen Sieg, 25 für einen neuen Highscore, 100 für die Tägliche Challenge plus 10 pro Serientag (bis 7). Das Level steigt mit wachsendem Bedarf (100 XP für Level 2, danach je 40 mehr). XP gibt es in allen Spielarten (Solo, Koop, Mehrspieler, Endlos, Blitz, Sudden Death, Lernrunde, Jahr-Schätzen, Interpret-Quiz); die Werte der beiden Quiz-Spielarten stehen unter „Spielarten und Handicap“. Alles wird nur lokal gespeichert. Tutorial-Runden zählen nicht.</p></div></details><details class="rules-sec" ><summary>🎯 Spielarten und Handicap</summary><div class="rules-body"><p><strong>Jahr-Schätzen</strong> (Mehrspieler, lokal oder online): Zu jedem Song tippen alle ein Jahr. Lokal gibst du das Gerät reihum weiter, online tippen alle gleichzeitig. Die kleinste Abweichung gewinnt die Runde: 3 / 2 / 1 Punkte für die drei Besten (gleiche Abweichung teilt sich den Platz), Volltreffer +2 Punkte. <strong>Interpret-Quiz</strong> (Solo, reihum oder online): nur den Interpreten raten, per Freitext (mit Toleranz bei Schreibweise) oder mit 4 Auswahlmöglichkeiten. Richtig gibt 1 Punkt, reihum wechseln die Spieler pro Song. Beide Spielarten laufen über die gewählte Rundenzahl (3 bis 30), zählen für XP (Jahr-Schätzen: 3 XP pro Punkt, Interpret-Quiz: 10 XP pro richtigem Interpreten, dazu 50 XP für den Sieg bei mehreren Spielern), aber nicht für die Statistik, und haben keine Tokens. <strong>Handicap-Modus</strong> (Klassisch, Mehrspieler; dazu pro Spieler „Weitere Handicaps“: eigenes Zeitlimit [Spiel-Standard, kein Limit, ¼ bis doppelte Zeit oder feste Zeiten von 10 bis 90 s], Jahre auf der eigenen Zeitleiste verdeckt, −3 bis +3 Karten bis zum Sieg, −2 bis +2 Start-Tokens, kein Überspringen und Kaufen, 1 Extra-Startkarte): Jeder Spieler hat seine eigene Schwierigkeit (Normal, Profi, Experte). Es gibt keine Punktewertung und kein Unentschieden: Jeder Spieler hat sein eigenes Ziel (Spielziel plus oder minus „Karten bis zum Sieg“), es gewinnt, wer sein Ziel zuerst erreicht. Die Rangfolge richtet sich nach dem Fortschritt in Prozent des eigenen Ziels, danach nach weniger Fehlern. Wer es schwerer hat (Profi, Experte, erschwerende Handicaps), bekommt mehr XP: Profi +50 %, Experte +100 % und je erschwerendes Handicap +10 % auf die XP der richtigen Karten.</p></div></details><details class="rules-sec" ><summary>💬 Schnellchat, Diagnose und Zugänglichkeit</summary><div class="rules-body"><p><strong>Schnellchat:</strong> In Online-Räumen gibt es unten links einen 💬-Button mit vorgefertigten Sätzen. Alle sehen die Nachricht kurz mit deinem Namen (höchstens eine alle 1,5 Sekunden). <strong>Beitreten:</strong> Füge den kopierten Einladungstext des Hosts ein, dann werden Raumname und Passwort ausgefüllt. <strong>Verbindungsdiagnose</strong> (Einstellungen oder Beitreten-Seite) prüft Internet, Vermittlungsserver, Netzwerkart, Mikrofon, Kopieren und Spotify. <strong>Zugänglichkeit:</strong> Farbsehschwäche-Voreinstellungen, Screenreader-Modus und Linkshändermodus (alle standardmäßig aus) sowie „Automatisch hell/dunkel“ nach System oder Uhrzeit unter Themes.</p></div></details><details class="rules-sec" ><summary>🎓 Lernrunde und Auswertungen</summary><div class="rules-body"><p><strong>Auswertung:</strong> Ab dem Update merkt sich Chronohit lokal im Browser jede platzierte Karte (Song, richtig/falsch, Tag). Daraus entstehen in den Statistiken die Trefferquote pro Epoche und Genre mit schwächster Epoche/Genre (ab 5 Karten pro Gruppe), ein Verlaufsdiagramm der letzten 30 Tage (Trefferquote, richtige oder gespielte Karten, XP) und ein Kalender mit Spieltagen und Challenge-Tagen. Bei Online-Spielen als Gast werden Karten nicht mitgeschrieben, nur beim Host und lokal.</p><p><strong>Lernrunde:</strong> 10 Karten, bei denen Songs mit vielen bisherigen Fehlern häufiger vorkommen. Ohne bisherige Daten sind es zufällige Songs. Die Runde wird nicht gespeichert, zählt aber für XP und Statistik.</p></div></details><details class="rules-sec" ><summary>🎧 Playlist</summary><div class="rules-body"><p>Im Hauptmenü listet die Playlist alle Lieder mit Jahr, Sprache und Genre/Kategorie. Du kannst suchen, über „Filter“ nach Sprache, Genre, Jahrzehnt und Kategorien filtern, nach Titel, Interpret oder Jahr sortieren und mit ▶ die 30-Sekunden-Vorschau anspielen.</p></div></details><details class="rules-sec" ><summary>🎨 Themes und Darstellung</summary><div class="rules-body"><p>In den Einstellungen wählst du ein Theme. Jahreszeiten (Frühling bis Winter) und Feiertage (Valentinstag, Ostern, Halloween, Weihnachten, Silvester) sind aufklappbare Gruppen mit Hintergrund-Deko; Feiertags-Themes haben eigene Sounds. „Jahreszeiten-Themes nach Datum“ schaltet beim Start automatisch auf das passende Theme (Aus / Nur Feiertage / Feiertage &amp; Jahreszeiten). „Benutzerdefiniert“ erlaubt eigene Farben, Schrift und Stil. „Animationen reduzieren“ schaltet Deko-Animationen, Feuerwerk und Flattertiere aus. Unter „Darstellung &amp; Barrierefreiheit“ färbt „Kartenrückseiten nach Jahrzehnt“ aufgedeckte Karten nach ihrem Jahrzehnt (reine Optik, keine Spielhilfe).</p></div></details><details class="rules-sec" ><summary>⌨️ Bedienung per Tastatur</summary><div class="rules-body"><p>Wenn aktiviert: ←/→ oder A/D wählen die Lücke, Enter/Leertaste bestätigt (platzieren, aufdecken, weiter), Rücktaste ändert die Position, S überspringt, B kauft, P pausiert (nicht online). <strong>Esc</strong> geht in jedem Menü eine Ebene zurück.</p></div></details></div></div>
     <div class="menu-actions">
       <button class="btn-ghost" onclick="state.tutRules=false; render()">← Zurück zum Tutorial</button>
     </div>
@@ -4984,14 +5255,14 @@ function startCreateWizard(online){
   state.screen = "create";
   render();
 }
-// Schritte: Slot, Modus, (Spieler nur bei Mehrspieler), Einstellungen, Songs
+// Schritte: Slot, Modus, Einstellungen, (Spieler nur bei lokalem Mehrspieler), Songs
 function wizardStepKeys(){
   const keys = state.wizard.quick != null ? [] : ["slot"];
   if(state.wizard.online && state.wizard.quick == null) keys.push("online");
   keys.push("mode");
-  if(state.wizard.mode === "multiplayer" && !state.wizard.online) keys.push("players");
   const w = state.wizard;
   if(!(w.mode === "solo" && w.variant === "blitz" && !w.online) && !(w.game && w.game !== "classic")) keys.push("settings");   // Blitz: alles Nötige steht schon beim Modus
+  if(w.mode === "multiplayer" && !w.online) keys.push("players");   // Spieler nach den Einstellungen, damit Handicaps vorher feststehen
   keys.push("songs");
   return keys;
 }
@@ -5124,8 +5395,10 @@ function wizardStepMaxTokens(delta){
   render();
 }
 function wizardStepTarget(delta){
-  const t = state.wizard.target + delta;
-  if(t < 5 || t > 15) return;
+  const big = !!prefs.bigTarget, cur = state.wizard.target;
+  const step = (big && ((delta > 0 && cur >= 25) || (delta < 0 && cur > 25))) ? delta * 5 : delta;   // ab 25 in 5er-Schritten
+  const t = cur + step;
+  if(t < 5 || t > (big ? 100 : 25)) return;
   state.wizard.target = t; render();
 }
 function wizardToggleTimer(){ state.wizard.timer = !state.wizard.timer; render(); }
@@ -5324,7 +5597,7 @@ function renderWizardStep3(n){
             <div class="val">${w.target}</div>
             <button onclick="wizardStepTarget(1)">+</button>
           </div>`)}
-        ${w.mode === 'multiplayer' && !w.teams ? infoRow('w-handicap', 'Handicap-Modus', 'Jeder Spieler hat seine eigene Schwierigkeit (Normal, Profi, Experte). Schwerere Stufen zählen mehr: Profi ×1,5, Experte ×2. Das gilt für Ziel und Wertung. Lokal wählst du die Stufe im Spieler-Schritt, online in der Lobby.',
+        ${w.mode === 'multiplayer' && !w.teams ? infoRow('w-handicap', 'Handicap-Modus', 'Jeder Spieler hat seine eigene Schwierigkeit (Normal, Profi, Experte) und weitere Handicaps, zum Beispiel ein eigenes Kartenziel. Es gewinnt, wer sein Ziel zuerst erreicht, ohne Punktewertung. Wer es schwerer hat, bekommt mehr XP. Lokal stellst du das im Spieler-Schritt ein (der kommt nach den Einstellungen), online in der Lobby.',
           `<div class="switch ${w.handicap ? 'on' : ''}" onclick="state.wizard.handicap = !state.wizard.handicap; render()"><div class="knob"></div></div>`) : ''}
         ${w.online && w.mode === 'multiplayer' ? infoRow('w-teams', 'Team-Modus', 'Mehrere Spieler bilden ein Team mit gemeinsamer Zeitleiste und gemeinsamen Tokens. Jedes Teammitglied darf tippen und raten, die Teams sind reihum dran. Die Teams wählen die Spieler in der Lobby selbst, der Host kann sie ändern oder zufällig verteilen.',
           `<select class="dropdown" onchange="state.wizard.teams = +this.value; render()">${[[0, 'Aus (jeder für sich)'], [2, '2 Teams'], [3, '3 Teams'], [4, '4 Teams']].map(x => `<option value="${x[0]}" ${(w.teams || 0) === x[0] ? 'selected' : ''}>${x[1]}</option>`).join('')}</select>`) : ''}
@@ -5406,7 +5679,7 @@ function renderWizardPlayers(n){
       ${custom ? `
         <button class="btn-ghost btn-small icon-btn" onclick="wizardMovePlayer(${i},-1)" ${i===0?'disabled':''} aria-label="Nach oben">▲</button>
         <button class="btn-ghost btn-small icon-btn" onclick="wizardMovePlayer(${i},1)" ${i===w.playerNames.length-1?'disabled':''} aria-label="Nach unten">▼</button>` : ``}
-    </div>${w.handicap ? hcEditorHtml(hcClean((w.playerHc || [])[i]), `hcSetLocal(${i}, `, w.hcOpen === i) : ``}`).join('');
+    </div>${w.handicap ? hcEditorHtml(hcClean((w.playerHc || [])[i]), `hcSetLocal(${i}, `, w.hcOpen === i, w.timer ? w.turnLimit : 0) : ``}`).join('');
   return `
     <div class="menu-card">
       <h3>${n}. Spieler</h3>
@@ -5586,9 +5859,9 @@ function renderPlayersDrawer(){
       <div class="pp ${isCur ? 'current' : ''} ${expanded ? 'open' : ''}" id="pp-${i}">
         <div class="pp-head" ${isCur ? '' : `onclick="togglePlayerPanel(${i})"`}>
           <span class="pp-order">${i+1}</span>
-          <span class="pp-name">${esc(v.name)}</span>
+          <span class="pp-name">${esc(v.name)}</span>${state.online ? achChipsHtml(v.name) : ``}
           ${isCur ? `<span class="pp-now">am Zug</span>` : ``}
-          <span class="pp-stats">${v.correctCount}/${s.target}${s.tokens ? ` · ${v.tokens} ${icon('token')}` : ''}</span>
+          <span class="pp-stats">${v.correctCount}/${playerTarget(i)}${s.tokens ? ` · ${v.tokens} ${icon('token')}` : ''}</span>
           ${isCur ? `` : `<span class="pp-chevron">›</span>`}
         </div>
         ${isCur ? `` : `<div class="pp-body">${cards || `<div class="pp-empty">Noch keine Karten</div>`}</div>`}
@@ -5804,7 +6077,7 @@ function renderGame(){
 
   app.innerHTML = `
     <div class="topbar">
-      <div class="stat">Richtig <b>${state.correctCount} / ${s.target >= 9999 ? '∞' : s.target}</b></div>
+      <div class="stat">Richtig <b>${state.correctCount} / ${s.target >= 9999 ? '∞' : playerTarget(state.currentPlayer || 0)}</b></div>
       ${s.variant === 'blitz' ? `<div class="stat">Zeit <b id="blitz-t">${state.blitzEnd ? Math.max(0, Math.ceil((state.blitzEnd - Date.now()) / 1000)) : s.blitzSec} s</b></div>` : `<div class="stat">Stapel <b>${deckSize()}</b></div>`}
       ${s.lives ? `<div class="stat">Fehler <b>${state.wrongCount} / ${s.lives}</b></div>` : ``}
       ${s.tokens ? `<div class="stat">Chrono <div class="token-dots">${tokenDots}</div></div>` : ``}
@@ -5828,19 +6101,7 @@ function renderGame(){
 
     ${renderPlayersDrawer()}
 
-    ${state.showExitDialog ? `
-      <div class="modal-backdrop" onclick="if(event.target===this) closeExitDialog()">
-        <div class="modal-box">
-          <h3>Spiel verlassen?</h3>
-          <p>${online ? (NET.role === 'host' ? 'Online-Raum: Beim Verlassen wird der Raum für alle geschlossen. „Speichern“ sichert den Stand lokal — du kannst ihn später unter „Spiel laden“ wieder hosten.' : 'Du kannst jederzeit mit Raumname, Passwort und deinem Namen zurückkehren.') : 'Du hast eine laufende Runde. Was möchtest du tun?'}</p>
-          <div class="modal-actions">
-            ${online && NET.role === "guest" ? `<button class="btn-danger" onclick="netLeave()">Raum verlassen</button>` : `<button class="btn-primary" onclick="saveAndMenu()">Speichern und zum Menü</button>
-            <button class="btn-danger" onclick="discardAndMenu()">Ohne Speichern zum Menü</button>`}
-            <button class="btn-ghost" onclick="closeExitDialog()">Zurück zum Spiel</button>
-          </div>
-        </div>
-      </div>
-    ` : ``}
+    ${exitDialogHtml()}
 
     ${hintModalHtml(canAct)}
 
@@ -5897,7 +6158,12 @@ function isMultiRound(){ return isMulti() && state.players.length > 1; }
 
 function rankedPlayers(){
   const list = state.players.map((_, i) => ({ i, v: playerView(i) }));
-  const sc = r => state.settings.handicap ? r.v.correctCount * (HC_MULT[(state.players[r.i] || {}).diff || "normal"] || 1) : r.v.correctCount;
+  if(state.settings.handicap){
+    list.sort((a, b) => hcCompare(a.i, b.i));
+    list.forEach((r, k) => { r.pos = k + 1; });
+    return list;
+  }
+  const sc = r => r.v.correctCount;
   list.forEach(r => { r.pos = 1 + list.filter(o => sc(o) > sc(r)).length; });
   list.sort((a, b) => (sc(b) - sc(a)) || (a.v.wrongCount - b.v.wrongCount) || (a.i - b.i));
   return list;
@@ -5952,8 +6218,8 @@ function renderEnd(){
     const rows = ranking.map(r => `
       <div class="rank-row ${winners.includes(r.i) ? 'winner' : ''}">
         <span class="rank-pos">${r.pos}.</span>
-        <span class="rank-name">${esc(r.v.name)}</span>
-        <span class="rank-score"><b>${r.v.correctCount}</b> / ${s.target} · ${r.v.wrongCount} falsch</span>
+        <span class="rank-name">${esc(r.v.name)}</span>${state.online ? achChipsHtml(r.v.name) : ``}
+        <span class="rank-score"><b>${r.v.correctCount}</b> / ${playerTarget(r.i)} · ${r.v.wrongCount} falsch</span>
       </div>`).join('');
     app.innerHTML = `
       <div class="brand">
@@ -6137,6 +6403,7 @@ function render(){
   else if(state.screen === "playlist") renderPlaylist();
   else if(state.screen === "settings") renderSettings();
   else if(state.screen === "stats") renderStats();
+  else if(state.screen === "achievements") renderAch();
   else if(state.screen === "recap") renderRecap();
   else if(state.screen === "online") renderOnlineHub();
   else if(state.screen === "join") renderJoin();
@@ -6148,6 +6415,7 @@ function render(){
   else if(state.screen === "timeline") renderTimelineOnly();
 
   if(state.screen === "end") maybeRecordGameEnd();
+  try{ achObserve(); }catch(e){}
   confettiCheck();
   updateDocumentTitle();
   updateQuickMenu();
@@ -6177,8 +6445,10 @@ function toggleGenre(key){
   render(); saveState();
 }
 function stepTarget(delta){
-  const t = state.settings.target + delta;
-  if(t < 5 || t > 15) return;
+  const big = !!prefs.bigTarget, cur = state.settings.target;
+  const step = (big && ((delta > 0 && cur >= 25) || (delta < 0 && cur > 25))) ? delta * 5 : delta;
+  const t = cur + step;
+  if(t < 5 || t > (big ? 100 : 25)) return;
   state.settings.target = t;
   render(); saveState();
 }
@@ -6643,7 +6913,7 @@ function turnLimitMs(){
   if(state.special && state.special.type === "freeze") return 0;   // Spezialkarte „Zeit anhalten“
   let t = state.settings.turnLimit > 0 ? state.settings.turnLimit : 0;
   const m = hcCur().time;   // Handicap: Zeitlimit pro Spieler
-  if(m === "off") t = 0; else if(m === "half") t = t > 0 ? Math.max(5, Math.round(t / 2)) : 0; else if(m === "s20") t = 20; else if(m === "s40") t = 40;
+  if(m === "off") t = 0; else if(m in HC_TIME_MULT) t = t > 0 ? Math.max(5, Math.round(t * HC_TIME_MULT[m])) : 0; else if(/^s\d+$/.test(m)) t = +m.slice(1);
   return t > 0 ? t * 1000 : 0;
 }
 function turnTimerActive(){
@@ -6853,9 +7123,9 @@ function netSetDiff(i, v){
   if(!["normal", "pro", "expert"].includes(v)) return;
   if(NET.role === "host"){ const q = NET.seats[i]; if(q){ q.diff = v; netBroadcastLobby(); netUiUpdate(); } } else netSendHost({ t:"diff", v });
 }
-function lobbyHcHtml(host, i, x){
+function lobbyHcHtml(host, i, x, g){
   const me = netSameName(x.name, NET.myName), can = !NET.started && (host || me), h = hcClean(x.hc);
-  if(can) return hcEditorHtml(h, `netSetHc(${i}, `, NET.hcOpen === i);
+  if(can) return hcEditorHtml(h, `netSetHc(${i}, `, NET.hcOpen === i, g || 0);
   return hcCount(h) ? `<div class="hc-sum">${esc(hcSummary(h))}</div>` : ``;
 }
 function netSetHc(i, k, v){
@@ -7463,6 +7733,7 @@ function maybeRecordGameEnd(){
   if(mode === "multiplayer" && state.online) mpWin(stats.games.multiplayer);
   hsRecord();
   xpAward();
+  try{ achOnGameEnd(); }catch(e){}
   const good = mode === "multiplayer" || state.won || (state.settings.variant && state.hsNew);
   sfx((state.daily || state.learn) ? ((state.correctCount || 0) >= 4 ? "win" : "turn") : (good ? "win" : "lose"), 0.7);
   if(good || ((state.daily || state.learn) && (state.correctCount || 0) >= 9)) confettiBurst("big");
@@ -7732,7 +8003,7 @@ document.addEventListener("click", e => {
 
 /* ============ DARSTELLUNG & BARRIEREFREIHEIT ============ */
 const PREFS_KEY = "chronohit_prefs";
-const PREF_DEFAULTS = { relayOnly: false, turnUrl: "", turnUser: "", turnPass: "", voiceChat: false, bigRooms: false, autoPlay: false, soundDesign: "theme", reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, colorMode: "off", screenReader: false, leftHand: false, decadeBacks: false, vibrate: false, autoTheme: "off", autoLight: "notizbuch", autoDark: "", autoSave: "turn", autoSaveSec: 30, seasonal: "off", fontFamily: "theme", cardSize: "m", density: "normal", autoNextSec: 0, keys: true, sound: true, soundVolume: 0.5, soundGroups: null };
+const PREF_DEFAULTS = { relayOnly: false, turnUrl: "", turnUser: "", turnPass: "", voiceChat: false, bigRooms: false, autoPlay: false, soundDesign: "theme", reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, colorMode: "off", screenReader: false, leftHand: false, decadeBacks: false, vibrate: false, bigTarget: false, autoTheme: "off", autoLight: "notizbuch", autoDark: "", autoSave: "turn", autoSaveSec: 30, seasonal: "off", fontFamily: "theme", cardSize: "m", density: "normal", autoNextSec: 0, keys: true, sound: true, soundVolume: 0.5, soundGroups: null };
 let prefs = { ...PREF_DEFAULTS, reduceMotion: false, soundGroups: defaultSoundGroups() };
 function loadPrefs(){
   let saved = {};
@@ -8205,7 +8476,7 @@ function netCleanSnapshot(s){
   const settings = {
     mode: ["solo", "coop", "multiplayer"].includes(set.mode) ? set.mode : "solo",
     difficulty: ["normal", "pro", "expert"].includes(set.difficulty) ? set.difficulty : "normal",
-    target: netInt(set.target, 10, 1, 50), tokens: !!set.tokens, hintShop: !!set.hintShop, specials: !!set.specials, maxTokens: netInt(set.maxTokens, 5, 0, 50),
+    target: netInt(set.target, 10, 1, 100), tokens: !!set.tokens, hintShop: !!set.hintShop, specials: !!set.specials, maxTokens: netInt(set.maxTokens, 5, 0, 50),
     startTokens: netInt(set.startTokens, 0, 0, 50), turnLimit: netInt(set.turnLimit, 0, 0, 600), playerCount: netInt(set.playerCount, 0, 0, NET_MAX_PLAYERS), challenge: !!set.challenge,
     challengeMode: ["manual", "5", "10", "limit"].includes(set.challengeMode) ? set.challengeMode : "manual",
     yearTol: netInt(set.yearTol, 0, 0, 5)
@@ -8450,6 +8721,7 @@ async function netHostHandle(entry, d){
     case "vjoin": case "vleave": netHostVoice(entry, d); break;
     case "chat": netHostChat(entry, d); break;
     case "ava": netHostAvatar(entry, d); break;
+    case "bdg": netHostBadges(entry, d); break;
     case "diff": netHostDiff(entry, d); break;
     case "hc": netHostHc(entry, d); break;
     case "qg": netHostQg(entry, d); break;
@@ -8754,7 +9026,7 @@ function netGuestConnect(first){
         case "lobby": {
           const seats = Array.isArray(d.seats) ? d.seats.slice(0, NET_MAX_PLAYERS).map(x => ({ name: netCleanName(x && x.name), connected: !!(x && x.connected), ready: !!(x && x.ready), team: netInt(x && x.team, 0, 0, 3), diff: ["normal", "pro", "expert"].includes(x && x.diff) ? x.diff : "normal", hc: hcClean(x && x.hc) })).filter(x => x.name) : [];
           const i = d.info || {};
-          NET.lobby = { seats, info: { room: String(i.room || "").slice(0, 60), mode: i.mode, difficulty: i.difficulty, target: netInt(i.target, 10, 1, 50), turnLimit: netInt(i.turnLimit, 0, 0, 600), tokens: !!i.tokens, resume: !!i.resume, ordered: !!i.ordered, teams: netInt(i.teams, 0, 0, 4), handicap: !!i.handicap, start: netInt(i.start, 0, 0, NET_MAX_PLAYERS), specs: Array.isArray(i.specs) ? i.specs.slice(0, 20).map(netCleanName).filter(Boolean) : [] } };
+          NET.lobby = { seats, info: { room: String(i.room || "").slice(0, 60), mode: i.mode, difficulty: i.difficulty, target: netInt(i.target, 10, 1, 100), turnLimit: netInt(i.turnLimit, 0, 0, 600), tokens: !!i.tokens, resume: !!i.resume, ordered: !!i.ordered, teams: netInt(i.teams, 0, 0, 4), handicap: !!i.handicap, start: netInt(i.start, 0, 0, NET_MAX_PLAYERS), specs: Array.isArray(i.specs) ? i.specs.slice(0, 20).map(netCleanName).filter(Boolean) : [] } };
           if(!state.online){ if(state.screen === "join" || state.screen === "online") state.screen = "lobby"; netUiUpdate(); }
           break;
         }
@@ -8762,6 +9034,7 @@ function netGuestConnect(first){
         case "state": netGuestApplyState(d); break;
         case "vlist": VC.ids = (Array.isArray(d.ids) ? d.ids : []).filter(x => VC_ID.test(String(x))).slice(0, 100); vcSync(); break;
         case "avatars": NET.avatars = avCleanMap(d.m); netUiUpdate(); break;
+        case "badges": NET.badges = achCleanMap(d.m); netUiUpdate(); break;
         case "chatmsg": chatShow(String(d.n || "").slice(0, 20), d.i); break;
         case "rmreq": if(!NET.spec && !netMyTurnGuard()){ NET.rmAsk = true; NET.rmMine = ""; render(); } break;
         case "rmend": NET.rmAsk = false; NET.rmMine = ""; if(d.msg) toast(String(d.msg).slice(0, 120)); render(); break;
@@ -8953,12 +9226,12 @@ function renderLobby(){
   const rows = seats.map((_, k) => (k + st) % nSeats).map((i, k) => { const x = seats[i]; return `
     <div class="lobby-row">
       ${avatarHtml(x)}
-      <span class="lobby-name">${info.ordered ? '<b>' + (k + 1) + '.</b> ' : ''}${esc(x.name)}${i === 0 ? ' <small>(Host)</small>' : ''}${netSameName(x.name, NET.myName) ? ' <small>(du)</small>' : ''}</span>
+      <span class="lobby-name">${info.ordered ? '<b>' + (k + 1) + '.</b> ' : ''}${esc(x.name)}${achChipsHtml(x.name)}${i === 0 ? ' <small>(Host)</small>' : ''}${netSameName(x.name, NET.myName) ? ' <small>(du)</small>' : ''}</span>
       ${info.handicap && !info.resume ? lobbyDiffHtml(host, i, x) : ``}
       ${info.teams && !info.resume ? lobbyTeamHtml(host, i, x, info.teams) : ``}
       ${!info.resume ? `<span class="lobby-ready" style="font-size:calc(13px * var(--font-scale)); color:${i === 0 || (x.connected && x.ready) ? 'var(--correct, #3ecf8e)' : 'var(--muted)'};">${i === 0 ? '✓ Bereit' : (x.connected && x.ready ? '✓ Bereit' : 'Wartet …')}</span>` : ``}
       ${host && !NET.started && !NET.resume && i > 0 ? `<button class="btn-ghost btn-small" onclick="netKick(${i})">Entfernen</button>` : ``}
-    </div>${info.handicap && !info.resume ? lobbyHcHtml(host, i, x) : ``}`; }).join("") + (info.specs || []).map(n => `<div class="lobby-row"><span class="net-dot"></span><span class="lobby-name">👁 ${esc(n)} <small>(Zuschauer)</small></span></div>`).join("");
+    </div>${info.handicap && !info.resume ? lobbyHcHtml(host, i, x, info.turnLimit) : ``}`; }).join("") + (info.specs || []).map(n => `<div class="lobby-row"><span class="net-dot"></span><span class="lobby-name">👁 ${esc(n)} <small>(Zuschauer)</small></span></div>`).join("");
   const connected = seats.filter(x => x.connected).length;
   const canStart = host && NET.status === "open" && (NET.resume ? true : (connected >= 2 && seats.every((x, i) => i === 0 || !x.connected || x.ready)));
   const statusText = NET.status === "opening" ? "Raum wird geöffnet … (Schlüssel wird berechnet)"
