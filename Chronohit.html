@@ -1369,6 +1369,11 @@
   .menu-actions .menu-split > button{ width:auto !important; margin:0; }
   .menu-actions .menu-split > .main{ flex:1 1 0; min-width:0; }
   .menu-actions .menu-split > .side{ flex:0 0 auto; padding-inline:14px; }
+  .stats-fold > summary{ cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center; }
+  .stats-fold > summary::-webkit-details-marker{ display:none; }
+  .stats-fold > summary::after{ content:"▾"; transition:transform .15s; }
+  .stats-fold[open] > summary::after{ transform:rotate(180deg); }
+  .stats-fold > summary h3{ margin:0; }
   .bar-wrap{ flex:1 1 auto; height:8px; background:var(--panel-2); border:1px solid var(--line); border-radius:99px; overflow:hidden; margin:0 10px; align-self:center; }
   .bar-wrap i{ display:block; height:100%; background:var(--accent); }
   .cal-grid{ display:grid; grid-template-columns:repeat(7, 1fr); gap:4px; }
@@ -3503,7 +3508,8 @@ function themeGroupsHtml(){
 const SETTINGS_SUBS = [["language","🌐 Sprache"],["themes","🎨 Themes"],["display","👁️ Darstellung & Barrierefreiheit"],["save","💾 Speichern"],["play","🎮 Spielen"],["sound","🔊 Sound"],["experimental","🧪 Experimentelles"]];
 function renderExperimentalCard(){
   return `<div class="menu-card"><h3>Experimentelles</h3>
-    <div class="setting-row"><div><div class="label">Mehrspieler bis zu 100 Leute</div><div class="hint">Erhöht die Spielerzahl in Online-Räumen von 10 auf 100. Gilt für Räume, die du hostest. Bei vielen Spielern kann das Spiel je nach Gerät und Verbindung des Hosts langsam werden. Standard: aus.</div></div>${prefSwitchHtml("bigRooms")}</div>
+    <div class="setting-row"><div><div class="label">Mehrspieler bis zu 100 Leute</div><div class="hint">Erhöht die Spielerzahl von 10 auf 100: im lokalen Mehrspieler-Spiel und in Online-Räumen, die du hostest. Bei vielen Spielern kann das Spiel je nach Gerät und Verbindung des Hosts langsam werden. Standard: aus.</div></div>${prefSwitchHtml("bigRooms")}</div>
+    <div class="setting-row"><div><div class="label">Sprachchat (online)</div><div class="hint">Zeigt in Online-Räumen unten links einen Button „Sprachchat beitreten“. Dabei sprechen alle Teilnehmenden direkt miteinander (Peer-to-Peer, ohne Server). Das Mikrofon wird erst nach deiner Freigabe aktiv. Die Teilnehmenden sehen dabei gegenseitig ihre IP-Adressen, und bei mehr als 6 bis 8 Sprechenden wird es instabil. Standard: aus.</div></div>${prefSwitchHtml("voiceChat")}</div>
   </div>`;
 }
 function renderSettings(){
@@ -3663,14 +3669,14 @@ function renderPlay(){
   app.innerHTML = `
     <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">Spielen</h1></div>
     <div class="menu-card"><div class="menu-actions">
-      <div class="menu-split"><button class="btn-primary main" onclick="startDaily()">📅 Tägliche Challenge${dailyBadge()}</button><button class="btn-ghost side" onclick="dailyCopyToday()" aria-label="Heutiges Ergebnis kopieren" title="Heutiges Ergebnis kopieren">📋</button></div>
-      <button class="btn-ghost" onclick="startLearn()">🎓 Lernrunde${learnBadge()}</button>
       <div class="menu-row">
         <button class="btn-primary" onclick="startCreateWizard()">Spiel starten</button>
         <button class="btn-primary" onclick="startCreateWizard(true)">Spiel hosten</button>
         <button class="btn-primary" onclick="openJoin()">Spiel beitreten</button>
       </div>
       <button class="btn-ghost" onclick="openLoadGame()">Spiel laden</button>
+      <div class="menu-split"><button class="btn-primary main" onclick="startDaily()">📅 Tägliche Challenge${dailyBadge()}</button><button class="btn-ghost side" onclick="dailyCopyToday()" aria-label="Heutiges Ergebnis kopieren" title="Heutiges Ergebnis kopieren">📋</button></div>
+      <button class="btn-ghost" onclick="startLearn()">🎓 Lernrunde${learnBadge()}</button>
       <button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button>
     </div></div>`;
 }
@@ -3788,6 +3794,68 @@ setInterval(() => {
   const go = () => { if(state.screen === "game" && state.phase === "feedback") nextTurn(); };
   if(st.variant === "sudden") go(); else setTimeout(go, 1500);
 }, 200);
+/* ============ SPRACHCHAT (experimentell) ============ */
+const VC = { stream:null, on:false, muted:false, calls:{}, audio:{}, ids:[] };
+const VC_ID = /^chg-[0-9a-f]{24}$/;
+function vcMyId(){ return NET.peer && NET.peer.id; }
+async function vcJoin(){
+  if(VC.on || !NET.peer) return;
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ toast("Dein Browser erlaubt kein Mikrofon."); return; }
+  try{ VC.stream = await navigator.mediaDevices.getUserMedia({ audio:{ echoCancellation:true, noiseSuppression:true, autoGainControl:true } }); }
+  catch(e){ toast("Mikrofon nicht freigegeben."); return; }
+  VC.on = true; VC.muted = false;
+  if(!NET.peer.__vc){ NET.peer.__vc = true; NET.peer.on("call", call => { if(!VC.on) return; call.answer(VC.stream); vcAttach(call.peer, call); }); }
+  if(NET.role === "host") vcHostBroadcast(); else netSendHost({ t:"vjoin", id:vcMyId() });
+  vcSync(); vcUi();
+}
+function vcAttach(id, call){
+  if(VC.calls[id] && VC.calls[id] !== call){ try{ VC.calls[id].close(); }catch(e){} }
+  VC.calls[id] = call;
+  call.on("stream", st => {
+    let a = VC.audio[id];
+    if(!a){ a = document.createElement("audio"); a.autoplay = true; a.setAttribute("playsinline", ""); document.body.appendChild(a); VC.audio[id] = a; }
+    a.srcObject = st; const pr = a.play && a.play(); if(pr && pr.catch) pr.catch(() => {});
+  });
+  call.on("close", () => vcDrop(id, call)); call.on("error", () => vcDrop(id, call));
+}
+function vcDrop(id, call){
+  if(call && VC.calls[id] !== call) return;
+  try{ if(VC.calls[id]) VC.calls[id].close(); }catch(e){}
+  delete VC.calls[id];
+  if(VC.audio[id]){ try{ VC.audio[id].srcObject = null; VC.audio[id].remove(); }catch(e){} delete VC.audio[id]; }
+}
+function vcSync(){
+  if(!VC.on || !NET.peer) return; const me = vcMyId();
+  for(const id of VC.ids){ if(id !== me && !VC.calls[id] && me < id){ try{ vcAttach(id, NET.peer.call(id, VC.stream)); }catch(e){} } }
+  for(const id of Object.keys(VC.calls)) if(!VC.ids.includes(id)) vcDrop(id);
+}
+function vcHostBroadcast(){
+  if(NET.role !== "host") return;
+  const ids = []; if(VC.on && vcMyId()) ids.push(vcMyId());
+  for(const [key, id] of Object.entries(NET.vids || {})){ const q = NET.seats.find(x => netKey(x.name) === key && x.connected); if(q && VC_ID.test(id)) ids.push(id); }
+  VC.ids = ids; netBroadcast({ t:"vlist", ids }); vcSync();
+}
+function vcLeave(silent){
+  const was = VC.on;
+  VC.on = false; if(VC.stream){ VC.stream.getTracks().forEach(t => t.stop()); VC.stream = null; }
+  Object.keys(VC.calls).forEach(id => vcDrop(id));
+  if(was && !silent){ if(NET.role === "host") vcHostBroadcast(); else if(NET.role === "guest" && NET.hostConn) netSendHost({ t:"vleave" }); }
+  vcUi();
+}
+function vcMute(){ if(!VC.stream) return; VC.muted = !VC.muted; VC.stream.getAudioTracks().forEach(t => { t.enabled = !VC.muted; }); vcUi(); }
+function netHostVoice(entry, d){
+  NET.vids = NET.vids || {};
+  if(d.t === "vjoin" && VC_ID.test(String(d.id))) NET.vids[entry.key] = String(d.id); else delete NET.vids[entry.key];
+  vcHostBroadcast();
+}
+function vcUi(){
+  let el = document.getElementById("vc-ui");
+  const show = prefs.voiceChat && NET.peer && (NET.role === "host" || NET.role === "guest") && !NET.spec;
+  if(!show){ if(el) el.remove(); if(VC.on) vcLeave(true); return; }
+  if(!el){ el = document.createElement("div"); el.id = "vc-ui"; el.style.cssText = "position:fixed;left:12px;bottom:12px;z-index:45;display:flex;gap:6px;flex-wrap:wrap;"; document.body.appendChild(el); }
+  el.innerHTML = VC.on ? `<button class="btn-ghost btn-small" onclick="vcMute()">${VC.muted ? "🔇 Stumm" : "🎤 Mikro an"}</button><button class="btn-ghost btn-small" onclick="vcLeave()">Sprachchat verlassen</button>` : `<button class="btn-ghost btn-small" onclick="vcJoin()">🎙 Sprachchat beitreten</button>`;
+  el.querySelectorAll("button").forEach(b => { b.style.background = "var(--panel)"; });
+}
 /* ============ TÄGLICHE CHALLENGE, LEVEL & XP ============ */
 function dateKey(d){ d = d || new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
 function dailyLoad(){ let D = {}; try{ D = JSON.parse(localStorage.getItem("chronohit_daily") || "{}") || {}; }catch(e){} D.results = D.results || {}; return D; }
@@ -4005,20 +4073,14 @@ function statsInsightsHtml(){
     .map(([k, o]) => `<div class="stats-row"><span>${esc(lbl(k))}</span><span class="bar-wrap"><i style="width:${q(o)}%"></i></span><b>${q(o)} % (${o.n})</b></div>`).join("") || "<p>Noch keine Daten – sie sammeln sich ab jetzt mit jeder gespielten Karte.</p>";
   const weak = (m, lbl) => { const c = Object.entries(m).filter(([, o]) => o.n >= 5).sort((a, b) => q(a[1]) - q(b[1]))[0]; return c ? esc(lbl(c[0])) + " (" + q(c[1]) + " %)" : "noch zu wenige Karten (mindestens 5 pro Gruppe)"; };
   return `
-    <div class="menu-card">
-      <h3>Trefferquote nach Epoche</h3>${rows(dec, lblDec)}
-      <div class="stats-note"><b>Schwächste Epoche:</b> ${weak(dec, lblDec)}</div>
-    </div>
-    <div class="menu-card">
-      <h3>Trefferquote nach Genre</h3>${rows(gen, lblGen)}
-      <div class="stats-note"><b>Schwächstes Genre:</b> ${weak(gen, lblGen)}. In Klammern steht die Zahl gespielter Karten. Gezählt wird ab dem Update; Karten ohne Genre fehlen in dieser Liste.</div>
-    </div>
-    <div class="menu-card">
-      <h3>Verlauf (letzte 30 Tage)</h3>
+    <div class="menu-card"><h3>Kalender</h3><div id="stats-cal">${statsCalHtml()}</div></div>
+    <details class="menu-card stats-fold"><summary><h3>Trefferquote nach Epoche</h3></summary>${rows(dec, lblDec)}
+      <div class="stats-note"><b>Schwächste Epoche:</b> ${weak(dec, lblDec)}</div></details>
+    <details class="menu-card stats-fold"><summary><h3>Trefferquote nach Genre</h3></summary>${rows(gen, lblGen)}
+      <div class="stats-note"><b>Schwächstes Genre:</b> ${weak(gen, lblGen)}. In Klammern steht die Zahl gespielter Karten. Gezählt wird ab dem Update; Karten ohne Genre fehlen in dieser Liste.</div></details>
+    <details class="menu-card stats-fold"><summary><h3>Verlauf (letzte 30 Tage)</h3></summary>
       <select class="dropdown" aria-label="Messwert" onchange="PLS.metric=this.value; statsChartUpdate()">${[["rate", "Trefferquote pro Tag (%)"], ["ok", "Richtige Karten pro Tag"], ["n", "Gespielte Karten pro Tag"], ["xp", "XP pro Tag"]].map(x => `<option value="${x[0]}" ${PLS.metric === x[0] ? "selected" : ""}>${x[1]}</option>`).join("")}</select>
-      <div id="stats-chart">${statsChartSvg(PLS.metric)}</div>
-    </div>
-    <div class="menu-card"><h3>Kalender</h3><div id="stats-cal">${statsCalHtml()}</div></div>`;
+      <div id="stats-chart">${statsChartSvg(PLS.metric)}</div></details>`;
 }
 function statsChartUpdate(){ const el = document.getElementById("stats-chart"); if(el) el.innerHTML = statsChartSvg(PLS.metric); }
 function niceMax(v){ if(v <= 4) return 4; const p = Math.pow(10, Math.floor(Math.log10(v))); for(const m of [1, 2, 2.5, 5, 10]) if(v <= m * p) return m * p; return 10 * p; }
@@ -4141,8 +4203,8 @@ function renderPlaylist(){
 /* ============ TUTORIAL ============ */
 function topBack(){ state.settingsSub = null; state.tutRules = false; backToMenuInstant(); }
 function topBackBar(){
-  if(!["stats", "recap", "settings", "tutorial", "play", "quickplay", "loadgame"].includes(state.screen)) return;
-  app.insertAdjacentHTML("afterbegin", `<div class="topback" style="position:sticky;top:0;z-index:6;padding:8px 0;background:var(--body-bg-image, none), radial-gradient(1200px 600px at 50% -10%, var(--bg-highlight) 0%, var(--bg) 55%);background-attachment:fixed;"><button class="btn-ghost btn-small" onclick="topBack()">← Hauptmenü</button></div>`);
+  if(!["stats", "recap", "tutorial"].includes(state.screen)) return;
+  app.insertAdjacentHTML("afterbegin", `<div class="topback" style="position:sticky;top:8px;z-index:6;height:0;"><button class="btn-ghost btn-small" style="background:var(--panel);" onclick="topBack()">← Hauptmenü</button></div><div style="height:44px;"></div>`);
 }
 let tutPrev = null;
 const TUT_YEARS = [1990, 2008, 1978, 2000, 1985, 2015, 1995, 2011, 1980, 2005, 1992, 2018, 1983, 2013, 1998, 2003];   // feste Übungs-Reihenfolge (immer dieselben Songs)
@@ -4235,7 +4297,7 @@ function tutBubble(){
   } else { b.style.left = "50%"; b.style.bottom = "16px"; b.style.transform = "translateX(-50%)"; }
   if(el) b.style.transform = "none";
 }
-{ const r0 = render; render = function(){ if(state.screen === "online") state.screen = "play"; r0(); try{ topBackBar(); }catch(e){} try{ tutBubble(); }catch(e){} }; }
+{ const r0 = render; render = function(){ if(state.screen === "online") state.screen = "play"; r0(); try{ topBackBar(); }catch(e){} try{ vcUi(); }catch(e){} try{ tutBubble(); }catch(e){} }; }
 function renderTutorial(){
   if(state.tutRules) return renderTutorialRules();
   app.innerHTML = `
@@ -4356,7 +4418,7 @@ function flipAnimate(itemSelector, mutate){
 function wizardStepPlayerCount(delta){
   const w = state.wizard;
   const n = w.playerCount + delta;
-  if(n < 1 || n > 10) return;
+  if(n < 1 || n > (prefs.bigRooms ? 100 : 10)) return;
   w.playerCount = n;
   while(w.playerNames.length < n){ w.playerNames.push(""); w.playerIds.push(w.nextPlayerId++); }
   while(w.playerNames.length > n){ w.playerNames.pop(); w.playerIds.pop(); }
@@ -6690,7 +6752,6 @@ function renderStats(){
       <div class="stats-row"><span>Solo</span><b>${g.solo.played} gespielt · ${g.solo.won} gewonnen</b></div>
       <div class="stats-row"><span>Koop</span><b>${g.coop.played} gespielt · ${g.coop.won} gewonnen</b></div>
       <div class="stats-row"><span>Mehrspieler</span><b>${g.multiplayer.played} gespielt</b></div>
-      <div class="menu-actions" style="margin-top:10px;"><button class="btn-ghost" onclick="openRecap()">Jahresrückblick ansehen</button></div>
       <div class="stats-note">
         ${since ? `Erfasst seit ${since}. ` : `Noch keine Daten — sie erscheinen nach deiner ersten Karte. `}
         Siegquote: nur Solo und Koop (Mehrspieler-Runden haben mehrere Spieler und zählen nur als gespielt).
@@ -6701,6 +6762,7 @@ function renderStats(){
     ${statsInsightsHtml()}
     <div class="menu-actions">
       <button class="btn-danger" onclick="requestResetStats()">Statistiken zurücksetzen</button>
+      <button class="btn-ghost" onclick="openRecap()">Jahresrückblick ansehen</button>
       <button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button>
     </div>`;
 }
@@ -6912,7 +6974,7 @@ document.addEventListener("click", e => {
 
 /* ============ DARSTELLUNG & BARRIEREFREIHEIT ============ */
 const PREFS_KEY = "chronohit_prefs";
-const PREF_DEFAULTS = { bigRooms: false, autoPlay: false, soundDesign: "theme", reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, autoSave: "turn", autoSaveSec: 30, seasonal: "off", fontFamily: "theme", cardSize: "m", density: "normal", autoNextSec: 0, keys: true, sound: true, soundVolume: 0.5, soundGroups: null };
+const PREF_DEFAULTS = { voiceChat: false, bigRooms: false, autoPlay: false, soundDesign: "theme", reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, autoSave: "turn", autoSaveSec: 30, seasonal: "off", fontFamily: "theme", cardSize: "m", density: "normal", autoNextSec: 0, keys: true, sound: true, soundVolume: 0.5, soundGroups: null };
 let prefs = { ...PREF_DEFAULTS, reduceMotion: false, soundGroups: defaultSoundGroups() };
 function loadPrefs(){
   let saved = {};
@@ -7469,6 +7531,7 @@ function freshMenuState(settings){
   };
 }
 function netShutdown(){
+  try{ vcLeave(true); }catch(e){}
   if(NET.role === "host") netBroadcast({ t: "closed" });
   else if(NET.role === "guest") netSendHost({ t: "bye" });
   const prevSettings = NET.prevSettings;
@@ -7577,6 +7640,7 @@ async function netHostHandle(entry, d){
     case "team": netHostTeam(entry, d); break;
     case "react": netHostReact(entry, d); break;
     case "rmvote": netHostRmVote(entry, d); break;
+    case "vjoin": case "vleave": netHostVoice(entry, d); break;
     case "bye": try{ entry.conn.close(); }catch(e){} break;
   }
 }
@@ -7884,6 +7948,7 @@ function netGuestConnect(first){
         }
         case "react": { if(NET_REACTS.includes(d.e)) showReaction(netCleanName(d.n) || "?", d.e); break; }
         case "state": netGuestApplyState(d); break;
+        case "vlist": VC.ids = (Array.isArray(d.ids) ? d.ids : []).filter(x => VC_ID.test(String(x))).slice(0, 100); vcSync(); break;
         case "rmreq": if(!NET.spec && !netMyTurnGuard()){ NET.rmAsk = true; NET.rmMine = ""; render(); } break;
         case "rmend": NET.rmAsk = false; NET.rmMine = ""; if(d.msg) toast(String(d.msg).slice(0, 120)); render(); break;
         case "guess": {
