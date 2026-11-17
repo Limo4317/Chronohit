@@ -2800,9 +2800,10 @@ async function clearSave(){
    benannte, manuelle Spielstände. Werden separat gehalten, damit das
    normale Fortsetzen/Autosave unverändert weiterläuft.
 */
-const SLOT_COUNT = 4;
+const SLOT_COUNT = 10;   // gespeichert werden immer bis zu 10 Plätze; angezeigt werden 4 oder (Experiment) 10
+function slotCount(){ return (typeof prefs !== "undefined" && prefs.slots10) ? 10 : 4; }
 const SLOT_KEY_PREFIX = "chronohit_slot_";
-let memorySlots = [null, null, null, null];   // Fallback, falls localStorage blockiert ist
+let memorySlots = Array(10).fill(null);   // Fallback, falls localStorage blockiert ist
 
 function slotKey(n){ return SLOT_KEY_PREFIX + n; }
 
@@ -2830,7 +2831,7 @@ async function deleteSlot(n){
   slotsCache[n-1] = null;
 }
 
-let slotsCache = [null, null, null, null];
+let slotsCache = Array(10).fill(null);
 
 function formatSlotDate(ts){
   try{
@@ -3989,7 +3990,7 @@ function slotProgress(slot){
 }
 
 function renderSaveSlotModal(){
-  const rows = [1,2,3,4].map(n => {
+  const rows = Array.from({ length:slotCount() }, (_, i) => i + 1).map(n => {
     const slot = slotsCache[n-1];
     return `
       <div class="save-slot">
@@ -4255,6 +4256,7 @@ function renderExperimentalCard(){
     <div class="setting-row"><div><div class="label">IP-Adressen verbergen (TURN-Relay)</div><div class="hint">Leitet alle Online-Verbindungen (Spiel und Sprachchat) über einen TURN-Server, sodass sich die Spielenden nicht direkt sehen. Dafür brauchst du die Adresse eines TURN-Servers (zum Beispiel ein eigener coturn oder ein Anbieter), alle Teilnehmenden müssen dieselbe Einstellung nutzen. Ganz unsichtbar bist du trotzdem nicht: der TURN-Betreiber und der PeerJS-Vermittlungsserver sehen deine IP. Ist der Server nicht erreichbar, scheitert die Verbindung.</div></div>${prefSwitchHtml("relayOnly")}</div>
     <div class="setting-row"><div><div class="label">🎲 Bingo (experimentell)</div><div class="hint">Zeigt im Hauptmenü eine Bingo-Runde: 16 Felder (Jahrzehnte, Genres, Kategorien), die du mit richtig gelegten Karten abhakst.</div></div>${prefSwitchHtml("bingo")}</div>
     <div class="setting-row"><div><div class="label">📺 TV-Anzeige (große Darstellung)</div><div class="hint">Vergrößert die ganze Oberfläche für den Fernseher.</div></div>${prefSwitchHtml("tv")}</div>
+    <div class="setting-row"><div><div class="label">💾 10 Speicherplätze (experimentell)</div><div class="hint">Statt 4 gibt es 10 Plätze für Spielstände. Die Plätze 5–10 bleiben beim Ausschalten erhalten, werden dann aber nicht angezeigt.</div></div>${prefSwitchHtml("slots10")}</div>
     ${prefs.relayOnly ? `<div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:6px;">
       <input class="pl-search" placeholder="TURN-Adresse, z. B. turn:server.example:3478" value="${esc(prefs.turnUrl || "")}" oninput="prefs.turnUrl=this.value; savePrefs()" style="flex:none;width:280px;max-width:100%;">
       <input class="pl-search" placeholder="Benutzername" value="${esc(prefs.turnUser || "")}" oninput="prefs.turnUser=this.value; savePrefs()" style="flex:none;width:200px;max-width:100%;">
@@ -4385,7 +4387,6 @@ function renderQuickMenuContent(){
       <div class="qm-title">Darstellung</div>
       <div class="settings-grid" style="gap:14px;">
         <div class="setting-row"><div class="label">Animationen reduzieren</div>${prefSwitchHtml('reduceMotion')}</div>
-        <div class="setting-row"><div><div class="label">Windows-10-Emoji-Fix</div><div class="hint">Ersetzt neuere Emojis, die Windows 10 nicht darstellen kann (z. B. Grabstein, Discokugel, Leiter), durch ältere Ersatz-Emojis. Nur einschalten, wenn bei dir Kästchen statt Emojis erscheinen.</div></div>${prefSwitchHtml('win10Emoji')}</div>
         <div class="setting-row"><div class="label">Hoher Kontrast</div>${prefSwitchHtml('highContrast')}</div>
       </div>
     </div>
@@ -4488,7 +4489,7 @@ function renderSlotSettingsPanel(slot){
     </div>`;
 }
 function renderLoadGame(){
-  const rows = [1,2,3,4].map(n => {
+  const rows = Array.from({ length:slotCount() }, (_, i) => i + 1).map(n => {
     const slot = slotsCache[n-1];
     return `
       <div class="save-slot">
@@ -4530,9 +4531,10 @@ document.addEventListener("keydown", e => {
   if(sc === "playlist"){ if(PL.open){ PL.open = false; plFilterRender(); } else plLeave(); }
   else if(state.wizard && sc !== "game" && sc !== "end" && typeof wizardBack === "function") wizardBack();
   else if(sc === "settings"){ if(state.settingsSub){ state.settingsSub = null; render(); } else backToMenuInstant(); }
+  else if(FEAT_PARENT[sc]){ state.screen = FEAT_PARENT[sc]; render(); }
   else if(sc === "loadgame"){ state.screen = "play"; render(); }
   else if(sc === "timeline"){ plStop(true); state.screen = "end"; render(); }
-  else if(["stats", "recap", "tutorial", "online", "play", "quickplay"].includes(sc)){ state.screen = "menu"; render(); }
+  else if(["stats", "recap", "tutorial", "online", "play", "quickplay", "achievements"].includes(sc)){ state.screen = "menu"; render(); }
   else if(sc === "join"){ state.screen = "play"; render(); }
 });
 let apKey = "", apAt = 0;
@@ -4885,7 +4887,7 @@ function renderQuickplay(){
     <div class="brand"><h1 style="font-size:calc(30px * var(--font-scale));">⚡ Quickplay</h1></div>
     <div class="menu-card"><div class="menu-actions">
       ${[0, 1, 2].map(i => Q[i] ? `<div class="qp-row"><button class="qp-btn qp-play" onclick="quickPlay(${i})" aria-label="Spiel starten" title="Starten">${QP_ICONS.play}</button><div class="qp-main"><div class="qp-name">${esc(Q[i].name)}</div><div class="qp-sub">${esc(quickSummary(Q[i].w))}${Q[i].host ? " · online hosten" : ""}</div></div><label class="qp-host" title="Spiel online hosten"><input type="checkbox" ${Q[i].host ? "checked" : ""} onchange="quickToggleHost(${i}, this.checked)"><span>Hosten</span></label><button class="qp-btn" onclick="quickSetup(${i}, true)" aria-label="Bearbeiten" title="Bearbeiten">${QP_ICONS.edit}</button><button class="qp-btn" onclick="quickDelete(${i})" aria-label="Löschen" title="Löschen">${QP_ICONS.trash}</button></div>` : `<button class="btn-ghost" onclick="quickSetup(${i})">＋ Slot ${i + 1} einrichten</button>`).join("")}
-      <p style="margin:6px 0 0;font-size:calc(13px * var(--font-scale));color:var(--muted);">Quickplay-Spiele werden im nächsten freien der 4 Speicherplätze gespeichert. Sind alle belegt, wählst du einen zum Überschreiben.</p>
+      <p style="margin:6px 0 0;font-size:calc(13px * var(--font-scale));color:var(--muted);">Quickplay-Spiele werden im nächsten freien der ${slotCount()} Speicherplätze gespeichert. Sind alle belegt, wählst du einen zum Überschreiben.</p>
       <button class="btn-ghost" onclick="state.screen='menu'; render()">← Zurück zum Hauptmenü</button>
     </div></div>`;
 }
@@ -4896,7 +4898,7 @@ function quickSetup(i, edit){
 }
 function quickPlay(i){
   const Q = quickLoad(); if(!Q[i]) return;
-  let n = 0; for(let k = 1; k <= 4; k++){ if(!slotsCache[k - 1]){ n = k; break; } }
+  let n = 0; for(let k = 1; k <= slotCount(); k++){ if(!slotsCache[k - 1]){ n = k; break; } }
   if(n) return quickStartIn(i, n);
   quickSlotPick(i);   // alle 4 Speicherplätze belegt: Auswahl
 }
@@ -4939,7 +4941,7 @@ function quickSlotPick(i){
   el.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:70;display:flex;align-items:center;justify-content:center;padding:16px;";
   el.onclick = e => { if(e.target === el) closeQuickPick(); };
   const nm = k => { const c = slotsCache[k - 1]; return (c && (c.name || c.saveName)) || "Spielstand"; };
-  el.innerHTML = `<div class="menu-card" style="max-width:440px;width:100%;max-height:85vh;overflow:auto;"><h3>Speicherplatz wählen</h3><p style="margin:6px 0 12px;">Alle 4 Speicherplätze sind belegt. Der gewählte Spielstand wird durch dieses Quickplay-Spiel überschrieben.</p><div class="menu-actions">${[1, 2, 3, 4].map(k => `<div class="save-slot" style="cursor:pointer;" onclick="quickStartIn(${i}, ${k})"><div class="slot-info"><div class="slot-title">Slot ${k}: ${esc(nm(k))}</div>${slotsCache[k - 1] ? miniTimelineHtml(slotsCache[k - 1]) : ""}</div></div>`).join("")}<button class="btn-ghost" onclick="closeQuickPick()">Abbrechen</button></div></div>`;
+  el.innerHTML = `<div class="menu-card" style="max-width:440px;width:100%;max-height:85vh;overflow:auto;"><h3>Speicherplatz wählen</h3><p style="margin:6px 0 12px;">Alle ${slotCount()} Speicherplätze sind belegt. Der gewählte Spielstand wird durch dieses Quickplay-Spiel überschrieben.</p><div class="menu-actions">${[1, 2, 3, 4].map(k => `<div class="save-slot" style="cursor:pointer;" onclick="quickStartIn(${i}, ${k})"><div class="slot-info"><div class="slot-title">Slot ${k}: ${esc(nm(k))}</div>${slotsCache[k - 1] ? miniTimelineHtml(slotsCache[k - 1]) : ""}</div></div>`).join("")}<button class="btn-ghost" onclick="closeQuickPick()">Abbrechen</button></div></div>`;
   document.body.appendChild(el);
 }
 function closeQuickPick(){ const el = document.getElementById("qp-pick"); if(el) el.remove(); }
@@ -5767,7 +5769,7 @@ function renderShop(){
         <button class="btn-primary" onclick="ecoBuyShield()" ${can ? "" : "disabled"}>Kaufen · ${ECO_SHIELD.price} ${ECO.icon}</button></div></div>
     <div class="menu-card"><h3>So verdienst du ${ECO.name}</h3>
       <p style="margin:0;">Für jedes freigeschaltete Abzeichen: Bronze 10, Silber 25, Gold 60 (geheime und Komplett-Abzeichen ×1,5, besonders harte Abzeichen deutlich mehr). Bereits erreichte Abzeichen wurden dir rückwirkend gutgeschrieben. ${ECO.name} gibt es nicht für echtes Geld und lassen sich nicht kaufen.</p></div>
-    <div class="menu-actions"><button class="btn-ghost" onclick="openAch()">🏅 Zu den Errungenschaften</button></div>`;
+    <div class="menu-actions"><button class="btn-ghost" onclick="featBack()">← Zurück</button></div>`;
 }
 /* ---- Streak-Schild (Daily) ---- */
 function dailyLive(D){
@@ -5849,7 +5851,7 @@ function renderAlbum(){
       <div class="chip-row" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">${chip("dec", "all", "Alle Zeiten")}${decs.map(d => chip("dec", d, decadeLabel(+d))).join("")}</div>
       <div class="chip-row" style="display:flex;gap:6px;flex-wrap:wrap;">${chip("rar", "all", "Alle")}${chip("rar", "0", "🔒 Fehlend")}${chip("rar", "1", "🥉")}${chip("rar", "2", "🥈")}${chip("rar", "3", "🥇")}</div>
       <div id="alb-grid">${albGridHtml()}</div></div>
-    <div class="menu-actions"><button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button></div>`;
+    <div class="menu-actions"><button class="btn-ghost" onclick="featBack()">← Zurück</button></div>`;
 }
 
 /* ============ SCHWÄCHEN-RADAR (+ gezieltes Training in der Lernrunde) ============ */
@@ -5897,7 +5899,7 @@ function renderRadar(){
       ${weak.length ? weak.map(d => `<div class="stats-row"><span>${esc(d.label)} <small style="color:var(--muted);">(${d.n} Karten)</small></span><b>${Math.round(d.acc * 100)} %</b><button class="btn-ghost btn-small" onclick="radarTrain('${RAD.kind}','${d.key}')">🎓 Trainieren</button></div>`).join("") : `<p>Noch zu wenig Daten – spiele ein paar klassische Runden.</p>`}
       ${few.length ? `<div class="stats-note">Zu wenig Daten: ${few.map(d => esc(d.label)).join(", ")}</div>` : ``}
       <div class="stats-note">„Trainieren“ startet eine Lernrunde nur mit Songs dieser Gruppe – Songs, die du oft falsch hattest, kommen häufiger.</div></div>
-    <div class="menu-actions"><button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button></div>`;
+    <div class="menu-actions"><button class="btn-ghost" onclick="featBack()">← Zurück</button></div>`;
 }
 
 /* ============ WRAPPED (Jahresrückblick als Story) ============ */
@@ -6075,7 +6077,7 @@ function renderTournament(){
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;"><button class="btn-ghost btn-small" onclick="tourAdd(-1)">− Spieler</button><button class="btn-ghost btn-small" onclick="tourAdd(1)">+ Spieler</button></div>
         <div class="setting-row"><div class="label">Zielkarten pro Match</div><input class="guess-input" style="max-width:90px;" type="number" min="3" max="20" value="${TOURF.target}" onchange="tourTarget(this.value)"></div>
         <div class="stats-note">Online-Turniere gibt es noch nicht – dieses Turnier läuft an einem Gerät, die Spielenden wechseln sich ab.</div></div>
-      <div class="menu-actions"><button class="btn-primary" onclick="tourStart()">Turnier starten</button><button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button></div>`;
+      <div class="menu-actions"><button class="btn-primary" onclick="tourStart()">Turnier starten</button><button class="btn-ghost" onclick="featBack()">← Zurück</button></div>`;
     return;
   }
   const nx = tourNext();
@@ -6083,10 +6085,12 @@ function renderTournament(){
     ${TOUR.champion ? `<div class="menu-card tour-banner"><h3 style="margin:0;">🏆 Turniersieger: ${esc(TOUR.champion)}</h3></div>` : ``}
     ${TOUR.rounds.map((rd, ri) => `<div class="menu-card"><h3>${rn(ri + 1)}</h3>${rd.map(m => `<div class="stats-row tour-row ${nx && nx.m === m ? "next" : ""}"><span class="${m.w && m.w === m.a ? "tw" : ""}">${esc(m.a || "?")}</span><span>gegen</span><span class="${m.w && m.w === m.b ? "tw" : ""}">${m.b ? esc(m.b) : (m.a && ri === 0 ? "Freilos" : "?")}</span>${m.w ? `<b>✓ ${esc(m.w)}</b>` : ``}</div>`).join("")}</div>`).join("")}
     <div class="menu-actions">${nx ? `<button class="btn-primary" onclick="tourPlay()">▶ Nächstes Match: ${esc(nx.m.a)} gegen ${esc(nx.m.b)}</button>` : ``}
-      <button class="btn-ghost" onclick="tourReset()">${TOUR.champion ? "Neues Turnier" : "Turnier verwerfen"}</button><button class="btn-ghost" onclick="backToMenuInstant()">← Zurück zum Hauptmenü</button></div>`;
+      <button class="btn-ghost" onclick="tourReset()">${TOUR.champion ? "Neues Turnier" : "Turnier verwerfen"}</button><button class="btn-ghost" onclick="featBack()">← Zurück</button></div>`;
 }
 
 /* ============ NACH-RENDER-HAKEN, BILDSCHIRM-VERTEILER, TV-ANSICHT ============ */
+const FEAT_PARENT = { radar:"play", tournament:"play", wrapped:"play", album:"achievements", shop:"achievements" };
+function featBack(){ const p = FEAT_PARENT[state.screen]; if(p){ state.screen = p; render(); } else backToMenuInstant(); }
 const FEAT_SCREENS = { shop:renderShop, album:renderAlbum, radar:renderRadar, wrapped:renderWrapped, tournament:renderTournament };
 function featPostRender(){
   const g = state.screen === "game" || state.screen === "end";
@@ -6698,10 +6702,10 @@ function renderPlaylist(){
 }
 
 /* ============ TUTORIAL ============ */
-function topBack(){ state.settingsSub = null; state.tutRules = false; backToMenuInstant(); }
+function topBack(){ if(FEAT_PARENT[state.screen]){ featBack(); return; } state.settingsSub = null; state.tutRules = false; backToMenuInstant(); }
 function topBackBar(){
   if(!["stats", "recap", "tutorial", "achievements", "shop", "album", "radar", "wrapped", "tournament"].includes(state.screen)) return;
-  app.insertAdjacentHTML("afterbegin", `<div class="topback" style="position:sticky;top:8px;z-index:6;height:0;"><button class="btn-ghost btn-small" style="background:var(--panel);" onclick="topBack()">← Hauptmenü</button>${state.screen === "achievements" ? `<button class="btn-ghost btn-small" style="background:var(--panel);position:absolute;right:0;top:0;" onclick="openShop()">🛒 Laden · ${ecoLoad().bal} ${ECO.icon}</button>` : ``}</div><div style="height:44px;"></div>`);
+  app.insertAdjacentHTML("afterbegin", `<div class="topback" style="position:sticky;top:8px;z-index:6;height:0;"><button class="btn-ghost btn-small" style="background:var(--panel);" onclick="topBack()">${FEAT_PARENT[state.screen] ? "← Zurück" : "← Hauptmenü"}</button>${state.screen === "achievements" ? `<button class="btn-ghost btn-small" style="background:var(--panel);position:absolute;right:0;top:0;" onclick="openShop()">🛒 Laden · ${ecoLoad().bal} ${ECO.icon}</button>` : ``}</div><div style="height:44px;"></div>`);
 }
 let tutPrev = null;
 const TUT_YEARS = [1990, 2008, 1978, 2000, 1985, 2015, 1995, 2011, 1980, 2005, 1992, 2018, 1983, 2013, 1998, 2003];   // feste Übungs-Reihenfolge (immer dieselben Songs)
@@ -6833,7 +6837,7 @@ function renderTutorialRules(){
 /* ============ SPIEL ERSTELLEN (WIZARD) ============ */
 function startCreateWizard(online){
   let defaultSlot = 1;
-  for(let n=1; n<=4; n++){ if(!slotsCache[n-1]){ defaultSlot = n; break; } }
+  for(let n=1; n<=slotCount(); n++){ if(!slotsCache[n-1]){ defaultSlot = n; break; } }
   state.wizard = {
     step: 1,
     slot: defaultSlot,
@@ -7125,7 +7129,7 @@ function wizardToggleGenre(key){
 
 function renderWizardStep1(){
   const w = state.wizard;
-  const rows = [1,2,3,4].map(n => {
+  const rows = Array.from({ length:slotCount() }, (_, i) => i + 1).map(n => {
     const slot = slotsCache[n-1];
     const selected = w.slot === n;
     return `
@@ -9646,7 +9650,7 @@ document.addEventListener("click", e => {
 
 /* ============ DARSTELLUNG & BARRIEREFREIHEIT ============ */
 const PREFS_KEY = "chronohit_prefs";
-const PREF_DEFAULTS = { bingo:false, tv:false, win10Emoji:false, relayOnly: false, turnUrl: "", turnUser: "", turnPass: "", voiceChat: false, bigRooms: false, autoPlay: false, soundDesign: "theme", reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, colorMode: "off", screenReader: false, leftHand: false, decadeBacks: false, vibrate: false, bigTarget: false, autoTheme: "off", autoLight: "notizbuch", autoDark: "", autoSave: "turn", autoSaveSec: 30, seasonal: "off", fontFamily: "theme", cardSize: "m", density: "normal", autoNextSec: 0, keys: true, sound: true, soundVolume: 0.5, soundGroups: null };
+const PREF_DEFAULTS = { bingo:false, tv:false, slots10:false, win10Emoji:false, relayOnly: false, turnUrl: "", turnUser: "", turnPass: "", voiceChat: false, bigRooms: false, autoPlay: false, soundDesign: "theme", reduceMotion: null, fontScale: 1, highContrast: false, colorSafe: false, colorMode: "off", screenReader: false, leftHand: false, decadeBacks: false, vibrate: false, bigTarget: false, autoTheme: "off", autoLight: "notizbuch", autoDark: "", autoSave: "turn", autoSaveSec: 30, seasonal: "off", fontFamily: "theme", cardSize: "m", density: "normal", autoNextSec: 0, keys: true, sound: true, soundVolume: 0.5, soundGroups: null };
 let prefs = { ...PREF_DEFAULTS, reduceMotion: false, soundGroups: defaultSoundGroups() };
 function loadPrefs(){
   let saved = {};
@@ -9824,6 +9828,7 @@ function renderAccessibilityCard(){
         </div>
         ${row('Animationen reduzieren', 'Schaltet Übergänge, drehende Schallplatte und Cursor-Leuchtkreis ab. Ohne eigene Wahl folgt es deiner Systemeinstellung.', sw('reduceMotion'))}
         ${row('Hoher Kontrast', 'Kräftigere Rahmen, stärkerer Text und deckende Flächen.', sw('highContrast'))}
+        ${row('Windows-10-Emoji-Fix', 'Ersetzt neuere Emojis, die Windows 10 nicht darstellen kann (z. B. Grabstein, Discokugel, Leiter, Hamsa-Hand), durch ältere Ersatz-Emojis. Nur einschalten, wenn bei dir Kästchen statt Emojis erscheinen. Standardmäßig aus.', sw('win10Emoji'))}
         ${row('Kartenrückseiten nach Jahrzehnt', 'Aufgedeckte Karten bekommen je nach Jahrzehnt einen Farbstreifen und einen leichten Farbton. Reine Optik, keine Spielhilfe: Die „?“-Karte vor dem Aufdecken bleibt neutral.<div class="dec-legend"><span><i style="background:#8d6e63"></i>50er</span><span><i style="background:#e67e22"></i>60er</span><span><i style="background:#c0392b"></i>70er</span><span><i style="background:#8e44ad"></i>80er</span><span><i style="background:#2980b9"></i>90er</span><span><i style="background:#16a085"></i>2000er</span><span><i style="background:#27ae60"></i>2010er</span><span><i style="background:#d4a017"></i>2020er</span></div>', sw('decadeBacks'))}
         ${row('Vibration', 'Das Gerät vibriert bei richtig, falsch, den letzten 5 Sekunden des Timers und bei Zeitablauf. ⚠️ Nicht auf allen Geräten verfügbar, auf iOS vermutlich gar nicht.', sw('vibrate'))}
         ${row('Farbsehschwäche', 'Voreinstellung für die Farben von richtig/falsch, dazu zusätzliche Symbole (✓ / ✕). Rot-Grün: Blau/Orange. Blau-Gelb: Grün/Pink. Graustufen: für Vollfarbenblindheit.', colorModeSelect())}
